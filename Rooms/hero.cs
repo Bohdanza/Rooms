@@ -18,10 +18,11 @@ namespace Rooms
         {
             Type = type;
 
-            X = x;
-            Y = y;
+            ChangeCoords(x, y);
 
             Speed = 0.1;
+
+            Radius = 0.25;
 
             updateTexture(contentManager, true);
         }
@@ -32,22 +33,22 @@ namespace Rooms
 
             if(ks.IsKeyDown(Keys.W))
             {
-                Y -= Speed;
+                Move(Speed, Math.PI * 1.5, gameWorld);
             }
 
             if (ks.IsKeyDown(Keys.A))
             {
-                X -= Speed;
+                Move(Speed, Math.PI, gameWorld);
             }
 
             if (ks.IsKeyDown(Keys.S))
             {
-                Y += Speed;
+                Move(Speed, Math.PI * 0.5, gameWorld);
             }
 
             if (ks.IsKeyDown(Keys.D))
             {
-                X += Speed;
+                Move(Speed, 0, gameWorld);
             }
 
             base.Update(contentManager, gameWorld);

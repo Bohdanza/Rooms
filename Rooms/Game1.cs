@@ -77,7 +77,7 @@ namespace Rooms
             // TODO: Add your drawing code here
             _spriteBatch.Begin();
 
-            mainWorld.Draw(_spriteBatch, 50, 50);
+            mainWorld.Draw(_spriteBatch);
 
             _spriteBatch.End();
 

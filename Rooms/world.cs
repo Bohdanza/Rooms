@@ -16,7 +16,11 @@ namespace Rooms
     {
         public int timeSinceLastKeyPress { get; private set; } = 0;
 
-        public const int BlockSize=20; 
+        public static Texture2D SelectionCursorTexture { get; protected set; }
+        public static SpriteFont MainFont { get; protected set; }
+
+        public const int BlockSizeX = 30;
+        public const int BlockSizeY = 23;
         public string Name { get; protected set; }
         public Room currentRoom { get; protected set; }
 
@@ -44,6 +48,11 @@ namespace Rooms
                 currentRoom = new Room(contentManager, 0, 0, this, newHero);
             }
 
+            //loading all static things, most of them used for drawing
+            SelectionCursorTexture = contentManager.Load<Texture2D>("selection_cursor");
+
+            MainFont = contentManager.Load<SpriteFont>("main_font_28s");
+
             currentRoom.Save();
         }
 
@@ -63,54 +72,66 @@ namespace Rooms
 
             currentRoom.Update(contentManager, this);
 
-            if (currentRoom.heroReference.X < 0)
+            if (currentRoom.heroReference.X <= 0)
             {
                 currentRoom.heroReference.ChangeCoords(Room.roomSize - 1, currentRoom.heroReference.Y);
 
-                currentRoom.Save();
+                Save();
 
                 currentRoom = new Room(contentManager, currentRoom.X - 1, currentRoom.Y, this, currentRoom.heroReference);
 
-                currentRoom.Save();
+                Save();
             }
 
-            if (currentRoom.heroReference.X > Room.roomSize)
+            if (currentRoom.heroReference.X > Room.roomSize - 1)
             {
                 currentRoom.heroReference.ChangeCoords(0, currentRoom.heroReference.Y);
 
-                currentRoom.Save();
+                Save();
 
                 currentRoom = new Room(contentManager, currentRoom.X + 1, currentRoom.Y, this, currentRoom.heroReference);
 
-                currentRoom.Save();
+                Save();
             }
 
-            if (currentRoom.heroReference.Y < 0)
+            if (currentRoom.heroReference.Y <= 0)
             {
                 currentRoom.heroReference.ChangeCoords(currentRoom.heroReference.X, Room.roomSize - 1);
 
-                currentRoom.Save();
+                Save();
 
                 currentRoom = new Room(contentManager, currentRoom.X, currentRoom.Y - 1, this, currentRoom.heroReference);
 
-                currentRoom.Save();
+                Save();
             }
 
-            if (currentRoom.heroReference.Y > Room.roomSize)
+            if (currentRoom.heroReference.Y > Room.roomSize - 1)
             {
                 currentRoom.heroReference.ChangeCoords(currentRoom.heroReference.X, 0);
 
-                currentRoom.Save();
+                Save();
 
                 currentRoom = new Room(contentManager, currentRoom.X, currentRoom.Y + 1, this, currentRoom.heroReference);
 
-                currentRoom.Save();
+                Save();
             }
         }
 
         public void Save()
         {
+            string str = currentRoom.X.ToString() + '\n' + currentRoom.Y.ToString();
+
+            using (StreamWriter sw = new StreamWriter(@"info\" + Name + @"\current_pos"))
+            {
+                sw.Write(str);
+            }
+
             currentRoom.Save();
+        }
+
+        public static double GetDist(double x1, double y1, double x2, double y2)
+        {
+            return Math.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
         }
     }
 }

@@ -16,8 +16,10 @@ namespace Rooms
     {
         public const int roomSize = 30;
 
+        public int biome { get; protected set; }
+
         public int X { get; protected set; }
-        public int Y { get; protected set; }
+        public int Y { get; protected set; } 
         public Block[,] blocks;
 
         private GameWorld worldReference { get;  set; }
@@ -120,12 +122,6 @@ namespace Rooms
             placeRectagle(contentManager, roomSize - 1, 1, roomSize, roomSize, 1);
             placeRectagle(contentManager, 1, roomSize - 1, roomSize, roomSize, 1);
 
-            //doors
-            blocks[0, roomSize / 2] = new Block(contentManager, 0);
-            blocks[roomSize / 2, 0] = new Block(contentManager, 0);
-            blocks[roomSize-1, roomSize / 2] = new Block(contentManager, 0);
-            blocks[roomSize / 2, roomSize-1] = new Block(contentManager, 0);
-
             //generating main landscape
             var rnd = new Random();
 
@@ -148,6 +144,25 @@ namespace Rooms
                     c++;
                 }
             }
+
+            //doors
+            blocks[0, roomSize / 2] = new Block(contentManager, 0);
+            blocks[roomSize / 2, 0] = new Block(contentManager, 0);
+            blocks[roomSize - 1, roomSize / 2] = new Block(contentManager, 0);
+            blocks[roomSize / 2, roomSize - 1] = new Block(contentManager, 0);
+
+            //door lights
+            blocks[1, roomSize / 2 - 1] = new Block(contentManager, 2);
+            blocks[1, roomSize / 2 + 1] = new Block(contentManager, 2); 
+
+            blocks[roomSize / 2 - 1, 1] = new Block(contentManager, 2);
+            blocks[roomSize / 2 + 1, 1] = new Block(contentManager, 2);
+            
+            blocks[roomSize - 2, roomSize / 2 - 1] = new Block(contentManager, 2);
+            blocks[roomSize - 2, roomSize / 2 + 1] = new Block(contentManager, 2);
+
+            blocks[roomSize / 2 - 1, roomSize - 2] = new Block(contentManager, 2);
+            blocks[roomSize / 2 + 1, roomSize - 2] = new Block(contentManager, 2);
         }
 
         public void Draw(SpriteBatch spriteBatch, int x, int y)
@@ -156,9 +171,9 @@ namespace Rooms
 
             while (j < roomSize || currentMob < mobs.Count)
             {
-                if (currentMob < mobs.Count && mobs[currentMob].Y < j)
+                if (currentMob < mobs.Count && mobs[currentMob].Y < j-0.5)
                 {
-                    mobs[currentMob].Draw(spriteBatch, x+(int)(mobs[currentMob].X * GameWorld.BlockSize), y+(int)(mobs[currentMob].Y * GameWorld.BlockSize));
+                    mobs[currentMob].Draw(spriteBatch, x + (int)(mobs[currentMob].X * GameWorld.BlockSizeX), y + (int)(mobs[currentMob].Y * GameWorld.BlockSizeY));
 
                     currentMob++;
                 }
@@ -166,7 +181,7 @@ namespace Rooms
                 {
                     for (int i = 0; i < roomSize; i++)
                     {
-                        blocks[i, j].Draw(spriteBatch, x + i * GameWorld.BlockSize, y + j * GameWorld.BlockSize);
+                        blocks[i, j].Draw(spriteBatch, x + i * GameWorld.BlockSizeX - GameWorld.BlockSizeX / 2, y + j * GameWorld.BlockSizeY - GameWorld.BlockSizeY / 2);
                     }
 
                     j++;
@@ -182,8 +197,16 @@ namespace Rooms
             }
         }
 
+        //used to get mouse cordinates in room's coord system. Can work incorrectly if Draw is called with push
+        public Tuple<double, double> GetMouseCordinates()
+        {
+            var ms = Mouse.GetState();
+
+            return new Tuple<double, double>(ms.X / GameWorld.BlockSizeX, ms.Y / GameWorld.BlockSizeY);
+        }
+
         //methods below are used to edit room "landscape"
-        
+
         /// <summary>
         /// Used to replace all blocks in area ([x1, x2); [y1, y2)) with block of given type. 
         /// </summary>
@@ -214,7 +237,6 @@ namespace Rooms
         }
 
         //methods below are used to edit mob list indirectly (useful when editing from other classes)
-        
         public void AddMob(Mob mob)
         {
             mobs.Add(mob);

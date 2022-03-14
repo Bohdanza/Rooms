@@ -16,10 +16,20 @@ namespace Rooms
     {
         public Texture2D Texture { get; protected set; }
         public int Type { get; protected set; }
+        public bool Passable { get; protected set; }
 
         public Block(ContentManager contentManager, int type)
         {
             Type = type;
+
+            if (type == 1 || type == 2)
+            {
+                Passable = false;
+            }
+            else
+            {
+                Passable = true;
+            }
 
             updateTexture(contentManager);
         }
@@ -31,7 +41,7 @@ namespace Rooms
 
         public void Draw(SpriteBatch spriteBatch, int x, int y)
         {
-            spriteBatch.Draw(Texture, new Vector2(x, y-Texture.Height+GameWorld.BlockSize), Color.White);
+            spriteBatch.Draw(Texture, new Vector2(x, y-Texture.Height+GameWorld.BlockSizeY), Color.White);
         }
 
         public void Update()
