@@ -14,6 +14,9 @@ namespace Rooms
 {
     public class GameWorld
     {
+        public int DrawX = 0, DrawY = 0;
+        public const int TextureUpdateSpeed = 9;
+
         public int timeSinceLastKeyPress { get; private set; } = 0;
 
         public static Texture2D SelectionCursorTexture { get; protected set; }
@@ -58,14 +61,9 @@ namespace Rooms
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            currentRoom.Draw(spriteBatch, 0, 0);
+            currentRoom.Draw(spriteBatch, DrawX, DrawY);
         }
-
-        public void Draw(SpriteBatch spriteBatch, int x, int y)
-        {
-            currentRoom.Draw(spriteBatch, x, y);
-        }
-
+        
         public void Update(ContentManager contentManager)
         {
             timeSinceLastKeyPress++;

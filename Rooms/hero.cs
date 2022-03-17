@@ -14,6 +14,8 @@ namespace Rooms
 {
     public class Hero:Mob
     {
+        public int WeightToCarry { get; protected set; }
+
         public Hero(ContentManager contentManager, double x, double y, int type, GameWorld gameWorld)
         {
             Type = type;
@@ -23,6 +25,19 @@ namespace Rooms
             Speed = 0.1;
 
             Radius = 0.25;
+
+            updateTexture(contentManager, true);
+        }
+
+        public Hero(ContentManager contentManager, List<string> input, int currentStr)
+        {
+            Name = input[currentStr + 1];
+
+            ChangeCoords(double.Parse(input[currentStr + 2]), double.Parse(input[currentStr + 3]));
+
+            Type = Int32.Parse(input[currentStr + 4]);
+
+            Speed = double.Parse(input[currentStr + 5]);
 
             updateTexture(contentManager, true);
         }
@@ -52,6 +67,18 @@ namespace Rooms
             }
 
             base.Update(contentManager, gameWorld);
+        }
+
+        public override string SaveList()
+        {
+            string result = "Hero\n";
+
+            result += base.SaveList();
+
+            result += Speed.ToString();
+            result += "\n";
+
+            return result;
         }
     }
 }

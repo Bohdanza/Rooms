@@ -14,9 +14,6 @@ namespace Rooms
 {   
     public abstract class Item:Mob
     {
-        public string Name { get; protected set; }
         public int Weight { get; protected set; }
-
-
     }
 }

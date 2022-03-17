@@ -76,6 +76,23 @@ namespace Rooms
                     blocks[i, j] = new Block(contentManager, Int32.Parse(lst[j]));
                 }
             }
+
+            int mobsCount = Int32.Parse(input[roomSize]);
+            int currentString=roomSize+1, mobsAdded=0;
+
+            for (mobsAdded=0; mobsAdded < mobsCount; mobsAdded++)
+            {
+                Mob newMob = Mob.Loader(contentManager, currentString, input);
+
+                if (newMob != null)
+                {
+                    string str = newMob.SaveList();
+
+                    currentString += newMob.SaveList().Count(f => (f == '\n'));
+
+                    AddMob(newMob);
+                }
+            }
         }
 
         public void Save()
@@ -99,6 +116,24 @@ namespace Rooms
                 output += '\n';
             }
 
+            output += mobs.Count.ToString();
+            output += "\n";
+
+            for (int i = 0; i < mobs.Count; i++)
+            {
+                string csave = mobs[i].SaveList();
+
+                if (!csave.StartsWith("Hero"))
+                {
+                    if (csave[csave.Length - 1] != '\n')
+                    {
+                        csave += "\n";
+                    }
+
+                    output += csave;
+                }
+            }
+
             //writing   
             using (StreamWriter sw = new StreamWriter(@"info\" + worldReference.Name + @"\rooms\" + X.ToString() + "_" + Y.ToString() + ".rr"))
             {
@@ -108,23 +143,28 @@ namespace Rooms
 
         protected void Generate(ContentManager contentManager, int x, int y, GameWorld gameWorld)
         {
-            //filling with 0-blocks
+            var rnd = new Random();
+
+            //filling with 0-blocks and walls
             for (int i = 0; i < roomSize; i++)
                 for (int j = 0; j < roomSize; j++)
                 {
-                    blocks[i, j] = new Block(contentManager, 0);
+                    if (GameWorld.GetDist(roomSize / 2 - 0.5, roomSize / 2 - 0.5, i, j) < roomSize / 2 - 3 + rnd.Next(0, 3))
+                    {
+                        blocks[i, j] = new Block(contentManager, 0);
+
+                        if(rnd.Next(0, 100)<1)
+                        {
+                            AddMob(new NPC(contentManager, gameWorld, i, j, 1, 0.075, 10, 10));
+                        }
+                    }
+                    else
+                    {
+                        blocks[i, j] = new Block(contentManager, 1);
+                    }
                 }
 
-            //walls
-            placeRectagle(contentManager, 0, 0, roomSize, 1, 1);
-            placeRectagle(contentManager, 0, 0, 1, roomSize, 1);
-
-            placeRectagle(contentManager, roomSize - 1, 1, roomSize, roomSize, 1);
-            placeRectagle(contentManager, 1, roomSize - 1, roomSize, roomSize, 1);
-
             //generating main landscape
-            var rnd = new Random();
-
             //points which are used to generate "rocks" around them
             int pointCount = rnd.Next(5, 11);
 
@@ -146,10 +186,8 @@ namespace Rooms
             }
 
             //doors
-            blocks[0, roomSize / 2] = new Block(contentManager, 0);
-            blocks[roomSize / 2, 0] = new Block(contentManager, 0);
-            blocks[roomSize - 1, roomSize / 2] = new Block(contentManager, 0);
-            blocks[roomSize / 2, roomSize - 1] = new Block(contentManager, 0);
+            placeRectagle(contentManager, roomSize / 2, 0, roomSize / 2 + 1, roomSize, 0);
+            placeRectagle(contentManager, 0, roomSize / 2, roomSize, roomSize / 2 + 1, 0);
 
             //door lights
             blocks[1, roomSize / 2 - 1] = new Block(contentManager, 2);
@@ -195,14 +233,20 @@ namespace Rooms
             {
                 mobs[i].Update(contentManager, gameWorld);
             }
+
+            for (int i = 0; i < roomSize; i++)
+                for (int j = 0; j < roomSize; j++)
+                {
+                    blocks[i, j].Update(contentManager);
+                }
         }
 
         //used to get mouse cordinates in room's coord system. Can work incorrectly if Draw is called with push
-        public Tuple<double, double> GetMouseCordinates()
+        public Tuple<double, double> GetMouseCordinates(GameWorld gameWorld)
         {
             var ms = Mouse.GetState();
 
-            return new Tuple<double, double>(ms.X / GameWorld.BlockSizeX, ms.Y / GameWorld.BlockSizeY);
+            return new Tuple<double, double>(ms.X - gameWorld.DrawX / GameWorld.BlockSizeX, ms.Y - gameWorld.DrawY / GameWorld.BlockSizeY);
         }
 
         //methods below are used to edit room "landscape"
@@ -240,6 +284,8 @@ namespace Rooms
         public void AddMob(Mob mob)
         {
             mobs.Add(mob);
+
+            mobs.Sort((a, b) => a.Y.CompareTo(b.Y));
         }
     }
 }

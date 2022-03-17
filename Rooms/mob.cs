@@ -13,9 +13,7 @@ using System.Threading;
 namespace Rooms
 {
     public abstract class Mob
-    { 
-        public const int TextureUpdateSpeed = 25; 
-
+    {
         public int Type { get; protected set; }
         public string Name { get; protected set; } = "Noname mob";
 
@@ -88,18 +86,18 @@ namespace Rooms
         {
             TimeSinceLastTextureUpdate++;
             
-            if (TimeSinceLastTextureUpdate > TextureUpdateSpeed)
+            if (TimeSinceLastTextureUpdate > GameWorld.TextureUpdateSpeed)
             {
                 updateTexture(contentManager, false);
 
                 TimeSinceLastTextureUpdate = 0;
             }
 
-            var mouseCoord = gameWorld.currentRoom.GetMouseCordinates();
-
             if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
-                if (GameWorld.GetDist(X, Y, mouseCoord.Item1, mouseCoord.Item2) < Radius)
+                var mouseCoord = gameWorld.currentRoom.GetMouseCordinates(gameWorld);
+
+                if (GameWorld.GetDist(X, Y, mouseCoord.Item1, mouseCoord.Item2) < Radius*3)
                 {
                     IsSelected = true;
                 }
@@ -153,26 +151,26 @@ namespace Rooms
             }
 
             //fast check for hitbox. Can be incorrect sometimes
-            if (X + Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
+            if (X + Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X + Radius >= 0 && Y >= 0 &&
                 !gameWorld.currentRoom.blocks[(int)Math.Round(X + Radius), (int)Math.Round(Y)].Passable)
             {
                 X = px;
             }
             
-            if (X - Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
+            if (X - Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X - Radius >= 0 && Y >= 0 &&
                 !gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y)].Passable)
             {
                 X = px;
             }
 
-            if (X <= Room.roomSize - 1 && Y + Radius <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
+            if (X <= Room.roomSize - 1 && Y + Radius <= Room.roomSize - 1 && X >= 0 && Y + Radius >= 0 &&
                 !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y + Radius)].Passable)
             {
                 X = px;
             }
 
-            if (X<= Room.roomSize - 1 && Y + Radius <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
-                !gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y + Radius)].Passable)
+            if (X<= Room.roomSize - 1 && Y - Radius <= Room.roomSize - 1 && X >= 0 && Y - Radius >= 0 &&
+                !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y - Radius)].Passable)
             {
                 X = px;
             }
@@ -184,44 +182,88 @@ namespace Rooms
                 Y = 0;
             }
 
+            //check for center
             if (X <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
                 !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y)].Passable)
             {
                 Y = py;
             }
-            
+
             //fast check for hitbox. Can be incorrect sometimes
-            if (X + Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
+            if (X + Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X + Radius >= 0 && Y >= 0 &&
                 !gameWorld.currentRoom.blocks[(int)Math.Round(X + Radius), (int)Math.Round(Y)].Passable)
             {
                 Y = py;
             }
 
-            if (X - Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
+            if (X - Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X - Radius >= 0 && Y >= 0 &&
                 !gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y)].Passable)
             {
                 Y = py;
             }
 
-            if (X <= Room.roomSize - 1 && Y + Radius <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
+            if (X <= Room.roomSize - 1 && Y + Radius <= Room.roomSize - 1 && X >= 0 && Y + Radius >= 0 &&
                 !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y + Radius)].Passable)
             {
                 Y = py;
             }
 
-            if (X <= Room.roomSize - 1 && Y + Radius <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
-                !gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y + Radius)].Passable)
+            if (X <= Room.roomSize - 1 && Y - Radius <= Room.roomSize - 1 && X >= 0 && Y - Radius >= 0 &&
+                !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y - Radius)].Passable)
             {
                 Y = py;
             }
         }
-
+        
         /// <summary>
         /// Used to draw interface. Automatically called in Draw function if mob is selected
         /// </summary>
         public virtual void DrawInterface(SpriteBatch spriteBatch)
         {
             spriteBatch.DrawString(GameWorld.MainFont, Name, new Vector2(30, 30), Color.White);
+        }
+
+        public virtual string SaveList()
+        {
+            string result = "";
+
+            result += Name;
+            result += "\n";
+
+            result += X.ToString();
+            result += "\n";
+
+            result += Y.ToString();
+            result += "\n";
+
+            result += Type.ToString();
+            result += "\n";
+
+            return result;
+        }
+        /// <summary>
+        /// Used to automatically load some kind of mob from it's Save() value
+        /// </summary>
+        /// <param name="currentStr"></param>
+        /// <param name="input"></param>
+        /// <returns>Mob itself</returns>
+        public static Mob Loader(ContentManager contentManager, int currentStr, List<string> input)
+        {
+            Mob resultingMob = null;
+            string className = input[currentStr].Trim('\n');
+
+            if (className == "Hero")
+            {
+                resultingMob = new Hero(contentManager, input, currentStr);
+            }
+
+            if(className=="NPC")
+            {
+                resultingMob = new NPC(contentManager, input, currentStr);
+            }
+
+
+            return resultingMob;
         }
     }
 }

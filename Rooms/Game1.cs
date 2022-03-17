@@ -49,6 +49,9 @@ namespace Rooms
             // TODO: Add your initialization logic here
             mainWorld = new GameWorld(Content, "world1");
 
+            mainWorld.DrawX = 100;
+            mainWorld.DrawY = 100;
+
             base.Initialize();
         }
 

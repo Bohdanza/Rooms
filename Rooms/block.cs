@@ -14,7 +14,10 @@ namespace Rooms
 {
     public class Block
     {
-        public Texture2D Texture { get; protected set; }
+        public List<Texture2D> Textures { get; protected set; }
+        public int TextureNumber { get; protected set; }
+        protected int TimeSinceLastTextureUpdate = 0;
+
         public int Type { get; protected set; }
         public bool Passable { get; protected set; }
 
@@ -31,22 +34,54 @@ namespace Rooms
                 Passable = true;
             }
 
-            updateTexture(contentManager);
+            updateTexture(contentManager, true);
         }
 
-        public void updateTexture(ContentManager contentManager)
+        public void updateTexture(ContentManager contentManager, bool reload)
         {
-            Texture = contentManager.Load<Texture2D>("block" + Type.ToString());
+            if (reload)
+            {
+                Textures = new List<Texture2D>();
+
+                TextureNumber = 0;
+
+                while (File.Exists(@"Content\block" + Type.ToString() + "_" + TextureNumber.ToString() + ".xnb"))
+                {
+                    Textures.Add(contentManager.Load<Texture2D>("block" + Type.ToString() + "_" + TextureNumber.ToString()));
+
+                    TextureNumber++;
+                }
+
+                TextureNumber = 0;
+            }
+            else
+            {
+                TextureNumber++;
+
+                if (TextureNumber >= Textures.Count)
+                {
+                    TextureNumber = 0;
+                }
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch, int x, int y)
         {
-            spriteBatch.Draw(Texture, new Vector2(x, y-Texture.Height+GameWorld.BlockSizeY), Color.White);
+            spriteBatch.Draw(Textures[TextureNumber], new Vector2(x - (int)Textures[TextureNumber].Width / 2 + GameWorld.BlockSizeX / 2,
+                y - Textures[TextureNumber].Height + GameWorld.BlockSizeY), Color.White);
         }
 
-        public void Update()
+        public void Update(ContentManager contentManager)
         {
             //Just in case...
+            TimeSinceLastTextureUpdate++;
+
+            if (TimeSinceLastTextureUpdate >= GameWorld.TextureUpdateSpeed)
+            {
+                updateTexture(contentManager, false);
+
+                TimeSinceLastTextureUpdate = 0;
+            }
         }
     }
 }
