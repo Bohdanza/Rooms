@@ -46,6 +46,8 @@ namespace Rooms
 
         protected override void Initialize()
         {
+            Window.Position = new Point(0, 0);
+
             // TODO: Add your initialization logic here
             mainWorld = new GameWorld(Content, "world1");
 
@@ -65,7 +67,11 @@ namespace Rooms
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            {
                 Exit();
+
+                mainWorld.Save();
+            }
 
             // TODO: Add your update logic here
             mainWorld.Update(Content);

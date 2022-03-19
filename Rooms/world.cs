@@ -17,8 +17,6 @@ namespace Rooms
         public int DrawX = 0, DrawY = 0;
         public const int TextureUpdateSpeed = 9;
 
-        public int timeSinceLastKeyPress { get; private set; } = 0;
-
         public static Texture2D SelectionCursorTexture { get; protected set; }
         public static SpriteFont MainFont { get; protected set; }
 
@@ -42,7 +40,7 @@ namespace Rooms
 
                 Hero newHero = new Hero(contentManager, Room.roomSize / 2, Room.roomSize / 2, 0, this);
 
-                currentRoom = new Room(contentManager, Int32.Parse(posRead[0]), Int32.Parse(posRead[0]), this, newHero);
+                currentRoom = new Room(contentManager, Int32.Parse(posRead[0]), Int32.Parse(posRead[1]), this, newHero);
             }
             catch
             {
@@ -66,17 +64,20 @@ namespace Rooms
         
         public void Update(ContentManager contentManager)
         {
-            timeSinceLastKeyPress++;
-
             currentRoom.Update(contentManager, this);
 
             if (currentRoom.heroReference.X <= 0)
             {
                 currentRoom.heroReference.ChangeCoords(Room.roomSize - 1, currentRoom.heroReference.Y);
 
+                var newHero = currentRoom.heroReference;
+
+                currentRoom.MarkMobAsDeleted(currentRoom.heroReference);
+                currentRoom.DeleteMarked();
+
                 Save();
 
-                currentRoom = new Room(contentManager, currentRoom.X - 1, currentRoom.Y, this, currentRoom.heroReference);
+                currentRoom = new Room(contentManager, currentRoom.X - 1, currentRoom.Y, this, newHero);
 
                 Save();
             }
@@ -85,9 +86,14 @@ namespace Rooms
             {
                 currentRoom.heroReference.ChangeCoords(0, currentRoom.heroReference.Y);
 
+                var newHero = currentRoom.heroReference;
+
+                currentRoom.MarkMobAsDeleted(currentRoom.heroReference);
+                currentRoom.DeleteMarked();
+
                 Save();
 
-                currentRoom = new Room(contentManager, currentRoom.X + 1, currentRoom.Y, this, currentRoom.heroReference);
+                currentRoom = new Room(contentManager, currentRoom.X + 1, currentRoom.Y, this, newHero);
 
                 Save();
             }
@@ -95,10 +101,15 @@ namespace Rooms
             if (currentRoom.heroReference.Y <= 0)
             {
                 currentRoom.heroReference.ChangeCoords(currentRoom.heroReference.X, Room.roomSize - 1);
+                
+                var newHero = currentRoom.heroReference;
+
+                currentRoom.MarkMobAsDeleted(currentRoom.heroReference);
+                currentRoom.DeleteMarked();
 
                 Save();
 
-                currentRoom = new Room(contentManager, currentRoom.X, currentRoom.Y - 1, this, currentRoom.heroReference);
+                currentRoom = new Room(contentManager, currentRoom.X, currentRoom.Y - 1, this, newHero);
 
                 Save();
             }
@@ -107,9 +118,14 @@ namespace Rooms
             {
                 currentRoom.heroReference.ChangeCoords(currentRoom.heroReference.X, 0);
 
+                var newHero = currentRoom.heroReference;
+
+                currentRoom.MarkMobAsDeleted(currentRoom.heroReference);
+                currentRoom.DeleteMarked();
+
                 Save();
 
-                currentRoom = new Room(contentManager, currentRoom.X, currentRoom.Y + 1, this, currentRoom.heroReference);
+                currentRoom = new Room(contentManager, currentRoom.X, currentRoom.Y + 1, this, newHero);
 
                 Save();
             }

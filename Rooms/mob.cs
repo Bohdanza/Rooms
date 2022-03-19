@@ -70,15 +70,6 @@ namespace Rooms
 
         public virtual void Draw(SpriteBatch spriteBatch, int x, int y)
         {
-            if(IsSelected)
-            {
-                spriteBatch.Draw(GameWorld.SelectionCursorTexture,
-                    new Vector2(x - GameWorld.SelectionCursorTexture.Width / 2, y - GameWorld.SelectionCursorTexture.Height/2),
-                    Color.White);
-
-                DrawInterface(spriteBatch);
-            }
-
             spriteBatch.Draw(Textures[TextureNumber], new Vector2(x - Textures[TextureNumber].Width/2, y - Textures[TextureNumber].Height), Color.White);
         }
 
@@ -93,11 +84,11 @@ namespace Rooms
                 TimeSinceLastTextureUpdate = 0;
             }
 
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+        /*    if (Mouse.GetState().LeftButton == ButtonState.Pressed)
             {
                 var mouseCoord = gameWorld.currentRoom.GetMouseCordinates(gameWorld);
 
-                if (GameWorld.GetDist(X, Y, mouseCoord.Item1, mouseCoord.Item2) < Radius*3)
+                if (GameWorld.GetDist(X, Y, mouseCoord.Item1, mouseCoord.Item2) <= Radius*3)
                 {
                     IsSelected = true;
                 }
@@ -105,7 +96,7 @@ namespace Rooms
                 {
                     IsSelected = false;
                 }
-            }
+            }*/
         }
 
         /// <summary>
@@ -241,6 +232,7 @@ namespace Rooms
 
             return result;
         }
+
         /// <summary>
         /// Used to automatically load some kind of mob from it's Save() value
         /// </summary>
@@ -257,12 +249,16 @@ namespace Rooms
                 resultingMob = new Hero(contentManager, input, currentStr);
             }
 
-            if(className=="NPC")
+            if (className == "NPC") 
             {
                 resultingMob = new NPC(contentManager, input, currentStr);
             }
 
-
+            if (className == "Item")
+            {
+                resultingMob = new Item(contentManager, input, currentStr);
+            }
+            
             return resultingMob;
         }
     }

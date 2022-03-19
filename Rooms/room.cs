@@ -14,7 +14,7 @@ namespace Rooms
 {
     public class Room
     {
-        public const int roomSize = 30;
+        public const int roomSize = 47;
 
         public int biome { get; protected set; }
 
@@ -26,6 +26,8 @@ namespace Rooms
         public Hero heroReference { get; protected set; }
         public List<Mob> mobs { get; protected set; }
 
+        private List<int> markedMobs { get; set; } = new List<int>();
+
         public Room(ContentManager contentManager, int x, int y, GameWorld gameWorld, Hero heroMoved)
         {
             X = x;
@@ -36,26 +38,23 @@ namespace Rooms
             blocks = new Block[roomSize, roomSize];
             mobs = new List<Mob>();
 
-            if (Directory.Exists(@"info\" + gameWorld.Name + @"\rooms") && 
-                File.Exists(@"info\" + gameWorld.Name + @"\rooms\" + x.ToString() + "_" + y.ToString() + ".rr"))
-            {
-                try
-                {
-                    Load(contentManager, x, y, gameWorld);
-                }
-                catch
-                {
-                    Generate(contentManager, x, y, gameWorld);
-                }
+            heroReference = null;
+
+            try
+            { 
+                Load(contentManager, x, y, gameWorld);
             }
-            else
+            catch
             {
                 Generate(contentManager, x, y, gameWorld);
             }
 
-            AddMob(heroMoved);
+            if(heroReference==null)
+            {
+                heroReference = heroMoved;
 
-            heroReference = heroMoved;
+                AddMob(heroMoved);
+            }
         }
 
         protected void Load(ContentManager contentManager, int x, int y, GameWorld gameWorld)
@@ -91,6 +90,11 @@ namespace Rooms
                     currentString += newMob.SaveList().Count(f => (f == '\n'));
 
                     AddMob(newMob);
+                    
+                    if(str.StartsWith("Hero"))
+                    {
+                        heroReference = (Hero)newMob;
+                    }
                 }
             }
         }
@@ -122,16 +126,13 @@ namespace Rooms
             for (int i = 0; i < mobs.Count; i++)
             {
                 string csave = mobs[i].SaveList();
-
-                if (!csave.StartsWith("Hero"))
+                
+                if (csave[csave.Length - 1] != '\n')
                 {
-                    if (csave[csave.Length - 1] != '\n')
-                    {
-                        csave += "\n";
-                    }
-
-                    output += csave;
+                    csave += "\n";
                 }
+
+                output += csave;
             }
 
             //writing   
@@ -149,13 +150,18 @@ namespace Rooms
             for (int i = 0; i < roomSize; i++)
                 for (int j = 0; j < roomSize; j++)
                 {
-                    if (GameWorld.GetDist(roomSize / 2 - 0.5, roomSize / 2 - 0.5, i, j) < roomSize / 2 - 3 + rnd.Next(0, 3))
+                    if (GameWorld.GetDist(roomSize / 2 - 0.5, roomSize / 2 - 0.5, i, j) < roomSize / 2 - 1 - rnd.Next(0, 8))
                     {
                         blocks[i, j] = new Block(contentManager, 0);
 
-                        if(rnd.Next(0, 100)<1)
+                        if(rnd.Next(0, 1000)<5)
                         {
                             AddMob(new NPC(contentManager, gameWorld, i, j, 1, 0.075, 10, 10));
+                        }
+                        else if(rnd.Next(0, 1000)<5)
+                        {
+                            //coins
+                            AddMob(new Item(contentManager, i + rnd.NextDouble() * 0.75 - 0.375, j + rnd.NextDouble() * 0.75 - 0.375, 3, 1));
                         }
                     }
                     else
@@ -209,7 +215,7 @@ namespace Rooms
 
             while (j < roomSize || currentMob < mobs.Count)
             {
-                if (currentMob < mobs.Count && mobs[currentMob].Y < j-0.5)
+                if (currentMob < mobs.Count && mobs[currentMob].Y < j - 0.5)
                 {
                     mobs[currentMob].Draw(spriteBatch, x + (int)(mobs[currentMob].X * GameWorld.BlockSizeX), y + (int)(mobs[currentMob].Y * GameWorld.BlockSizeY));
 
@@ -231,7 +237,10 @@ namespace Rooms
         {
             for (int i = 0; i < mobs.Count; i++)
             {
-                mobs[i].Update(contentManager, gameWorld);
+                if (mobs[i] != null)
+                {
+                    mobs[i].Update(contentManager, gameWorld);
+                }
             }
 
             for (int i = 0; i < roomSize; i++)
@@ -239,6 +248,8 @@ namespace Rooms
                 {
                     blocks[i, j].Update(contentManager);
                 }
+
+            DeleteMarked();
         }
 
         //used to get mouse cordinates in room's coord system. Can work incorrectly if Draw is called with push
@@ -286,6 +297,62 @@ namespace Rooms
             mobs.Add(mob);
 
             mobs.Sort((a, b) => a.Y.CompareTo(b.Y));
+        }
+
+        /// <summary>
+        /// Used to mark mob and later delete it with DeleteMarked 
+        /// </summary>
+        /// <param name="index"></param>
+        public void MarkMobIndexAsDeleted(int index)
+        {
+            mobs[index] = null;
+
+            markedMobs.Add(index);
+        }
+        
+        /// <summary>
+        /// Used to mark mob and later delete it with DeleteMarked 
+        /// </summary>
+        /// <param name="index"></param>
+        public void MarkMobAsDeleted(Mob mob)
+        { 
+            int ind = mobs.IndexOf(mob);
+
+            MarkMobIndexAsDeleted(ind);
+        }
+
+        public void DeleteMarked()
+        {
+            markedMobs.Sort();
+
+            for (int i = 0; i < markedMobs.Count; i++)
+            {
+                mobs.RemoveAt(markedMobs[i] - i);
+            }
+
+            markedMobs = new List<int>();
+        }
+
+        public Mob GetClosestMob(double x, double y, List<Mob> ignoredMobs, List<string> allowedTypes)
+        {
+            double cdist = 1e9;
+            Mob closestMob = null;
+
+            for (int i = 0; i < mobs.Count; i++)
+            {
+                double dst = GameWorld.GetDist(x, y, mobs[i].X, mobs[i].Y);
+
+                if (cdist > dst 
+                    && !ignoredMobs.Contains(mobs[i]) 
+                    && allowedTypes.Any(s=>mobs[i].SaveList().StartsWith(s)))
+                {
+                    cdist = dst;
+
+                    closestMob = mobs[i];
+                }
+            }
+
+            return closestMob;
         }
     }
 }
