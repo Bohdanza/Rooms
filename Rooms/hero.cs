@@ -113,14 +113,14 @@ namespace Rooms
         {
             base.Draw(spriteBatch, x, y);
 
-        //    DrawInterface(spriteBatch);
+            DrawInterface(spriteBatch);
         }
 
         public override void DrawInterface(SpriteBatch spriteBatch)
         {
             for (int i = 0; i < Inventory.Count; i++)
             {
-                Inventory[i].DrawIcon(spriteBatch, 20 + i * 60, 1000, 0f);
+                Inventory[i].DrawIcon(spriteBatch, 20 + i * 60, 1000, 1f);
             }
 
             //base.DrawInterface(spriteBatch);

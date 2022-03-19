@@ -250,6 +250,8 @@ namespace Rooms
                 }
 
             DeleteMarked();
+
+            mobs.Sort((a, b) => a.Y.CompareTo(b.Y));
         }
 
         //used to get mouse cordinates in room's coord system. Can work incorrectly if Draw is called with push
