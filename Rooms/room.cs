@@ -231,6 +231,8 @@ namespace Rooms
                     j++;
                 }
             }
+
+            heroReference.DrawInterface(spriteBatch);
         }
 
         public void Update(ContentManager contentManager, GameWorld gameWorld)

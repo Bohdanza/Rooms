@@ -74,11 +74,9 @@ namespace Rooms
             base.updateTexture(contentManager, reload);
         }
 
-        public void DrawIcon(SpriteBatch spriteBatch, int x, int y, float layer)
+        public void DrawIcon(SpriteBatch spriteBatch, int x, int y)
         {
-            spriteBatch.Draw(bigTextures[bigTexturesNumber], new Vector2(x, y),
-                null,
-                Color.White, 0, new Vector2(0, 0), 1, SpriteEffects.None, layer);
+            spriteBatch.Draw(bigTextures[bigTexturesNumber], new Vector2(x, y), Color.White);
         }
 
         public override string SaveList()

@@ -84,7 +84,7 @@ namespace Rooms
             GraphicsDevice.Clear(Color.Black);
 
             // TODO: Add your drawing code here
-            _spriteBatch.Begin();
+            _spriteBatch.Begin(SpriteSortMode.Deferred);
 
             mainWorld.Draw(_spriteBatch);
 

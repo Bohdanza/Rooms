@@ -18,6 +18,7 @@ namespace Rooms
         public int WeightToCarry { get; protected set; } = 0;
         public List<Item> Inventory { get; protected set; } = new List<Item>();
         private int timeSinceLastItemPick = 0;
+        private Item selectedItem = null;
 
         public Hero(ContentManager contentManager, double x, double y, int type, GameWorld gameWorld)
         {
@@ -95,15 +96,40 @@ namespace Rooms
 
             timeSinceLastItemPick++;
 
-            if (timeSinceLastItemPick>=10&&ms.LeftButton == ButtonState.Pressed && ms.Y >= 1000 && ms.Y <= 1055 && ms.X >= 20 && ms.X < 20 + Inventory.Count * 60) 
+            if (timeSinceLastItemPick>=10&&ms.LeftButton == ButtonState.Pressed && ms.Y >= 1000 && ms.Y <= 1055 && ms.X >= 20 && ms.X < 80 + Inventory.Count * 60) 
             {
                 timeSinceLastItemPick = 0;
+                int pickedItemIndex = (ms.X - 20) / 60;
 
-                int pickedItemIndex = (ms.Y - 20) / 60;
+                if (selectedItem == null && pickedItemIndex < Inventory.Count)
+                {
+                    WeightToCarry -= Inventory[pickedItemIndex].Weight;
 
-                WeightToCarry -= Inventory[pickedItemIndex].Weight;
+                    selectedItem = Inventory[pickedItemIndex];
 
-                Inventory.RemoveAt(pickedItemIndex);
+                    Inventory.RemoveAt(pickedItemIndex);
+                }
+                else if (selectedItem != null)
+                {
+                    WeightToCarry += selectedItem.Weight;
+
+                    if (pickedItemIndex >= Inventory.Count)
+                    {
+                        Inventory.Add(selectedItem);
+
+                        selectedItem = null;
+                    }
+                    else
+                    {
+                        Item prevSelected = selectedItem;
+
+                        WeightToCarry -= Inventory[pickedItemIndex].Weight;
+
+                        selectedItem = Inventory[pickedItemIndex];
+
+                        Inventory[pickedItemIndex] = prevSelected;
+                    }
+                }
             }
 
             base.Update(contentManager, gameWorld);
@@ -113,16 +139,23 @@ namespace Rooms
         {
             base.Draw(spriteBatch, x, y);
 
-            DrawInterface(spriteBatch);
+          //  DrawInterface(spriteBatch);
         }
 
         public override void DrawInterface(SpriteBatch spriteBatch)
         {
             for (int i = 0; i < Inventory.Count; i++)
             {
-                Inventory[i].DrawIcon(spriteBatch, 20 + i * 60, 1000, 1f);
+                Inventory[i].DrawIcon(spriteBatch, 20 + i * 60, 1000);
             }
 
+            var ms = Mouse.GetState();
+
+            if (selectedItem != null)
+            {
+                selectedItem.DrawIcon(spriteBatch, ms.X - 27, ms.Y - 27);
+            }
+            
             //base.DrawInterface(spriteBatch);
         }
 
