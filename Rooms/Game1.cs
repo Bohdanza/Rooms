@@ -46,7 +46,7 @@ namespace Rooms
 
         protected override void Initialize()
         {
-            Window.Position = new Point(0, 0);
+           // Window.Position = new Point(0, 0);
 
             // TODO: Add your initialization logic here
             mainWorld = new GameWorld(Content, "world1");

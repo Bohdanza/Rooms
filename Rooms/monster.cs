@@ -17,6 +17,7 @@ namespace Rooms
     {
         public int HP { get; protected set; }
         public int MaxHP { get; protected set; }
+        private string Action { get; set; }
 
         public NPC(ContentManager contentManager, GameWorld gameWorld, double x, double y, int type, double speed, int HP, int maxHP)
         {
@@ -29,8 +30,11 @@ namespace Rooms
 
             Type = type;
 
+            Action = "wa";
+
             updateTexture(contentManager, true);
         }
+       
         public NPC(ContentManager contentManager, List<string> input, int currentStr)
         {
             Name = input[currentStr + 1];
@@ -44,7 +48,42 @@ namespace Rooms
 
             Speed = double.Parse(input[currentStr + 7]);
 
+            Action = "wa";
+
             updateTexture(contentManager, true);
+        }
+        
+        /// <summary>
+        /// Used to increase the texture number if reload==false and reload the whole Textures list if it's true
+        /// </summary>
+        /// <param name="contentManager"></param>
+        /// <param name="reload"></param>
+        protected override void updateTexture(ContentManager contentManager, bool reload)
+        {
+            if (reload)
+            {
+                Textures = new List<Texture2D>();
+
+                TextureNumber = 0;
+
+                while (File.Exists(@"Content\mob_" + Type.ToString() + "_" + TextureNumber.ToString() + "_" + Action + ".xnb"))
+                {
+                    Textures.Add(contentManager.Load<Texture2D>("mob_" + Type.ToString() + "_" + TextureNumber.ToString() + "_" + Action));
+
+                    TextureNumber++;
+                }
+
+                TextureNumber = 0;
+            }
+            else
+            {
+                TextureNumber++;
+
+                if (TextureNumber >= Textures.Count)
+                {
+                    TextureNumber = 0;
+                }
+            }
         }
 
         public override string SaveList()

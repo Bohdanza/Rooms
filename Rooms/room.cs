@@ -170,6 +170,19 @@ namespace Rooms
                     }
                 }
 
+            int placeBeholder = rnd.Next(0, 100);
+
+            if (placeBeholder < 100)
+            {
+                int xb = rnd.Next(0, roomSize);
+                int yb = rnd.Next(0, roomSize);
+                
+                if(blocks[xb, yb].Passable)
+                {
+                    AddMob(new NPC(contentManager, gameWorld, xb + 0.5, yb + 0.5, 5, 0.1, 20, 20));
+                }
+            }
+
             //generating main landscape
             //points which are used to generate "rocks" around them
             int pointCount = rnd.Next(5, 11);
@@ -261,7 +274,7 @@ namespace Rooms
         {
             var ms = Mouse.GetState();
 
-            return new Tuple<double, double>(ms.X - gameWorld.DrawX / GameWorld.BlockSizeX, ms.Y - gameWorld.DrawY / GameWorld.BlockSizeY);
+            return new Tuple<double, double>((double)(ms.X - gameWorld.DrawX) / GameWorld.BlockSizeX, (double)(ms.Y - gameWorld.DrawY) / GameWorld.BlockSizeY);
         }
 
         //methods below are used to edit room "landscape"
