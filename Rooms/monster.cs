@@ -30,7 +30,7 @@ namespace Rooms
 
             Type = type;
 
-            Action = "wa";
+            Action = "id";
 
             updateTexture(contentManager, true);
         }
@@ -48,7 +48,7 @@ namespace Rooms
 
             Speed = double.Parse(input[currentStr + 7]);
 
-            Action = "wa";
+            Action = "id";
 
             updateTexture(contentManager, true);
         }
@@ -82,7 +82,37 @@ namespace Rooms
                 if (TextureNumber >= Textures.Count)
                 {
                     TextureNumber = 0;
+
+                    if(Action=="dm")
+                    {
+                        Action = "id";
+
+                        updateTexture(contentManager, true);
+                    }
                 }
+            }
+        }
+
+        public void Damage(ContentManager contentManager, GameWorld gameWorld, int power)
+        {
+            HP -= power;
+
+            if(HP<=0)
+            {
+                HP = 0;
+
+                if (Action != "di")
+                {
+                    Action = "di";
+
+                    updateTexture(contentManager, true);
+                }
+            }
+            else if (Action != "dm")
+            {
+                Action = "dm";
+
+                updateTexture(contentManager, true);
             }
         }
 

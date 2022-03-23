@@ -20,6 +20,7 @@ namespace Rooms
         private int timeSinceLastItemPick = 0;
         private Item selectedItem = null;
         private string Action = "id";
+        public int AttackEnergy { get; protected set; } = 0;
 
         public Hero(ContentManager contentManager, double x, double y, int type, GameWorld gameWorld)
         {
@@ -97,7 +98,7 @@ namespace Rooms
 
                 Action = "wa";
             }
-
+            
             if (ks.IsKeyDown(Keys.A))
             {
                 Move(realSpeed, Math.PI, gameWorld);
@@ -190,6 +191,39 @@ namespace Rooms
                         gameWorld.currentRoom.AddMob(selectedItem);
 
                         selectedItem = null;
+                    }
+                }
+            }
+
+            AttackEnergy++;
+
+            if (ms.RightButton == ButtonState.Pressed && AttackEnergy >= 20)
+            {
+                AttackEnergy = 0;
+
+                var mousePosition = gameWorld.currentRoom.GetMouseCordinates(gameWorld);
+
+                double directionToMouse = Math.Atan2(Y - mousePosition.Item2, X - mousePosition.Item1);
+
+                Move(0.075, directionToMouse + Math.PI, gameWorld);
+
+                gameWorld.currentRoom.AddMob(new KickTrace(contentManager, X, Y, 6, 0, directionToMouse + Math.PI, 9, gameWorld));
+
+                foreach (var currentMob in gameWorld.currentRoom.mobs)
+                {
+                    if (currentMob.SaveList().StartsWith("NPC"))
+                    {
+                        double dist = GameWorld.GetDist(X, Y, currentMob.X, currentMob.Y);
+
+                        if (dist <= Radius + currentMob.Radius + 1)
+                        {
+                            double directionToMob = Math.Atan2(Y - currentMob.Y, X - currentMob.X);
+
+                            if (Math.Abs(directionToMouse - directionToMob) <= 0.872)
+                            {
+                                ((NPC)currentMob).Damage(contentManager, gameWorld, 5);
+                            }
+                        }
                     }
                 }
             }
