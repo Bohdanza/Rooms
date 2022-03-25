@@ -207,7 +207,10 @@ namespace Rooms
 
                 Move(0.075, directionToMouse + Math.PI, gameWorld);
 
-                gameWorld.currentRoom.AddMob(new KickTrace(contentManager, X, Y, 6, 0, directionToMouse + Math.PI, 9, gameWorld));
+                Mob kck = new KickTrace(contentManager, X, Y+5, 6, 0, directionToMouse + Math.PI, 9, gameWorld);
+                kck.Move(0.2, directionToMouse + Math.PI, gameWorld);
+
+                gameWorld.currentRoom.AddMob(kck);
 
                 foreach (var currentMob in gameWorld.currentRoom.mobs)
                 {
@@ -219,9 +222,43 @@ namespace Rooms
                         {
                             double directionToMob = Math.Atan2(Y - currentMob.Y, X - currentMob.X);
 
-                            if (Math.Abs(directionToMouse - directionToMob) <= 0.872)
+                            if (Math.Abs(directionToMouse - directionToMob) <= 2.7)
                             {
                                 ((NPC)currentMob).Damage(contentManager, gameWorld, 5);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (ms.MiddleButton == ButtonState.Pressed && AttackEnergy >= 30)
+            {
+                AttackEnergy = 0;
+
+                var mousePosition = gameWorld.currentRoom.GetMouseCordinates(gameWorld);
+
+                double directionToMouse = Math.Atan2(Y - mousePosition.Item2, X - mousePosition.Item1);
+
+                Move(0.1, directionToMouse + Math.PI, gameWorld);
+
+                Mob kck = new KickTrace(contentManager, X, Y + 5, 7, 0, directionToMouse + Math.PI, 20, gameWorld);
+                kck.Move(0.2, directionToMouse + Math.PI, gameWorld);
+
+                gameWorld.currentRoom.AddMob(kck);
+
+                foreach (var currentMob in gameWorld.currentRoom.mobs)
+                {
+                    if (currentMob.SaveList().StartsWith("NPC"))
+                    {
+                        double dist = GameWorld.GetDist(X, Y, currentMob.X, currentMob.Y);
+
+                        if (dist <= Radius + currentMob.Radius + 1)
+                        {
+                            double directionToMob = Math.Atan2(Y - currentMob.Y, X - currentMob.X);
+
+                            if (Math.Abs(directionToMouse - directionToMob) <= 0.5)
+                            {
+                                ((NPC)currentMob).Damage(contentManager, gameWorld, 10);
                             }
                         }
                     }

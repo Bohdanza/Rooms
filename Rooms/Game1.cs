@@ -38,7 +38,7 @@ namespace Rooms
 
             this.Window.IsBorderless = true;
 
-            _graphics.IsFullScreen = false;
+            _graphics.IsFullScreen = true;
             _graphics.ApplyChanges();
 
             this.Window.Title = "Rooms";

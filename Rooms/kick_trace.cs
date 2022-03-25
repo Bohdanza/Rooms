@@ -35,8 +35,8 @@ namespace Rooms
 
         public override void Draw(SpriteBatch spriteBatch, int x, int y)
         {
-            spriteBatch.Draw(Textures[TextureNumber], new Vector2(x, y),
-                null, Color.White, (float)Direction, new Vector2(0, Textures[TextureNumber].Height/2), 1f, SpriteEffects.None, 0);
+            spriteBatch.Draw(Textures[TextureNumber], new Vector2(x, y - GameWorld.BlockSizeY * 5),
+                null, Color.White, (float)Direction, new Vector2(0, Textures[TextureNumber].Height / 2), 1f, SpriteEffects.None, 0);
         }
 
         public override void Update(ContentManager contentManager, GameWorld gameWorld)
@@ -52,12 +52,17 @@ namespace Rooms
 
             TimeSinceLastTextureUpdate++;
 
-            if (TimeSinceLastTextureUpdate > GameWorld.TextureUpdateSpeed/3)
+            if (TimeSinceLastTextureUpdate > 4.5)
             {
                 updateTexture(contentManager, false);
 
                 TimeSinceLastTextureUpdate = 0;
             }
+        }
+
+        public override string SaveList()
+        {
+            return "";
         }
     }
 }

@@ -23,8 +23,8 @@ namespace Rooms
 
         public bool IsSelected { get; protected set; }
 
-        public double X { get; private set; }
-        public double Y { get; private set; }
+        public virtual double X { get; private set; }
+        public virtual double Y { get; private set; }
 
         public List<Texture2D> Textures { get; protected set; }
 

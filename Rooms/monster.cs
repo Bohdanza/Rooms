@@ -81,7 +81,14 @@ namespace Rooms
 
                 if (TextureNumber >= Textures.Count)
                 {
-                    TextureNumber = 0;
+                    if (Action != "di")
+                    {
+                        TextureNumber = 0;
+                    }
+                    else
+                    {
+                        TextureNumber--;
+                    }
 
                     if(Action=="dm")
                     {
