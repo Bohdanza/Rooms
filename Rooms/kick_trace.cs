@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Audio;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,13 +23,20 @@ namespace Rooms
         {
             Direction = direction;
             Speed = speed;
-
+            
             timeLived = 0;
             Lifetime = lifetime;
 
             ChangeCoords(x, y);
 
             Type = type;
+
+            try 
+            {
+                contentManager.Load<SoundEffect>("kick" + Type.ToString() + "sound").CreateInstance().Play();  
+            }
+            catch
+            { }
 
             updateTexture(contentManager, true);
         }

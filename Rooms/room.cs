@@ -126,8 +126,8 @@ namespace Rooms
             for (int i = 0; i < mobs.Count; i++)
             {
                 string csave = mobs[i].SaveList();
-                
-                if (csave[csave.Length - 1] != '\n')
+
+                if (csave.Length > 0 && csave[csave.Length - 1] != '\n')
                 {
                     csave += "\n";
                 }

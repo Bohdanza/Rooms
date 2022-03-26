@@ -17,6 +17,8 @@ namespace Rooms
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private GameWorld mainWorld;
+        private MusicCreator musicCreator;
+        private int timeSinceLastPlay = 0;
 
         public Game1()
         {
@@ -38,7 +40,7 @@ namespace Rooms
 
             this.Window.IsBorderless = true;
 
-            _graphics.IsFullScreen = true;
+            _graphics.IsFullScreen = false;
             _graphics.ApplyChanges();
 
             this.Window.Title = "Rooms";
@@ -46,13 +48,11 @@ namespace Rooms
 
         protected override void Initialize()
         {
-           // Window.Position = new Point(0, 0);
+            Window.Position = new Point(0, 0);
 
             // TODO: Add your initialization logic here
             mainWorld = new GameWorld(Content, "world1");
-
-            mainWorld.DrawX = 100;
-            mainWorld.DrawY = 100;
+            musicCreator = new MusicCreator(Content);
 
             base.Initialize();
         }
@@ -75,6 +75,15 @@ namespace Rooms
 
             // TODO: Add your update logic here
             mainWorld.Update(Content);
+
+            timeSinceLastPlay++;
+
+            if (timeSinceLastPlay >= 13)
+            {
+                timeSinceLastPlay = 0;
+
+                musicCreator.Update();
+            }
 
             base.Update(gameTime);
         }
