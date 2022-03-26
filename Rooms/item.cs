@@ -33,11 +33,11 @@ namespace Rooms
         {
             Weight = Int32.Parse(input[currentStr + 1]);
 
-            Name = input[currentStr + 1];
+            Name = input[currentStr + 2];
 
-            ChangeCoords(double.Parse(input[currentStr + 2]), double.Parse(input[currentStr + 3]));
+            ChangeCoords(double.Parse(input[currentStr + 3]), double.Parse(input[currentStr + 4]));
 
-            Type = Int32.Parse(input[currentStr + 4]);
+            Type = Int32.Parse(input[currentStr + 5]);
             
             base.Radius = 0.25;
 

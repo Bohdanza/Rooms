@@ -120,20 +120,30 @@ namespace Rooms
                 output += '\n';
             }
 
-            output += mobs.Count.ToString();
-            output += "\n";
+            string tmpout = "";
+            int realMobs = 0;
 
             for (int i = 0; i < mobs.Count; i++)
             {
                 string csave = mobs[i].SaveList();
 
-                if (csave.Length > 0 && csave[csave.Length - 1] != '\n')
+                if (csave.Length > 0)
                 {
-                    csave += "\n";
+                    realMobs++;
+
+                    if (csave[csave.Length - 1] != '\n')
+                    {
+                        csave += "\n";
+                    }
                 }
 
-                output += csave;
+                tmpout += csave;
             }
+
+            output += realMobs.ToString();
+            output += "\n";
+
+            output += tmpout;
 
             //writing   
             using (StreamWriter sw = new StreamWriter(@"info\" + worldReference.Name + @"\rooms\" + X.ToString() + "_" + Y.ToString() + ".rr"))
