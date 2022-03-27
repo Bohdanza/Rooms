@@ -14,6 +14,8 @@ namespace Rooms
 {
     public class GameWorld
     {
+        public const int ItemTextureSize = 55;
+
         public int DrawX = (1920-BlockSizeX*Room.roomSize)/2, DrawY = (1080 - BlockSizeY * Room.roomSize) / 2;
         public const int TextureUpdateSpeed = 9;
 
@@ -73,6 +75,9 @@ namespace Rooms
 
         public void Draw(SpriteBatch spriteBatch)
         {
+            leftRoom.Draw(spriteBatch, 960 - (int)(Room.roomSize * 1.5)*BlockSizeX, DrawY);
+            rightRoom.Draw(spriteBatch, 960 + (int)(Room.roomSize * 0.5) * BlockSizeX, DrawY);
+
             currentRoom.Draw(spriteBatch, DrawX, DrawY);
         }
         
@@ -149,7 +154,17 @@ namespace Rooms
             
             if(roomX!=currentRoom.X||roomY!=currentRoom.Y)
             {
-                
+                leftRoom = new Room(contentManager, currentRoom.X - 1, currentRoom.Y, this, currentRoom.heroReference);
+                leftRoom.MarkMobAsDeleted(leftRoom.heroReference);
+                leftRoom.DeleteMarked();
+
+                leftRoom.Save();
+
+                rightRoom = new Room(contentManager, currentRoom.X + 1, currentRoom.Y, this, currentRoom.heroReference);
+                rightRoom.MarkMobAsDeleted(leftRoom.heroReference);
+                rightRoom.DeleteMarked();
+
+                rightRoom.Save();
             }
         }
 

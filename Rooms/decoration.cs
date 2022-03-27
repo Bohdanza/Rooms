@@ -9,17 +9,18 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Reflection;
 
 namespace Rooms
 {
-    public class BehaviourInstruction
+    public class Decoration:Mob
     {
-
-
-        public BehaviourInstruction()
+        public Decoration(ContentManager contentManager, double x, double y, int type)
         {
+            Type = type;
 
+            ChangeCoords(x, y);
+
+            updateTexture(contentManager, true);
         }
     }
 }

@@ -27,6 +27,7 @@ namespace Rooms
         public List<Mob> mobs { get; protected set; }
 
         private List<int> markedMobs { get; set; } = new List<int>();
+        public List<Mob> mobsWithInterface { get; protected set; }
 
         public Room(ContentManager contentManager, int x, int y, GameWorld gameWorld, Hero heroMoved)
         {
@@ -39,7 +40,7 @@ namespace Rooms
             mobs = new List<Mob>();
 
             heroReference = null;
-
+            
             try
             { 
                 Load(contentManager, x, y, gameWorld);
@@ -49,12 +50,16 @@ namespace Rooms
                 Generate(contentManager, x, y, gameWorld);
             }
 
-            if(heroReference==null)
+            if (heroReference == null)
             {
                 heroReference = heroMoved;
 
                 AddMob(heroMoved);
             }
+
+            mobsWithInterface = new List<Mob>();
+
+            mobsWithInterface.Add(heroReference);
         }
 
         protected void Load(ContentManager contentManager, int x, int y, GameWorld gameWorld)
@@ -154,7 +159,13 @@ namespace Rooms
 
         protected void Generate(ContentManager contentManager, int x, int y, GameWorld gameWorld)
         {
+            bool IsVillage = false;
             var rnd = new Random();
+
+            if (rnd.Next(0, 100) < 100)
+            {
+                IsVillage = true;
+            }
 
             //filling with 0-blocks and walls
             for (int i = 0; i < roomSize; i++)
@@ -164,14 +175,19 @@ namespace Rooms
                     {
                         blocks[i, j] = new Block(contentManager, 0);
 
-                        if(rnd.Next(0, 1000)<5)
+                        if (!IsVillage && rnd.Next(0, 1000) < 5)
                         {
                             AddMob(new NPC(contentManager, gameWorld, i, j, 1, 0.075, 10, 10));
                         }
-                        else if(rnd.Next(0, 1000)<5)
+                        else if (!IsVillage && rnd.Next(0, 1000) < 5)
                         {
                             //coins
                             AddMob(new Item(contentManager, i + rnd.NextDouble() * 0.75 - 0.375, j + rnd.NextDouble() * 0.75 - 0.375, 3, 1));
+                        }
+                        
+                        if(IsVillage&&rnd.Next(0, 100)<1)
+                        {
+                            blocks[i, j] = new Block(contentManager, 4);
                         }
                     }
                     else
@@ -230,6 +246,33 @@ namespace Rooms
 
             blocks[roomSize / 2 - 1, roomSize - 2] = new Block(contentManager, 2);
             blocks[roomSize / 2 + 1, roomSize - 2] = new Block(contentManager, 2);
+
+            //village
+            if (IsVillage)
+            {
+                AddMob(new Trader(contentManager, roomSize / 2, roomSize / 2, 9, gameWorld));
+
+                int hutCount = rnd.Next(4, 8);
+
+                for (int i = 0; i < hutCount; i++)
+                {
+                    int xmn = rnd.Next((int)(roomSize * 0.125), (int)(roomSize * 0.3));
+                    int ymn = rnd.Next((int)(roomSize * 0.125), (int)(roomSize * 0.3));
+                    int hutx, huty;
+
+                    if(rnd.Next(0, 2)==0)
+                        hutx = roomSize / 2 + xmn;
+                    else
+                        hutx = roomSize / 2 - xmn;
+
+                    if (rnd.Next(0, 2) == 0)
+                        huty = roomSize / 2 + ymn;
+                    else
+                        huty = roomSize / 2 - ymn;
+
+                    AddMob(new Decoration(contentManager, hutx, huty, 8));
+                }
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch, int x, int y)
@@ -255,7 +298,12 @@ namespace Rooms
                 }
             }
 
-            heroReference.DrawInterface(spriteBatch);
+            foreach(var currentMobInterface in mobsWithInterface)
+            {
+                currentMobInterface.DrawInterface(spriteBatch);
+            }
+
+           // heroReference.DrawInterface(spriteBatch);
         }
 
         public void Update(ContentManager contentManager, GameWorld gameWorld)
