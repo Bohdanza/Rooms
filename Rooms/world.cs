@@ -76,9 +76,10 @@ namespace Rooms
         public void Draw(SpriteBatch spriteBatch)
         {
             leftRoom.Draw(spriteBatch, 960 - (int)(Room.roomSize * 1.5)*BlockSizeX, DrawY);
-            rightRoom.Draw(spriteBatch, 960 + (int)(Room.roomSize * 0.5) * BlockSizeX, DrawY);
 
             currentRoom.Draw(spriteBatch, DrawX, DrawY);
+
+            rightRoom.Draw(spriteBatch, 960 + (int)(Room.roomSize /2 * BlockSizeX)+15, DrawY);
         }
         
         public void Update(ContentManager contentManager)
@@ -171,6 +172,17 @@ namespace Rooms
         public void Save()
         {
             string str = currentRoom.X.ToString() + '\n' + currentRoom.Y.ToString();
+
+            if (!Directory.Exists(@"info\" + Name + @"\"))
+            {
+                Directory.CreateDirectory(@"info\" + Name + @"\");
+            }
+
+            if(!File.Exists(@"info\" + Name + @"\current_pos"))
+            {
+                var nf=File.Create(@"info\" + Name + @"\current_pos");
+                nf.Close();
+            }
 
             using (StreamWriter sw = new StreamWriter(@"info\" + Name + @"\current_pos"))
             {

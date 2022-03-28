@@ -18,6 +18,8 @@ namespace Rooms
         public int HP { get; protected set; }
         public int MaxHP { get; protected set; }
         private string Action { get; set; }
+        public bool Agressive { get; set; } = false;
+        private float Direction { get; set; } = 0;
 
         public NPC(ContentManager contentManager, GameWorld gameWorld, double x, double y, int type, double speed, int HP, int maxHP)
         {
@@ -52,7 +54,41 @@ namespace Rooms
 
             updateTexture(contentManager, true);
         }
-        
+
+        public override void Update(ContentManager contentManager, GameWorld gameWorld)
+        {
+            var rnd = new Random();
+
+            if(rnd.Next(0, 1000)<10)
+            {
+                float addToDirection = 0.872f;
+
+                if(rnd.Next(0, 2)==0)
+                {
+                    addToDirection *= -1;
+                }
+
+                Direction += addToDirection;
+            }
+
+            if (Action == "id" && rnd.Next(0, 1000) < 15)
+            {
+                Action = "wa";
+            }
+
+            if (Action == "wa")
+            {
+                Move(Speed, Direction, gameWorld);
+
+                if(rnd.Next(0, 1000) < 15)
+                {
+                    Action = "id";
+                }
+            }
+
+            base.Update(contentManager, gameWorld);
+        }
+
         /// <summary>
         /// Used to increase the texture number if reload==false and reload the whole Textures list if it's true
         /// </summary>

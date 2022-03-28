@@ -162,7 +162,7 @@ namespace Rooms
             bool IsVillage = false;
             var rnd = new Random();
 
-            if (rnd.Next(0, 100) < 100)
+            if (rnd.Next(0, 100) < 20)
             {
                 IsVillage = true;
             }
@@ -184,11 +184,6 @@ namespace Rooms
                             //coins
                             AddMob(new Item(contentManager, i + rnd.NextDouble() * 0.75 - 0.375, j + rnd.NextDouble() * 0.75 - 0.375, 3, 1));
                         }
-                        
-                        if(IsVillage&&rnd.Next(0, 100)<1)
-                        {
-                            blocks[i, j] = new Block(contentManager, 4);
-                        }
                     }
                     else
                     {
@@ -198,7 +193,7 @@ namespace Rooms
 
             int placeBeholder = rnd.Next(0, 100);
 
-            if (placeBeholder < 100)
+            if (placeBeholder < -1)
             {
                 int xb = rnd.Next(0, roomSize);
                 int yb = rnd.Next(0, roomSize);
@@ -252,7 +247,7 @@ namespace Rooms
             {
                 AddMob(new Trader(contentManager, roomSize / 2, roomSize / 2, 9, gameWorld));
 
-                int hutCount = rnd.Next(4, 8);
+                int hutCount = rnd.Next(10, 16);
 
                 for (int i = 0; i < hutCount; i++)
                 {
