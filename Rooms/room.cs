@@ -298,6 +298,18 @@ namespace Rooms
 
                                 //blocks[(int)Math.Round(Xplace), (int)Math.Round(Yplace)] = new Block(contentManager, 5);
                             }
+                            else if (rnd.Next(0, 100) <= -5 * (layer - 2) * (layer - 2) + 20)
+                            {
+                                hutToAdd = new Decoration(contentManager, Xplace, Yplace, 16);
+                            }
+                            else if (rnd.Next(0, 100) <= layer * layer * 2.5)
+                            {
+                                hutToAdd = new Decoration(contentManager, Xplace, Yplace, 15);
+                            }
+                            else if (rnd.Next(0, 100) <= -4 * (layer - 2) * (layer - 2) + 15)
+                            {
+                                hutToAdd = new Decoration(contentManager, Xplace, Yplace, 17);
+                            }
                             else
                             {
                                 hutToAdd = new Decoration(contentManager, Xplace, Yplace, 8);
@@ -306,7 +318,7 @@ namespace Rooms
                                 {
                                     AddMob(new NPC(contentManager, gameWorld, Xplace, Yplace, 11, 0.05, 30, 30));
                                 }
-                                else if(rnd.Next(0, 100)<10)
+                                else if(rnd.Next(0, 100)<20)
                                 {
                                     AddMob(new Trader(contentManager, Xplace+(rnd.NextDouble()-0.5)*2, Yplace + 1, 9, gameWorld));
                                 }
