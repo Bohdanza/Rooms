@@ -22,5 +22,23 @@ namespace Rooms
 
             updateTexture(contentManager, true);
         }
+
+        public Decoration(ContentManager contentManager, List<string> input, int currentStr)
+        {
+            Name = input[currentStr + 1];
+
+            ChangeCoords(double.Parse(input[currentStr + 2]), double.Parse(input[currentStr + 3]));
+
+            Type = Int32.Parse(input[currentStr + 4]);
+
+            Radius = 1;
+
+            updateTexture(contentManager, true);
+        }
+
+        public override string SaveList()
+        {
+            return "Decoration\n" +base.SaveList();
+        }
     }
 }

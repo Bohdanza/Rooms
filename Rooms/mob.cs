@@ -119,8 +119,10 @@ namespace Rooms
             Y = y;
         }
 
-        public void Move(double speed, double direction, GameWorld gameWorld)
+        public bool Move(double speed, double direction, GameWorld gameWorld)
         {
+            bool ans = true;
+
             double x = Math.Cos(direction) * speed;
             double y = Math.Sin(direction) * speed;
 
@@ -132,6 +134,13 @@ namespace Rooms
             if (X < 0)
             {
                 X = 0;
+                ans = false;
+            }
+
+            if (X > Room.roomSize - 1)
+            {
+                X = Room.roomSize - 1;
+                ans = false;
             }
 
             //check for center
@@ -139,6 +148,7 @@ namespace Rooms
                 !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y)].Passable)
             {
                 X = px;
+                ans = false;
             }
 
             //fast check for hitbox. Can be incorrect sometimes
@@ -146,24 +156,28 @@ namespace Rooms
                 !gameWorld.currentRoom.blocks[(int)Math.Round(X + Radius), (int)Math.Round(Y)].Passable)
             {
                 X = px;
+                ans = false;
             }
             
             if (X - Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X - Radius >= 0 && Y >= 0 &&
                 !gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y)].Passable)
             {
                 X = px;
+                ans = false;
             }
 
             if (X <= Room.roomSize - 1 && Y + Radius <= Room.roomSize - 1 && X >= 0 && Y + Radius >= 0 &&
                 !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y + Radius)].Passable)
             {
                 X = px;
+                ans = false;
             }
 
             if (X<= Room.roomSize - 1 && Y - Radius <= Room.roomSize - 1 && X >= 0 && Y - Radius >= 0 &&
                 !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y - Radius)].Passable)
             {
                 X = px;
+                ans = false;
             }
 
             Y += y;
@@ -171,6 +185,13 @@ namespace Rooms
             if (Y < 0)
             {
                 Y = 0;
+                ans = false;
+            }
+
+            if (Y > Room.roomSize - 1)
+            {
+                Y = Room.roomSize - 1;
+                ans = false;
             }
 
             //check for center
@@ -178,6 +199,7 @@ namespace Rooms
                 !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y)].Passable)
             {
                 Y = py;
+                ans = false;
             }
 
             //fast check for hitbox. Can be incorrect sometimes
@@ -185,25 +207,31 @@ namespace Rooms
                 !gameWorld.currentRoom.blocks[(int)Math.Round(X + Radius), (int)Math.Round(Y)].Passable)
             {
                 Y = py;
+                ans = false;
             }
 
             if (X - Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X - Radius >= 0 && Y >= 0 &&
                 !gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y)].Passable)
             {
                 Y = py;
+                ans = false;
             }
 
             if (X <= Room.roomSize - 1 && Y + Radius <= Room.roomSize - 1 && X >= 0 && Y + Radius >= 0 &&
                 !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y + Radius)].Passable)
             {
                 Y = py;
+                ans = false;
             }
 
             if (X <= Room.roomSize - 1 && Y - Radius <= Room.roomSize - 1 && X >= 0 && Y - Radius >= 0 &&
                 !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y - Radius)].Passable)
             {
                 Y = py;
+                ans = false;
             }
+
+            return ans;
         }
         
         /// <summary>
@@ -258,7 +286,17 @@ namespace Rooms
             {
                 resultingMob = new Item(contentManager, input, currentStr);
             }
-            
+
+            if (className == "Decoration")
+            {
+                resultingMob = new Decoration(contentManager, input, currentStr);
+            }
+
+            if(className=="Trader")
+            {
+                resultingMob = new Trader(contentManager, input, currentStr);
+            }
+
             return resultingMob;
         }
     }

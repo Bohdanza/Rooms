@@ -34,6 +34,11 @@ namespace Rooms
 
             Action = "id";
 
+            if (HP <= 0)
+            {
+                Action = "di";
+            }
+
             updateTexture(contentManager, true);
         }
        
@@ -52,14 +57,25 @@ namespace Rooms
 
             Action = "id";
 
+            if(HP<=0)
+            {
+                Action = "di";
+            }
+
             updateTexture(contentManager, true);
+
+            if (Action == "di")
+            {
+                TextureNumber = Textures.Count-1;
+            }
         }
 
         public override void Update(ContentManager contentManager, GameWorld gameWorld)
         {
+            string pact = Action;
             var rnd = new Random();
 
-            if(rnd.Next(0, 1000)<10)
+            if(rnd.Next(0, 1000)<20)
             {
                 float addToDirection = 0.872f;
 
@@ -78,15 +94,31 @@ namespace Rooms
 
             if (Action == "wa")
             {
-                Move(Speed, Direction, gameWorld);
+                bool moved = Move(Speed, Direction, gameWorld);
 
                 if(rnd.Next(0, 1000) < 15)
                 {
                     Action = "id";
                 }
+
+                if(!moved)
+                {
+                    Direction += (float)Math.PI;
+                }
             }
 
-            base.Update(contentManager, gameWorld);
+            TimeSinceLastTextureUpdate++;
+
+            if (Action != pact)
+            {
+                updateTexture(contentManager, true);
+            }
+            else if (TimeSinceLastTextureUpdate >= GameWorld.TextureUpdateSpeed)
+            {
+                TimeSinceLastTextureUpdate = 0;
+
+                updateTexture(contentManager, false);
+            }
         }
 
         /// <summary>

@@ -162,7 +162,7 @@ namespace Rooms
             bool IsVillage = false;
             var rnd = new Random();
 
-            if (rnd.Next(0, 100) < 20)
+            if (rnd.Next(0, 100) < 75)
             {
                 IsVillage = true;
             }
@@ -204,24 +204,27 @@ namespace Rooms
                 }
             }
 
-            //generating main landscape
-            //points which are used to generate "rocks" around them
-            int pointCount = rnd.Next(5, 11);
-
-            //counter of already added
-            int c = 0;
-
-            //placing in random places
-            while (c < pointCount)
+            if (!IsVillage)
             {
-                int tmpx = rnd.Next(1, roomSize - 1);
-                int tmpy = rnd.Next(1, roomSize - 1);
+                //generating main landscape
+                //points which are used to generate "rocks" around them
+                int pointCount = rnd.Next(5, 11);
 
-                if (blocks[tmpx, tmpy].Type != 1)
+                //counter of already added
+                int c = 0;
+
+                //placing in random places
+                while (c < pointCount)
                 {
-                    blocks[tmpx, tmpy] = new Block(contentManager, 1);
+                    int tmpx = rnd.Next(1, roomSize - 1);
+                    int tmpy = rnd.Next(1, roomSize - 1);
 
-                    c++;
+                    if (blocks[tmpx, tmpy].Type != 1)
+                    {
+                        blocks[tmpx, tmpy] = new Block(contentManager, 1);
+
+                        c++;
+                    }
                 }
             }
 
@@ -245,27 +248,73 @@ namespace Rooms
             //village
             if (IsVillage)
             {
-                AddMob(new Trader(contentManager, roomSize / 2, roomSize / 2, 9, gameWorld));
-
-                int hutCount = rnd.Next(10, 16);
-
-                for (int i = 0; i < hutCount; i++)
+                for (int layer = 0; layer < 4; layer++)
                 {
-                    int xmn = rnd.Next((int)(roomSize * 0.125), (int)(roomSize * 0.3));
-                    int ymn = rnd.Next((int)(roomSize * 0.125), (int)(roomSize * 0.3));
-                    int hutx, huty;
+                    int dist = layer * 3 + 6;
+                    int count = rnd.Next(3 + layer * 2, 6 + (int)(layer * 1.5));
+                    int currentlyPlaced = 0;
+                    List<Vector2> forbiddenPositions = new List<Vector2>();
 
-                    if(rnd.Next(0, 2)==0)
-                        hutx = roomSize / 2 + xmn;
-                    else
-                        hutx = roomSize / 2 - xmn;
+                    while (currentlyPlaced < count)
+                    {
+                        float angle = (float)(rnd.NextDouble() * Math.PI * 2);
+                        bool canBeUsed = true;
 
-                    if (rnd.Next(0, 2) == 0)
-                        huty = roomSize / 2 + ymn;
-                    else
-                        huty = roomSize / 2 - ymn;
+                        for (int i = 0; i < forbiddenPositions.Count && canBeUsed; i++)
+                        {
+                            if (angle < forbiddenPositions[i].Y && angle > forbiddenPositions[i].X)
+                            {
+                                canBeUsed = false;
+                            }
+                        }
 
-                    AddMob(new Decoration(contentManager, hutx, huty, 8));
+                        if (canBeUsed)
+                        {
+                            forbiddenPositions.Add(new Vector2(angle - ((float)Math.PI / count),
+                                angle + ((float)Math.PI / count)));
+
+                            double Xplace = Math.Cos(angle) * dist + roomSize / 2;
+                            double Yplace = Math.Sin(angle) * dist + roomSize / 2;
+
+                            currentlyPlaced++;
+
+                            Mob hutToAdd;
+
+                            if (layer == 0 && rnd.Next(0, 100) < 33)
+                            {
+                                hutToAdd = new Decoration(contentManager, Xplace, Yplace, 10);
+                            }
+                            else if (layer == 0 && rnd.Next(0, 100) < 10)
+                            {
+                                hutToAdd = new Decoration(contentManager, Xplace, Yplace, 13);
+                            }
+                            else if ((layer == 1 || layer == 2) && rnd.Next(0, 100) < 25)
+                            {
+                                hutToAdd = new Decoration(contentManager, Xplace, Yplace, 13);
+                            }
+                            else if (rnd.Next(0, 100) < layer * 15)
+                            {
+                                hutToAdd = new Decoration(contentManager, (int)Math.Round(Xplace), (int)Math.Round(Yplace), 14);
+
+                                //blocks[(int)Math.Round(Xplace), (int)Math.Round(Yplace)] = new Block(contentManager, 5);
+                            }
+                            else
+                            {
+                                hutToAdd = new Decoration(contentManager, Xplace, Yplace, 8);
+
+                                if (rnd.Next(0, 100) < 33)
+                                {
+                                    AddMob(new NPC(contentManager, gameWorld, Xplace, Yplace, 11, 0.05, 30, 30));
+                                }
+                                else if(rnd.Next(0, 100)<10)
+                                {
+                                    AddMob(new Trader(contentManager, Xplace+(rnd.NextDouble()-0.5)*2, Yplace + 1, 9, gameWorld));
+                                }
+                            }
+
+                            AddMob(hutToAdd);
+                        }
+                    }
                 }
             }
         }
@@ -282,11 +331,14 @@ namespace Rooms
 
                     currentMob++;
                 }
-                else if (j < Room.roomSize)
+                else
                 {
-                    for (int i = 0; i < roomSize; i++)
+                    if (j < Room.roomSize)
                     {
-                        blocks[i, j].Draw(spriteBatch, x + i * GameWorld.BlockSizeX - GameWorld.BlockSizeX / 2, y + j * GameWorld.BlockSizeY - GameWorld.BlockSizeY / 2);
+                        for (int i = 0; i < roomSize; i++)
+                        {
+                            blocks[i, j].Draw(spriteBatch, x + i * GameWorld.BlockSizeX - GameWorld.BlockSizeX / 2, y + j * GameWorld.BlockSizeY - GameWorld.BlockSizeY / 2);
+                        }
                     }
 
                     j++;

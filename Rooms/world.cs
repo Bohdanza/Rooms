@@ -26,8 +26,8 @@ namespace Rooms
         public const int BlockSizeY = 23;
         public string Name { get; protected set; }
         public Room currentRoom { get; protected set; }
-        public Room leftRoom { get; protected set; }
-        public Room rightRoom { get; protected set; }
+     //   public Room leftRoom { get; protected set; }
+     //   public Room rightRoom { get; protected set; }
 
         public GameWorld(ContentManager contentManager, string name)
         {
@@ -53,7 +53,7 @@ namespace Rooms
                 currentRoom = new Room(contentManager, 0, 0, this, newHero);
             }
 
-            leftRoom = new Room(contentManager, currentRoom.X - 1, currentRoom.Y, this, currentRoom.heroReference);
+           /* leftRoom = new Room(contentManager, currentRoom.X - 1, currentRoom.Y, this, currentRoom.heroReference);
             leftRoom.MarkMobAsDeleted(leftRoom.heroReference);
             leftRoom.DeleteMarked();
 
@@ -63,7 +63,7 @@ namespace Rooms
             rightRoom.MarkMobAsDeleted(leftRoom.heroReference);
             rightRoom.DeleteMarked();
 
-            rightRoom.Save();
+            rightRoom.Save();*/
 
             //loading all static things, most of them used for drawing
             SelectionCursorTexture = contentManager.Load<Texture2D>("selection_cursor");
@@ -75,11 +75,11 @@ namespace Rooms
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            leftRoom.Draw(spriteBatch, 960 - (int)(Room.roomSize * 1.5)*BlockSizeX, DrawY);
+      //      leftRoom.Draw(spriteBatch, 960 - (int)(Room.roomSize * 1.5)*BlockSizeX, DrawY);
 
             currentRoom.Draw(spriteBatch, DrawX, DrawY);
 
-            rightRoom.Draw(spriteBatch, 960 + (int)(Room.roomSize /2 * BlockSizeX)+15, DrawY);
+     //       rightRoom.Draw(spriteBatch, 960 + (int)(Room.roomSize /2 * BlockSizeX)+15, DrawY);
         }
         
         public void Update(ContentManager contentManager)
@@ -91,7 +91,7 @@ namespace Rooms
 
             if (currentRoom.heroReference.X <= 0)
             {
-                currentRoom.heroReference.ChangeCoords(Room.roomSize - 1, currentRoom.heroReference.Y);
+                currentRoom.heroReference.ChangeCoords(Room.roomSize - 1.00001, currentRoom.heroReference.Y);
 
                 var newHero = currentRoom.heroReference;
 
@@ -105,7 +105,7 @@ namespace Rooms
                 Save();
             }
 
-            if (currentRoom.heroReference.X > Room.roomSize - 1)
+            if (currentRoom.heroReference.X >= Room.roomSize - 1)
             {
                 currentRoom.heroReference.ChangeCoords(0, currentRoom.heroReference.Y);
 
@@ -123,7 +123,7 @@ namespace Rooms
 
             if (currentRoom.heroReference.Y <= 0)
             {
-                currentRoom.heroReference.ChangeCoords(currentRoom.heroReference.X, Room.roomSize - 1);
+                currentRoom.heroReference.ChangeCoords(currentRoom.heroReference.X, Room.roomSize - 1.00001);
                 
                 var newHero = currentRoom.heroReference;
 
@@ -137,7 +137,7 @@ namespace Rooms
                 Save();
             }
 
-            if (currentRoom.heroReference.Y > Room.roomSize - 1)
+            if (currentRoom.heroReference.Y >= Room.roomSize - 1)
             {
                 currentRoom.heroReference.ChangeCoords(currentRoom.heroReference.X, 0);
 
@@ -153,7 +153,7 @@ namespace Rooms
                 Save();
             }
             
-            if(roomX!=currentRoom.X||roomY!=currentRoom.Y)
+           /* if(roomX!=currentRoom.X||roomY!=currentRoom.Y)
             {
                 leftRoom = new Room(contentManager, currentRoom.X - 1, currentRoom.Y, this, currentRoom.heroReference);
                 leftRoom.MarkMobAsDeleted(leftRoom.heroReference);
@@ -166,7 +166,7 @@ namespace Rooms
                 rightRoom.DeleteMarked();
 
                 rightRoom.Save();
-            }
+            }*/
         }
 
         public void Save()
@@ -190,6 +190,8 @@ namespace Rooms
             }
 
             currentRoom.Save();
+         //   rightRoom.Save();
+         //   leftRoom.Save();
         }
 
         public static double GetDist(double x1, double y1, double x2, double y2)
