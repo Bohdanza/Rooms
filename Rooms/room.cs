@@ -159,10 +159,12 @@ namespace Rooms
 
         protected void Generate(ContentManager contentManager, int x, int y, GameWorld gameWorld)
         {
+            bool IsFirstTemple = x==0&&y==0;
             bool IsVillage = false;
+
             var rnd = new Random();
 
-            if (rnd.Next(0, 100) < 75)
+            if (rnd.Next(0, 100) < 20&&!IsFirstTemple)
             {
                 IsVillage = true;
             }
@@ -328,6 +330,14 @@ namespace Rooms
                         }
                     }
                 }
+            }
+
+            //the beginning
+            if(IsFirstTemple)
+            {
+                AddMob(new Decoration(contentManager, roomSize / 2, roomSize / 2, 20));
+
+                AddMob(new Speaker(contentManager, gameWorld, roomSize / 2, roomSize / 2 + 1, 21, 0));
             }
         }
 

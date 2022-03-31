@@ -169,6 +169,13 @@
 /processorParam:TextureFormat=Color
 /build:deal_arrow.png
 
+#begin dialogue_font.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:dialogue_font.spritefont
+
 #begin main_font_28s.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -872,6 +879,18 @@
 /processorParam:TextureFormat=Color
 /build:mob_18_0.png
 
+#begin mob_19_0.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:mob_19_0.png
+
 #begin mob_2_0.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -883,6 +902,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:mob_2_0.png
+
+#begin mob_20_0.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:mob_20_0.png
+
+#begin mob_21_0.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:mob_21_0.png
 
 #begin mob_3_0.png
 /importer:TextureImporter

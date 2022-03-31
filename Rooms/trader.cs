@@ -45,6 +45,13 @@ namespace Rooms
 
             Radius = 1;
 
+            deals = new List<Deal>();
+
+            for (int i = 0; i < 4; i++)
+            {
+                deals.Add(new Deal(contentManager));
+            }
+
             updateTexture(contentManager, true);
         }
 
