@@ -40,7 +40,7 @@ namespace Rooms
             mobs = new List<Mob>();
 
             heroReference = null;
-            
+
             try
             { 
                 Load(contentManager, x, y, gameWorld);

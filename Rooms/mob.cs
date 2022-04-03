@@ -297,6 +297,11 @@ namespace Rooms
                 resultingMob = new Trader(contentManager, input, currentStr);
             }
 
+            if(className=="Speaker")
+            {
+                resultingMob = new Speaker(contentManager, input, currentStr);
+            }
+
             return resultingMob;
         }
     }

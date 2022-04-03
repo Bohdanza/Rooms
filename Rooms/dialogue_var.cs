@@ -61,6 +61,8 @@ namespace Rooms
                 selectedPhrase--;
             }
 
+            pstate = mstate;
+
             return selectedPhrase;
         }
 
@@ -81,7 +83,7 @@ namespace Rooms
                 }
                 else
                 {
-                    spriteBatch.DrawString(font, Answers[i], new Vector2(X, Y + (i+1) * font.LineSpacing), Color.White);
+                    spriteBatch.DrawString(font, Answers[i], new Vector2(X, Y + i * font.LineSpacing), Color.White);
                 }
             }
         }
