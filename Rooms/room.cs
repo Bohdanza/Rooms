@@ -191,6 +191,13 @@ namespace Rooms
                     {
                         blocks[i, j] = new Block(contentManager, 1);
                     }
+
+                    int blockChangeProb = rnd.Next(0, 100);
+
+                    if (blocks[i, j].Type == 1 && blockChangeProb < 33)
+                    {
+                        blocks[i, j] = new Block(contentManager, rnd.Next(4, 10));
+                    }
                 }
 
             int placeBeholder = rnd.Next(0, 100);
@@ -489,6 +496,28 @@ namespace Rooms
                 if (cdist > dst 
                     && !ignoredMobs.Contains(mobs[i]) 
                     && allowedTypes.Any(s=>mobs[i].SaveList().StartsWith(s)))
+                {
+                    cdist = dst;
+
+                    closestMob = mobs[i];
+                }
+            }
+
+            return closestMob;
+        }
+
+        public Mob GetClosestMob(double x, double y, List<Mob> ignoredMobs, List<Mob> allowedMobs)
+        {
+            double cdist = 1e9;
+            Mob closestMob = null;
+
+            for (int i = 0; i < mobs.Count; i++)
+            {
+                double dst = GameWorld.GetDist(x, y, mobs[i].X, mobs[i].Y);
+
+                if (cdist > dst
+                    && !ignoredMobs.Contains(mobs[i])
+                    && allowedMobs.Contains(mobs[i]))
                 {
                     cdist = dst;
 
