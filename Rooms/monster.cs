@@ -20,6 +20,8 @@ namespace Rooms
         private string Action { get; set; }
         public bool Agressive { get; set; } = false;
         private float Direction { get; set; } = 0;
+        public int TimeSinceLastAttack = 0;
+        public int AttackDelay = 20;
 
         public NPC(ContentManager contentManager, GameWorld gameWorld, double x, double y, int type, double speed, int HP, int maxHP)
         {

@@ -16,7 +16,7 @@ namespace Rooms
     {
         public const int ItemTextureSize = 55;
 
-        public int DrawX = (1920-BlockSizeX*Room.roomSize)/2, DrawY = (1080 - BlockSizeY * Room.roomSize) / 2;
+        public int DrawX = BlockSizeX / 2, DrawY = (1080 - BlockSizeY * Room.roomSize) / 2;
         public const int TextureUpdateSpeed = 9;
 
         public static Texture2D SelectionCursorTexture { get; protected set; }
@@ -152,21 +152,10 @@ namespace Rooms
 
                 Save();
             }
-            
-           /* if(roomX!=currentRoom.X||roomY!=currentRoom.Y)
-            {
-                leftRoom = new Room(contentManager, currentRoom.X - 1, currentRoom.Y, this, currentRoom.heroReference);
-                leftRoom.MarkMobAsDeleted(leftRoom.heroReference);
-                leftRoom.DeleteMarked();
 
-                leftRoom.Save();
+            DrawY = (int)(-currentRoom.heroReference.Y * BlockSizeY) + 540 - BlockSizeY;
 
-                rightRoom = new Room(contentManager, currentRoom.X + 1, currentRoom.Y, this, currentRoom.heroReference);
-                rightRoom.MarkMobAsDeleted(leftRoom.heroReference);
-                rightRoom.DeleteMarked();
-
-                rightRoom.Save();
-            }*/
+            DrawY = Math.Min(DrawY, BlockSizeY);
         }
 
         public void Save()

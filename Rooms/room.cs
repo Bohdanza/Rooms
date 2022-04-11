@@ -14,7 +14,7 @@ namespace Rooms
 {
     public class Room
     {
-        public const int roomSize = 47;
+        public const int roomSize = 64;
 
         public int biome { get; protected set; }
 
@@ -173,35 +173,32 @@ namespace Rooms
             for (int i = 0; i < roomSize; i++)
                 for (int j = 0; j < roomSize; j++)
                 {
-                    if (GameWorld.GetDist(roomSize / 2 - 0.5, roomSize / 2 - 0.5, i, j) < roomSize / 2 - 1 - rnd.Next(0, 8))
-                    {
-                        blocks[i, j] = new Block(contentManager, 0);
+                    blocks[i, j] = new Block(contentManager, 0);
 
-                        if (!IsVillage && rnd.Next(0, 1000) < 5)
-                        {
-                            AddMob(new NPC(contentManager, gameWorld, i, j, 1, 0.075, 10, 10));
-                        }
-                        else if (!IsVillage && rnd.Next(0, 1000) < 5)
-                        {
-                            //coins
-                            AddMob(new Item(contentManager, i + rnd.NextDouble() * 0.75 - 0.375, j + rnd.NextDouble() * 0.75 - 0.375, 3, 1));
-                        }
-                    }
-                    else
+                    if (!IsVillage && rnd.Next(0, 1000) < 5)
                     {
-                        blocks[i, j] = new Block(contentManager, 1);
+                        AddMob(new NPC(contentManager, gameWorld, i, j, 1, 0.075, 10, 10));
+                    }
+                    else if (!IsVillage && rnd.Next(0, 1000) < 5)
+                    {
+                        //coins
+                        AddMob(new Item(contentManager, i + rnd.NextDouble() * 0.75 - 0.375, j + rnd.NextDouble() * 0.75 - 0.375, 3, 1));
                     }
 
                     int blockChangeProb = rnd.Next(0, 100);
-
-                    if (blocks[i, j].Type == 1 && blockChangeProb < 33)
-                    {
-                        blocks[i, j] = new Block(contentManager, rnd.Next(4, 10));
-                    }
                 }
 
-            int placeBeholder = rnd.Next(0, 100);
+            placeRectagle(contentManager, 0, 0, roomSize, roomSize, 5);
+            placeRectagle(contentManager, 3, 3, roomSize - 3, roomSize - 3, 0);
 
+            placeRectagle(contentManager, 3, 3, roomSize - 3, 4, 3);
+            placeRectagle(contentManager, 3, 3, 4, roomSize - 3, 7);
+
+            placeRectagle(contentManager, roomSize - 3, 4, roomSize - 2, roomSize - 3, 8);
+            placeRectagle(contentManager, 4, roomSize - 3, roomSize - 3, roomSize - 2, 4);
+
+            int placeBeholder = rnd.Next(0, 100);
+            
             if (placeBeholder < -1)
             {
                 int xb = rnd.Next(0, roomSize);
@@ -236,24 +233,7 @@ namespace Rooms
                     }
                 }
             }
-
-            //doors
-            placeRectagle(contentManager, roomSize / 2, 0, roomSize / 2 + 1, roomSize, 0);
-            placeRectagle(contentManager, 0, roomSize / 2, roomSize, roomSize / 2 + 1, 0);
-
-            //door lights
-            blocks[1, roomSize / 2 - 1] = new Block(contentManager, 2);
-            blocks[1, roomSize / 2 + 1] = new Block(contentManager, 2); 
-
-            blocks[roomSize / 2 - 1, 1] = new Block(contentManager, 2);
-            blocks[roomSize / 2 + 1, 1] = new Block(contentManager, 2);
             
-            blocks[roomSize - 2, roomSize / 2 - 1] = new Block(contentManager, 2);
-            blocks[roomSize - 2, roomSize / 2 + 1] = new Block(contentManager, 2);
-
-            blocks[roomSize / 2 - 1, roomSize - 2] = new Block(contentManager, 2);
-            blocks[roomSize / 2 + 1, roomSize - 2] = new Block(contentManager, 2);
-
             //village
             if (IsVillage)
             {
@@ -383,7 +363,7 @@ namespace Rooms
         }
 
         public void Update(ContentManager contentManager, GameWorld gameWorld)
-        {
+        { 
             for (int i = 0; i < mobs.Count; i++)
             {
                 if (mobs[i] != null)
