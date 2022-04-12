@@ -35,6 +35,8 @@ namespace Rooms
         /// </summary>
         public int TextureNumber { get; protected set; }
 
+        public ControlCenter controlCenter { get; set; } = null;
+
         /// <summary>
         /// Used to increase the texture number if reload==false and reload the whole Textures list if it's true
         /// </summary>

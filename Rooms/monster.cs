@@ -77,39 +77,49 @@ namespace Rooms
             string pact = Action;
             var rnd = new Random();
 
-            if(rnd.Next(0, 1000)<20)
+            if (controlCenter == null)
             {
-                float addToDirection = 0.872f;
-
-                if(rnd.Next(0, 2)==0)
+                if (rnd.Next(0, 1000) < 20)
                 {
-                    addToDirection *= -1;
+                    float addToDirection = 0.872f;
+
+                    if (rnd.Next(0, 2) == 0)
+                    {
+                        addToDirection *= -1;
+                    }
+
+                    Direction += addToDirection;
                 }
 
-                Direction += addToDirection;
-            }
-
-            if (Action == "id" && rnd.Next(0, 1000) < 15)
-            {
-                Action = "wa";
-            }
-
-            if (Action == "wa")
-            {
-                bool moved = Move(Speed, Direction, gameWorld);
-
-                if(rnd.Next(0, 1000) < 15)
+                if (Action == "id" && rnd.Next(0, 1000) < 15)
                 {
-                    Action = "id";
+                    Action = "wa";
                 }
 
-                if(!moved)
+                if (Action == "wa")
                 {
-                    Direction += (float)Math.PI;
+                    bool moved = Move(Speed, Direction, gameWorld);
+
+                    if (rnd.Next(0, 1000) < 15)
+                    {
+                        Action = "id";
+                    }
+
+                    if (!moved)
+                    {
+                        Direction += (float)Math.PI;
+                    }
+                }
+
+                TimeSinceLastTextureUpdate++;
+            }
+            else
+            {
+                if (GameWorld.GetDist(X, Y, controlCenter.X, controlCenter.Y) >= controlCenter.MaxDist)
+                {
+                    Move(Speed, GameWorld.GetDirection(controlCenter.X, controlCenter.Y, X, Y), gameWorld);
                 }
             }
-
-            TimeSinceLastTextureUpdate++;
 
             if (Action != pact)
             {

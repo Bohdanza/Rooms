@@ -192,7 +192,7 @@ namespace Rooms
             placeRectagle(contentManager, 3, 3, roomSize - 3, roomSize - 3, 0);
 
             placeRectagle(contentManager, 3, 3, roomSize - 3, 4, 3);
-            placeRectagle(contentManager, 3, 3, 4, roomSize - 3, 7);
+            placeRectagle(contentManager, 3, 4, 4, roomSize - 3, 7);
 
             placeRectagle(contentManager, roomSize - 3, 4, roomSize - 2, roomSize - 3, 8);
             placeRectagle(contentManager, 4, roomSize - 3, roomSize - 3, roomSize - 2, 4);
@@ -232,9 +232,39 @@ namespace Rooms
                         c++;
                     }
                 }
+
+                //Adding sharokz group
+                if (rnd.Next(0, 100) < 66)
+                {
+                    double xGroup = rnd.NextDouble() * Room.roomSize;
+                    double yGroup = rnd.NextDouble() * Room.roomSize;
+
+                    ControlCenter comCenter = new ControlCenter(xGroup, yGroup, 0, 3, 1.2);
+
+                    int groupSize = rnd.Next(3, 8);
+
+                    for (int i = 0; i < groupSize; i++)
+                    {
+                        double xUnit = xGroup - (rnd.NextDouble() - 0.5) * 6;
+                        double yUnit = yGroup - (rnd.NextDouble() - 0.5) * 6;
+
+                        if ((int)xUnit >= 0 && (int)xUnit < Room.roomSize &&
+                            (int)yUnit >= 0 && (int)yUnit < Room.roomSize &&
+                            blocks[(int)xUnit, (int)yUnit].Passable)
+                        {
+                            var mbadd = new NPC(contentManager, gameWorld, xUnit, yUnit, 22, 0.12, 10, 10);
+
+                            comCenter.AddMob(mbadd);
+
+                            AddMob(mbadd);
+                        }
+
+                        AddMob(comCenter);
+                    }
+                }
             }
             
-            //village
+            //village-
             if (IsVillage)
             {
                 for (int layer = 0; layer < 4; layer++)

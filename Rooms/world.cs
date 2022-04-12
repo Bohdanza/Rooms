@@ -153,9 +153,18 @@ namespace Rooms
                 Save();
             }
 
-            DrawY = (int)(-currentRoom.heroReference.Y * BlockSizeY) + 540 - BlockSizeY;
+            if(currentRoom.heroReference.Y*BlockSizeY+DrawY>=1080-250)
+            {
+                DrawY -= (int)(currentRoom.heroReference.Speed * BlockSizeY);
+            }
 
+            if (currentRoom.heroReference.Y * BlockSizeY + DrawY <= 250)
+            {
+                DrawY += (int)(currentRoom.heroReference.Speed * BlockSizeY);
+            }
+            
             DrawY = Math.Min(DrawY, BlockSizeY);
+            DrawY = Math.Max(DrawY, -(Room.roomSize * BlockSizeY) + 1080+BlockSizeY);
         }
 
         public void Save()
@@ -186,6 +195,11 @@ namespace Rooms
         public static double GetDist(double x1, double y1, double x2, double y2)
         {
             return Math.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+        }
+
+        public static double GetDirection(double x1, double y1, double x2, double y2)
+        {
+            return Math.Atan2(y1 - y2, x1 - x2);
         }
     }
 }
