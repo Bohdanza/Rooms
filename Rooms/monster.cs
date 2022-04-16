@@ -110,16 +110,52 @@ namespace Rooms
                         Direction += (float)Math.PI;
                     }
                 }
-
-                TimeSinceLastTextureUpdate++;
             }
-            else
+            else if (Action != "dm" && Action != "di")
             {
                 if (GameWorld.GetDist(X, Y, controlCenter.X, controlCenter.Y) >= controlCenter.MaxDist)
                 {
                     Move(Speed, GameWorld.GetDirection(controlCenter.X, controlCenter.Y, X, Y), gameWorld);
+
+                    Action = "wa";
+                }
+                else
+                {
+                    if (rnd.Next(0, 1000) < 20)
+                    {
+                        float addToDirection = 0.872f;
+
+                        if (rnd.Next(0, 2) == 0)
+                        {
+                            addToDirection *= -1;
+                        }
+
+                        Direction += addToDirection;
+                    }
+
+                    if (Action == "id" && rnd.Next(0, 1000) < 15)
+                    {
+                        Action = "wa";
+                    }
+
+                    if (Action == "wa")
+                    {
+                        bool moved = Move(Speed, Direction, gameWorld);
+
+                        if (rnd.Next(0, 1000) < 15)
+                        {
+                            Action = "id";
+                        }
+
+                        if (!moved)
+                        {
+                            Direction += (float)Math.PI;
+                        }
+                    }
                 }
             }
+
+            TimeSinceLastTextureUpdate++;
 
             if (Action != pact)
             {

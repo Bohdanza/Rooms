@@ -25,7 +25,7 @@ namespace Rooms
         {
             Type = type;
 
-            if (type != 0)
+            if (type == 1 || type == 2)
             {
                 Passable = false;
             }

@@ -17,7 +17,7 @@ namespace Rooms
         public int Weight { get; protected set; }
         protected List<Texture2D> bigTextures { get; set; }
         protected int bigTexturesNumber = 0;
-
+            
         public Item(ContentManager contentManager, double x, double y, int type, int weight)
         {
             ChangeCoords(x, y);

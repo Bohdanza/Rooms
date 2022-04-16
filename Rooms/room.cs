@@ -14,7 +14,7 @@ namespace Rooms
 {
     public class Room
     {
-        public const int roomSize = 64;
+        public const int roomSize = 128;
 
         public int biome { get; protected set; }
 
@@ -159,7 +159,7 @@ namespace Rooms
 
         protected void Generate(ContentManager contentManager, int x, int y, GameWorld gameWorld)
         {
-            bool IsFirstTemple = x==0&&y==0;
+            bool IsFirstTemple = x == 0 && y == 0;
             bool IsVillage = false;
 
             var rnd = new Random();
@@ -169,33 +169,97 @@ namespace Rooms
                 IsVillage = true;
             }
 
+            int IslandRad = rnd.Next(5, roomSize / 4);
+
             //filling with 0-blocks and walls
             for (int i = 0; i < roomSize; i++)
                 for (int j = 0; j < roomSize; j++)
                 {
-                    blocks[i, j] = new Block(contentManager, 0);
+                    blocks[i, j] = new Block(contentManager, 1);
 
-                    if (!IsVillage && rnd.Next(0, 1000) < 5)
+                    if (GameWorld.GetDist(roomSize / 2, roomSize / 2, i, j) <= IslandRad + rnd.Next(0, 5))
                     {
-                        AddMob(new NPC(contentManager, gameWorld, i, j, 1, 0.075, 10, 10));
-                    }
-                    else if (!IsVillage && rnd.Next(0, 1000) < 5)
-                    {
-                        //coins
-                        AddMob(new Item(contentManager, i + rnd.NextDouble() * 0.75 - 0.375, j + rnd.NextDouble() * 0.75 - 0.375, 3, 1));
+                        blocks[i, j] = new Block(contentManager, 0);
+
+                        if (!IsVillage && rnd.Next(0, 1000) < 5)
+                        {
+                            AddMob(new NPC(contentManager, gameWorld, i, j, 1, 0.075, 10, 10));
+                        }
+                        else if (!IsVillage && rnd.Next(0, 1000) < 5)
+                        {
+                            //coins
+                            AddMob(new Item(contentManager, i + rnd.NextDouble() * 0.75 - 0.375, j + rnd.NextDouble() * 0.75 - 0.375, 3, 1));
+                        }
                     }
 
                     int blockChangeProb = rnd.Next(0, 100);
                 }
 
-            placeRectagle(contentManager, 0, 0, roomSize, roomSize, 5);
-            placeRectagle(contentManager, 3, 3, roomSize - 3, roomSize - 3, 0);
+            //normal borders
+            for (int i = 1; i < roomSize-1; i++)
+                for (int j = 1; j < roomSize-1; j++)
+                    if (blocks[i, j].Type == 0)
+                    {
+                        int newType = 11;
 
-            placeRectagle(contentManager, 3, 3, roomSize - 3, 4, 3);
-            placeRectagle(contentManager, 3, 4, 4, roomSize - 3, 7);
+                        if (blocks[i - 1, j].Passable)
+                        {
+                            newType = 14;
+                        }
 
-            placeRectagle(contentManager, roomSize - 3, 4, roomSize - 2, roomSize - 3, 8);
-            placeRectagle(contentManager, 4, roomSize - 3, roomSize - 3, roomSize - 2, 4);
+                        if (blocks[i, j - 1].Passable)
+                        {
+                            if (newType == 11)
+                                newType = 13;
+
+                            if(newType==14)
+                                newType = 4;
+                        }
+
+                        if (blocks[i + 1, j].Passable)
+                        {
+                            if (newType == 11)
+                                newType = 15;
+
+                            if (newType == 13)
+                                newType = 3;
+
+                            if (newType == 14)
+                                newType = 16;
+
+                            if (newType == 4)
+                                newType = 10;
+                        }
+
+                        if (blocks[i, j + 1].Passable)
+                        {
+                            if (newType == 11)
+                                newType = 12;
+
+                            if (newType == 14)
+                                newType = 6;
+
+                            if (newType == 13)
+                                newType = 17;
+
+                            if (newType == 4)
+                                newType = 7;
+
+                            if (newType == 15)
+                                newType = 5;
+
+                            if (newType == 3)
+                                newType = 8;
+
+                            if (newType == 16)
+                                newType = 9;
+                            
+                            if (newType == 10)
+                                newType = 0;
+                        }
+
+                        blocks[i, j] = new Block(contentManager, newType);
+                    }
 
             int placeBeholder = rnd.Next(0, 100);
             
@@ -212,36 +276,15 @@ namespace Rooms
 
             if (!IsVillage)
             {
-                //generating main landscape
-                //points which are used to generate "rocks" around them
-                int pointCount = rnd.Next(5, 11);
-
-                //counter of already added
-                int c = 0;
-
-                //placing in random places
-                while (c < pointCount)
-                {
-                    int tmpx = rnd.Next(1, roomSize - 1);
-                    int tmpy = rnd.Next(1, roomSize - 1);
-
-                    if (blocks[tmpx, tmpy].Type != 1)
-                    {
-                        blocks[tmpx, tmpy] = new Block(contentManager, 1);
-
-                        c++;
-                    }
-                }
-
                 //Adding sharokz group
-                if (rnd.Next(0, 100) < 66)
+                if (rnd.Next(0, 100) < 70)
                 {
                     double xGroup = rnd.NextDouble() * Room.roomSize;
                     double yGroup = rnd.NextDouble() * Room.roomSize;
 
-                    ControlCenter comCenter = new ControlCenter(xGroup, yGroup, 0, 3, 1.2);
+                    ControlCenter comCenter = new ControlCenter(xGroup, yGroup, 0, 6, 0.11);
 
-                    int groupSize = rnd.Next(3, 8);
+                    int groupSize = rnd.Next(3, 13);
 
                     for (int i = 0; i < groupSize; i++)
                     {
@@ -252,7 +295,7 @@ namespace Rooms
                             (int)yUnit >= 0 && (int)yUnit < Room.roomSize &&
                             blocks[(int)xUnit, (int)yUnit].Passable)
                         {
-                            var mbadd = new NPC(contentManager, gameWorld, xUnit, yUnit, 22, 0.12, 10, 10);
+                            var mbadd = new NPC(contentManager, gameWorld, xUnit, yUnit, 22, 0.12, 50, 50);
 
                             comCenter.AddMob(mbadd);
 

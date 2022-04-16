@@ -28,7 +28,7 @@ namespace Rooms
 
             ChangeCoords(x, y);
 
-            Speed = 0.1;
+            Speed = 0.11;
 
             base.Radius = 0.25;
 
@@ -219,7 +219,7 @@ namespace Rooms
                     {
                         double dist = GameWorld.GetDist(X, Y, currentMob.X, currentMob.Y);
 
-                        if (dist <= Radius + currentMob.Radius + 1)
+                        if (dist <= Radius + currentMob.Radius + 2.5)
                         {
                             double directionToMob = Math.Atan2(Y - currentMob.Y, X - currentMob.X);
 

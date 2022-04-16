@@ -26,8 +26,10 @@ namespace Rooms
         public const int BlockSizeY = 23;
         public string Name { get; protected set; }
         public Room currentRoom { get; protected set; }
-     //   public Room leftRoom { get; protected set; }
-     //   public Room rightRoom { get; protected set; }
+        //   public Room leftRoom { get; protected set; }
+        //   public Room rightRoom { get; protected set; }
+
+        private Texture2D background;
 
         public GameWorld(ContentManager contentManager, string name)
         {
@@ -53,20 +55,9 @@ namespace Rooms
                 currentRoom = new Room(contentManager, 0, 0, this, newHero);
             }
 
-           /* leftRoom = new Room(contentManager, currentRoom.X - 1, currentRoom.Y, this, currentRoom.heroReference);
-            leftRoom.MarkMobAsDeleted(leftRoom.heroReference);
-            leftRoom.DeleteMarked();
-
-            leftRoom.Save();
-
-            rightRoom = new Room(contentManager, currentRoom.X + 1, currentRoom.Y, this, currentRoom.heroReference);
-            rightRoom.MarkMobAsDeleted(leftRoom.heroReference);
-            rightRoom.DeleteMarked();
-
-            rightRoom.Save();*/
-
             //loading all static things, most of them used for drawing
             SelectionCursorTexture = contentManager.Load<Texture2D>("selection_cursor");
+            background = contentManager.Load<Texture2D>("background");
 
             MainFont = contentManager.Load<SpriteFont>("main_font_28s");
 
@@ -75,11 +66,9 @@ namespace Rooms
 
         public void Draw(SpriteBatch spriteBatch)
         {
-      //      leftRoom.Draw(spriteBatch, 960 - (int)(Room.roomSize * 1.5)*BlockSizeX, DrawY);
+            spriteBatch.Draw(background, new Vector2(0, 0), Color.White);
 
             currentRoom.Draw(spriteBatch, DrawX, DrawY);
-
-     //       rightRoom.Draw(spriteBatch, 960 + (int)(Room.roomSize /2 * BlockSizeX)+15, DrawY);
         }
         
         public void Update(ContentManager contentManager)
@@ -153,18 +142,22 @@ namespace Rooms
                 Save();
             }
 
-            if(currentRoom.heroReference.Y*BlockSizeY+DrawY>=1080-250)
-            {
-                DrawY -= (int)(currentRoom.heroReference.Speed * BlockSizeY);
-            }
+            int heroDrawY = 540 - (int)(currentRoom.heroReference.Y * BlockSizeY + DrawY);
+            int heroDrawX = 960 - (int)(currentRoom.heroReference.X * BlockSizeX + DrawX);
 
-            if (currentRoom.heroReference.Y * BlockSizeY + DrawY <= 250)
-            {
-                DrawY += (int)(currentRoom.heroReference.Speed * BlockSizeY);
-            }
-            
-            DrawY = Math.Min(DrawY, BlockSizeY);
-            DrawY = Math.Max(DrawY, -(Room.roomSize * BlockSizeY) + 1080+BlockSizeY);
+            //23.2379000772=sqrt(540), 540=1080/2
+            if (heroDrawY >= 0) 
+                DrawY += (int)(heroDrawY / 23.2379000772 * heroDrawY / 23.2379000772);
+
+            if (heroDrawY <= 0)
+                DrawY -= (int)(heroDrawY / 23.2379000772 * heroDrawY / 23.2379000772);
+
+            //30.9838667697=sqrt(960)
+            if (heroDrawX <= 0)
+                DrawX -= (int)(heroDrawX / 30.9838667697 * heroDrawX / 30.9838667697);
+
+            if (heroDrawX >= 0)
+                DrawX += (int)(heroDrawX / 30.9838667697 * heroDrawX / 30.9838667697);
         }
 
         public void Save()
