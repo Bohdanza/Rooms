@@ -169,7 +169,7 @@ namespace Rooms
                 IsVillage = true;
             }
 
-            int IslandRad = rnd.Next(5, roomSize / 4);
+            int IslandRad = rnd.Next(5, roomSize / 4 - 5);
 
             //filling with 0-blocks and walls
             for (int i = 0; i < roomSize; i++)
@@ -305,6 +305,50 @@ namespace Rooms
                         AddMob(comCenter);
                     }
                 }
+
+                //forest
+                if (rnd.Next(0, 100) < 50)
+                {
+                    int xcent = rnd.Next(roomSize / 2 - IslandRad/2, roomSize / 2 + IslandRad/2);
+                    int ycent = rnd.Next(roomSize / 2 - IslandRad/2, roomSize / 2 + IslandRad/2);
+                    int maxLayer = rnd.Next(2, 7);
+
+                    for (int layer = 0; layer < maxLayer; layer++)
+                    {
+                        int dist = layer * 3 + 6;
+                        int count = rnd.Next(3 + layer * 2, 6 + (int)(layer * 1.5));
+                        int currentlyPlaced = 0;
+                        List<Vector2> forbiddenPositions = new List<Vector2>();
+
+                        while (currentlyPlaced < count)
+                        {
+                            float angle = (float)(rnd.NextDouble() * Math.PI * 2);
+                            bool canBeUsed = true;
+
+                            for (int i = 0; i < forbiddenPositions.Count && canBeUsed; i++)
+                            {
+                                if (angle < forbiddenPositions[i].Y && angle > forbiddenPositions[i].X)
+                                {
+                                    canBeUsed = false;
+                                }
+                            }
+
+                            if (canBeUsed)
+                            {
+                                forbiddenPositions.Add(new Vector2(angle - ((float)Math.PI / count),
+                                    angle + ((float)Math.PI / count)));
+
+                                double Xplace = Math.Cos(angle) * dist + xcent;
+                                double Yplace = Math.Sin(angle) * dist + ycent;
+
+                                currentlyPlaced++;
+
+                                if (blocks[(int)Xplace, (int)Yplace].Type == 0)
+                                    blocks[(int)Xplace, (int)Yplace] = new Block(contentManager, 18);
+                            }
+                        }
+                    }
+                }
             }
             
             //village-
@@ -409,7 +453,9 @@ namespace Rooms
             {
                 if (currentMob < mobs.Count && mobs[currentMob].Y < j - 0.5)
                 {
-                    mobs[currentMob].Draw(spriteBatch, x + (int)(mobs[currentMob].X * GameWorld.BlockSizeX), y + (int)(mobs[currentMob].Y * GameWorld.BlockSizeY));
+                    mobs[currentMob].Draw(spriteBatch, x + (int)(mobs[currentMob].X * GameWorld.BlockSizeX),
+                        y + GameWorld.BlockSizeY + (int)(mobs[currentMob].Y * GameWorld.BlockSizeY)
+                        - blocks[(int)Math.Round(mobs[currentMob].X), (int)(j-0.5)].Textures[0].Height);
 
                     currentMob++;
                 }

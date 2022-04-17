@@ -71,7 +71,7 @@ namespace Rooms
             MouseState mstate = Mouse.GetState();
 
             int YNonAbsolute = mstate.Y - Y;
-            int selectedPhrase = YNonAbsolute / font.LineSpacing;
+            int selectedPhrase = YNonAbsolute / font.LineSpacing -1;
 
             spriteBatch.DrawString(font, Phrase, new Vector2(X, Y), Color.White);
 
@@ -79,11 +79,11 @@ namespace Rooms
             {
                 if (selectedPhrase == i)
                 {
-                    spriteBatch.DrawString(font, Answers[i], new Vector2(X, Y + i * font.LineSpacing), Color.Lime);
+                    spriteBatch.DrawString(font, Answers[i], new Vector2(X, Y + (i + 1) * font.LineSpacing), Color.Lime);
                 }
                 else
                 {
-                    spriteBatch.DrawString(font, Answers[i], new Vector2(X, Y + i * font.LineSpacing), Color.White);
+                    spriteBatch.DrawString(font, Answers[i], new Vector2(X, Y + (i + 1) * font.LineSpacing), Color.White);
                 }
             }
         }

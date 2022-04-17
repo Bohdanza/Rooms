@@ -41,7 +41,7 @@ namespace Rooms
 
             SpriteFont mainFont = contentManager.Load<SpriteFont>("dialogue_font");
 
-            for (int i = 0; i < input.Count; i += 2)
+            for (int i = 1; i < input.Count; i += 2)
             {
                 DialogueVariant dialogueVariant = new DialogueVariant(mainFont, Int32.Parse(input[i]));
 
@@ -88,7 +88,7 @@ namespace Rooms
 
             SpriteFont mainFont = contentManager.Load<SpriteFont>("dialogue_font");
 
-            for (int i = 0; i < inp.Count; i += 2)
+            for (int i = 1; i < inp.Count; i += 2)
             {
                 DialogueVariant dialogueVariant = new DialogueVariant(mainFont, Int32.Parse(inp[i]));
 
@@ -128,11 +128,14 @@ namespace Rooms
                 AddedToList = false;
             }
 
-            int selected=dialogueVariants[currentStage].Item1.Update();
-
-            if (selected >= 0 && selected < dialogueVariants[currentStage].Item2.Count)
+            if (currentStage < dialogueVariants.Count)
             {
-                currentStage = dialogueVariants[currentStage].Item2[selected];
+                int selected = dialogueVariants[currentStage].Item1.Update();
+
+                if (selected >= 0 && selected < dialogueVariants[currentStage].Item2.Count)
+                {
+                    currentStage = dialogueVariants[currentStage].Item2[selected];
+                }
             }
 
             base.Update(contentManager, gameWorld);
@@ -140,7 +143,10 @@ namespace Rooms
         
         public override void DrawInterface(SpriteBatch spriteBatch)
         {
-            dialogueVariants[currentStage].Item1.Draw(spriteBatch);
+            if (currentStage < dialogueVariants.Count)
+            {
+                dialogueVariants[currentStage].Item1.Draw(spriteBatch);
+            }
         }
 
         public override string SaveList()
