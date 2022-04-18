@@ -78,9 +78,12 @@ namespace Rooms
             int roomX = currentRoom.X;
             int roomY = currentRoom.Y;
 
-            if (currentRoom.heroReference.X <= 0)
+            int oldHeroDrawY = (int)(currentRoom.heroReference.Y * BlockSizeY + DrawY);
+            int oldHeroDrawX = (int)(currentRoom.heroReference.X * BlockSizeX + DrawX);
+
+            if (currentRoom.heroReference.X <= Room.roomSize / 2 - 64)
             {
-                currentRoom.heroReference.ChangeCoords(Room.roomSize - 1.00001, currentRoom.heroReference.Y);
+                currentRoom.heroReference.ChangeCoords(Room.roomSize / 2 + 64 - 0.0001, currentRoom.heroReference.Y);
 
                 var newHero = currentRoom.heroReference;
 
@@ -94,9 +97,9 @@ namespace Rooms
                 Save();
             }
 
-            if (currentRoom.heroReference.X >= Room.roomSize - 1)
+            if (currentRoom.heroReference.X >= Room.roomSize / 2 + 64)
             {
-                currentRoom.heroReference.ChangeCoords(0, currentRoom.heroReference.Y);
+                currentRoom.heroReference.ChangeCoords(Room.roomSize / 2 - 64 + 0.0001, currentRoom.heroReference.Y);
 
                 var newHero = currentRoom.heroReference;
 
@@ -110,9 +113,9 @@ namespace Rooms
                 Save();
             }
 
-            if (currentRoom.heroReference.Y <= 0)
+            if (currentRoom.heroReference.Y <= Room.roomSize / 2 - 64)
             {
-                currentRoom.heroReference.ChangeCoords(currentRoom.heroReference.X, Room.roomSize - 1.00001);
+                currentRoom.heroReference.ChangeCoords(currentRoom.heroReference.X, Room.roomSize / 2 + 64 - 0.0001);
                 
                 var newHero = currentRoom.heroReference;
 
@@ -126,9 +129,9 @@ namespace Rooms
                 Save();
             }
 
-            if (currentRoom.heroReference.Y >= Room.roomSize - 1)
+            if (currentRoom.heroReference.Y >= Room.roomSize / 2 + 64)
             {
-                currentRoom.heroReference.ChangeCoords(currentRoom.heroReference.X, 0);
+                currentRoom.heroReference.ChangeCoords(currentRoom.heroReference.X, Room.roomSize / 2 - 64 + 0.0001);
 
                 var newHero = currentRoom.heroReference;
 
@@ -142,22 +145,26 @@ namespace Rooms
                 Save();
             }
 
-            int heroDrawY = 540 - (int)(currentRoom.heroReference.Y * BlockSizeY + DrawY);
-            int heroDrawX = 960 - (int)(currentRoom.heroReference.X * BlockSizeX + DrawX);
+            if (roomX != currentRoom.X || roomY != currentRoom.Y)
+            {
+                DrawX = oldHeroDrawX - (int)(currentRoom.heroReference.X * BlockSizeX);
+                DrawY = oldHeroDrawY - (int)(currentRoom.heroReference.Y * BlockSizeY);
+            }
+
+            int heroDrawY = 540 - oldHeroDrawY;
+            int heroDrawX = 960 - oldHeroDrawX;
 
             //23.2379000772=sqrt(540), 540=1080/2
             if (heroDrawY >= 0) 
-                DrawY += (int)(heroDrawY / 23.2379000772 * heroDrawY / 23.2379000772);
-
-            if (heroDrawY <= 0)
-                DrawY -= (int)(heroDrawY / 23.2379000772 * heroDrawY / 23.2379000772);
+                DrawY += (int)(heroDrawY * heroDrawY / 540);
+            else if (heroDrawY <= 0)
+                DrawY -= (int)(heroDrawY * heroDrawY / 540);
 
             //30.9838667697=sqrt(960)
             if (heroDrawX <= 0)
-                DrawX -= (int)(heroDrawX / 30.9838667697 * heroDrawX / 30.9838667697);
-
-            if (heroDrawX >= 0)
-                DrawX += (int)(heroDrawX / 30.9838667697 * heroDrawX / 30.9838667697);
+                DrawX -= (int)(heroDrawX * heroDrawX / 960);
+            else if (heroDrawX >= 0)
+                DrawX += (int)(heroDrawX * heroDrawX / 960);
         }
 
         public void Save()

@@ -14,7 +14,7 @@ namespace Rooms
 {
     public class Room
     {
-        public const int roomSize = 128;
+        public const int roomSize = 52;
 
         public int biome { get; protected set; }
 
@@ -169,7 +169,10 @@ namespace Rooms
                 IsVillage = true;
             }
 
-            int IslandRad = rnd.Next(5, roomSize / 4 - 5);
+            int IslandRad = rnd.Next(5, 26);
+
+            //speedup
+            List<Tuple<int, int>> groundBlocks = new List<Tuple<int, int>>();
 
             //filling with 0-blocks and walls
             for (int i = 0; i < roomSize; i++)
@@ -177,9 +180,11 @@ namespace Rooms
                 {
                     blocks[i, j] = new Block(contentManager, 1);
 
-                    if (GameWorld.GetDist(roomSize / 2, roomSize / 2, i, j) <= IslandRad + rnd.Next(0, 5))
+                    if (GameWorld.GetDist(roomSize / 2, roomSize / 2, i, j) <= IslandRad - rnd.Next(0, 5))
                     {
                         blocks[i, j] = new Block(contentManager, 0);
+
+                        groundBlocks.Add(new Tuple<int, int>(i, j));
 
                         if (!IsVillage && rnd.Next(0, 1000) < 5)
                         {
@@ -196,70 +201,74 @@ namespace Rooms
                 }
 
             //normal borders
-            for (int i = 1; i < roomSize-1; i++)
-                for (int j = 1; j < roomSize-1; j++)
-                    if (blocks[i, j].Type == 0)
+            foreach (var currentTuple in groundBlocks)
+            {
+                int i = currentTuple.Item1;
+                int j = currentTuple.Item2;
+
+                if (blocks[i, j].Type == 0)
+                {
+                    int newType = 11;
+
+                    if (blocks[i - 1, j].Passable)
                     {
-                        int newType = 11;
-
-                        if (blocks[i - 1, j].Passable)
-                        {
-                            newType = 14;
-                        }
-
-                        if (blocks[i, j - 1].Passable)
-                        {
-                            if (newType == 11)
-                                newType = 13;
-
-                            if(newType==14)
-                                newType = 4;
-                        }
-
-                        if (blocks[i + 1, j].Passable)
-                        {
-                            if (newType == 11)
-                                newType = 15;
-
-                            if (newType == 13)
-                                newType = 3;
-
-                            if (newType == 14)
-                                newType = 16;
-
-                            if (newType == 4)
-                                newType = 10;
-                        }
-
-                        if (blocks[i, j + 1].Passable)
-                        {
-                            if (newType == 11)
-                                newType = 12;
-
-                            if (newType == 14)
-                                newType = 6;
-
-                            if (newType == 13)
-                                newType = 17;
-
-                            if (newType == 4)
-                                newType = 7;
-
-                            if (newType == 15)
-                                newType = 5;
-
-                            if (newType == 3)
-                                newType = 8;
-
-                            if (newType == 16)
-                                newType = 9;
-                            
-                            if (newType == 10)
-                                newType = 0;
-                        }
-
-                        blocks[i, j] = new Block(contentManager, newType);
+                        newType = 14;
                     }
+
+                    if (blocks[i, j - 1].Passable)
+                    {
+                        if (newType == 11)
+                            newType = 13;
+
+                        if (newType == 14)
+                            newType = 4;
+                    }
+
+                    if (blocks[i + 1, j].Passable)
+                    {
+                        if (newType == 11)
+                            newType = 15;
+
+                        if (newType == 13)
+                            newType = 3;
+
+                        if (newType == 14)
+                            newType = 16;
+
+                        if (newType == 4)
+                            newType = 10;
+                    }
+
+                    if (blocks[i, j + 1].Passable)
+                    {
+                        if (newType == 11)
+                            newType = 12;
+
+                        if (newType == 14)
+                            newType = 6;
+
+                        if (newType == 13)
+                            newType = 17;
+
+                        if (newType == 4)
+                            newType = 7;
+
+                        if (newType == 15)
+                            newType = 5;
+
+                        if (newType == 3)
+                            newType = 8;
+
+                        if (newType == 16)
+                            newType = 9;
+
+                        if (newType == 10)
+                            newType = 0;
+                    }
+
+                    blocks[i, j] = new Block(contentManager, newType);
+                }
+            }
 
             int placeBeholder = rnd.Next(0, 100);
             
@@ -453,9 +462,15 @@ namespace Rooms
             {
                 if (currentMob < mobs.Count && mobs[currentMob].Y < j - 0.5)
                 {
+                    int YDelay = 0;
+
+                    if (!mobs[currentMob].Flying&& (int)Math.Round(mobs[currentMob].X) < roomSize && (int)Math.Round(mobs[currentMob].X) > 0)
+                    {
+                        YDelay = -blocks[(int)Math.Round(mobs[currentMob].X), (int)(j - 0.5)].Textures[0].Height;
+                    }
+
                     mobs[currentMob].Draw(spriteBatch, x + (int)(mobs[currentMob].X * GameWorld.BlockSizeX),
-                        y + GameWorld.BlockSizeY + (int)(mobs[currentMob].Y * GameWorld.BlockSizeY)
-                        - blocks[(int)Math.Round(mobs[currentMob].X), (int)(j-0.5)].Textures[0].Height);
+                        y + GameWorld.BlockSizeY + (int)(mobs[currentMob].Y * GameWorld.BlockSizeY)+YDelay);
 
                     currentMob++;
                 }

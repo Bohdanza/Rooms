@@ -36,6 +36,7 @@ namespace Rooms
         public int TextureNumber { get; protected set; }
 
         public ControlCenter controlCenter { get; set; } = null;
+        public bool Flying { get; protected set; } = false;
 
         /// <summary>
         /// Used to increase the texture number if reload==false and reload the whole Textures list if it's true
@@ -133,104 +134,110 @@ namespace Rooms
 
             X += x;
 
-            if (X < 0)
+            if (X < Room.roomSize / 2 - 64)
             {
-                X = 0;
+                X = Room.roomSize / 2 - 64;
                 ans = false;
             }
 
-            if (X > Room.roomSize - 1)
+            if (X > Room.roomSize / 2 + 64)
             {
-                X = Room.roomSize - 1;
+                X = Room.roomSize / 2 + 64;
                 ans = false;
             }
 
-            //check for center
-            if (X <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
-                !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y)].Passable)
+            if (!Flying)
             {
-                X = px;
-                ans = false;
-            }
+                //check for center
+                if (X <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
+                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y)].Passable)
+                {
+                    X = px;
+                    ans = false;
+                }
 
-            //fast check for hitbox. Can be incorrect sometimes
-            if (X + Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X + Radius >= 0 && Y >= 0 &&
-                !gameWorld.currentRoom.blocks[(int)Math.Round(X + Radius), (int)Math.Round(Y)].Passable)
-            {
-                X = px;
-                ans = false;
-            }
-            
-            if (X - Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X - Radius >= 0 && Y >= 0 &&
-                !gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y)].Passable)
-            {
-                X = px;
-                ans = false;
-            }
+                //fast check for hitbox. Can be incorrect sometimes
+                if (X + Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X + Radius >= 0 && Y >= 0 &&
+                    !gameWorld.currentRoom.blocks[(int)Math.Round(X + Radius), (int)Math.Round(Y)].Passable)
+                {
+                    X = px;
+                    ans = false;
+                }
 
-            if (X <= Room.roomSize - 1 && Y + Radius <= Room.roomSize - 1 && X >= 0 && Y + Radius >= 0 &&
-                !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y + Radius)].Passable)
-            {
-                X = px;
-                ans = false;
-            }
+                if (X - Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X - Radius >= 0 && Y >= 0 &&
+                    !gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y)].Passable)
+                {
+                    X = px;
+                    ans = false;
+                }
 
-            if (X<= Room.roomSize - 1 && Y - Radius <= Room.roomSize - 1 && X >= 0 && Y - Radius >= 0 &&
-                !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y - Radius)].Passable)
-            {
-                X = px;
-                ans = false;
+                if (X <= Room.roomSize - 1 && Y + Radius <= Room.roomSize - 1 && X >= 0 && Y + Radius >= 0 &&
+                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y + Radius)].Passable)
+                {
+                    X = px;
+                    ans = false;
+                }
+
+                if (X <= Room.roomSize - 1 && Y - Radius <= Room.roomSize - 1 && X >= 0 && Y - Radius >= 0 &&
+                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y - Radius)].Passable)
+                {
+                    X = px;
+                    ans = false;
+                }
             }
 
             Y += y;
 
-            if (Y < 0)
+            if (Y < Room.roomSize / 2 - 64)
             {
-                Y = 0;
+                Y = Room.roomSize / 2 - 64;
                 ans = false;
             }
 
-            if (Y > Room.roomSize - 1)
+            if (Y > Room.roomSize / 2 + 64)
             {
-                Y = Room.roomSize - 1;
+                Y = Room.roomSize / 2 + 64;
                 ans = false;
             }
 
-            //check for center
-            if (X <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
-                !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y)].Passable)
+            if (!Flying)
             {
-                Y = py;
-                ans = false;
-            }
+                //check for center
+                if (X <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
+                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y)].Passable)
+                {
+                    Y = py;
+                    ans = false;
+                }
 
-            //fast check for hitbox. Can be incorrect sometimes
-            if (X + Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X + Radius >= 0 && Y >= 0 &&
-                !gameWorld.currentRoom.blocks[(int)Math.Round(X + Radius), (int)Math.Round(Y)].Passable)
-            {
-                Y = py;
-                ans = false;
-            }
+                //fast check for hitbox. Can be incorrect sometimes
+                if (X + Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X + Radius >= 0 && Y >= 0 &&
+                    !gameWorld.currentRoom.blocks[(int)Math.Round(X + Radius), (int)Math.Round(Y)].Passable)
+                {
+                    Y = py;
+                    ans = false;
+                }
 
-            if (X - Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X - Radius >= 0 && Y >= 0 &&
-                !gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y)].Passable)
-            {
-                Y = py;
-                ans = false;
-            }
+                if (X - Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X - Radius >= 0 && Y >= 0 &&
+                    !gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y)].Passable)
+                {
+                    Y = py;
+                    ans = false;
+                }
 
-            if (X <= Room.roomSize - 1 && Y + Radius <= Room.roomSize - 1 && X >= 0 && Y + Radius >= 0 &&
-                !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y + Radius)].Passable)
-            {
-                Y = py;
-                ans = false;
-            }
+                if (X <= Room.roomSize - 1 && Y + Radius <= Room.roomSize - 1 && X >= 0 && Y + Radius >= 0 &&
+                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y + Radius)].Passable)
+                {
+                    Y = py;
+                    ans = false;
+                }
 
-            if (X <= Room.roomSize - 1 && Y - Radius <= Room.roomSize - 1 && X >= 0 && Y - Radius >= 0 &&
-                !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y - Radius)].Passable)
-            {
-                Y = py;
-                ans = false;
+                if (X <= Room.roomSize - 1 && Y - Radius <= Room.roomSize - 1 && X >= 0 && Y - Radius >= 0 &&
+                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y - Radius)].Passable)
+                {
+                    Y = py;
+                    ans = false;
+                }
             }
 
             return ans;
