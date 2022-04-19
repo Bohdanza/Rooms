@@ -83,5 +83,10 @@ namespace Rooms
                 TimeSinceLastTextureUpdate = 0;
             }
         }
+
+        public void ChangePassability(bool newPas)
+        {
+            Passable = newPas;
+        }
     }
 }

@@ -15,12 +15,13 @@ namespace Rooms
     public class Room
     {
         public const int roomSize = 52;
+        public const int roomSizeZ = 5;
 
         public int biome { get; protected set; }
 
         public int X { get; protected set; }
         public int Y { get; protected set; } 
-        public Block[,] blocks;
+        public Block[,,] blocks;
 
         private GameWorld worldReference { get;  set; }
         public Hero heroReference { get; protected set; }
@@ -36,7 +37,7 @@ namespace Rooms
 
             worldReference = gameWorld;
 
-            blocks = new Block[roomSize, roomSize];
+            blocks = new Block[roomSize, roomSize, roomSizeZ];
             mobs = new List<Mob>();
 
             heroReference = null;
@@ -71,15 +72,16 @@ namespace Rooms
                 input = sr.ReadToEnd().Split('\n').ToList();
             }
 
-            for (int i = 0; i < roomSize; i++)
-            {
-                List<string> lst = input[i].Split("|").ToList();
-
-                for (int j = 0; j < roomSize; j++)
+            for (int k = 0; k < roomSizeZ; k++)
+                for (int i = 0; i < roomSize; i++)
                 {
-                    blocks[i, j] = new Block(contentManager, Int32.Parse(lst[j]));
+                    List<string> lst = input[k*roomSize+i].Split("|").ToList();
+
+                    for (int j = 0; j < roomSize; j++)
+                    {
+                        blocks[i, j, k] = new Block(contentManager, Int32.Parse(lst[j]));
+                    }
                 }
-            }
 
             int mobsCount = Int32.Parse(input[roomSize]);
             int currentString=roomSize+1, mobsAdded=0;
@@ -113,17 +115,18 @@ namespace Rooms
             //forming string
             string output = "";
 
-            for (int i = 0; i < roomSize; i++)
-            {
-                for (int j = 0; j < roomSize; j++)
+            for (int k = 0; k < roomSizeZ; k++)
+                for (int i = 0; i < roomSize; i++)
                 {
-                    output += blocks[i, j].Type.ToString();
+                    for (int j = 0; j < roomSize; j++)
+                    {
+                        output += blocks[i, j, k].Type.ToString();
 
-                    output += "|";
+                        output += "|";
+                    }
+
+                    output += '\n';
                 }
-
-                output += '\n';
-            }
 
             string tmpout = "";
             int realMobs = 0;
@@ -160,208 +163,184 @@ namespace Rooms
         protected void Generate(ContentManager contentManager, int x, int y, GameWorld gameWorld)
         {
             bool IsFirstTemple = x == 0 && y == 0;
-            bool IsVillage = false;
+
+            //0-golden forest, 1-village, 2-cryzualis, 4-clouds, 5-Femuhiblu desert
+            int biome=0;
 
             var rnd = new Random();
+            int prob = rnd.Next(0, 100);
 
-            if (rnd.Next(0, 100) < 20&&!IsFirstTemple)
+            if (prob <= 33)
             {
-                IsVillage = true;
+                biome = 0;
+            }
+            else if (prob <= 33 + 10)
+            {
+                biome = 1;
             }
 
-            int IslandRad = rnd.Next(5, 26);
+            int minIslandRad = 5, maxIslandRad = 26;
+
+            int IslandRad = rnd.Next(minIslandRad, maxIslandRad);
 
             //speedup
             List<Tuple<int, int>> groundBlocks = new List<Tuple<int, int>>();
 
             //filling with 0-blocks and walls
-            for (int i = 0; i < roomSize; i++)
-                for (int j = 0; j < roomSize; j++)
-                {
-                    blocks[i, j] = new Block(contentManager, 1);
-
-                    if (GameWorld.GetDist(roomSize / 2, roomSize / 2, i, j) <= IslandRad - rnd.Next(0, 5))
+            for (int k = 0; k < roomSizeZ; k++)
+                for (int i = 0; i < roomSize; i++)
+                    for (int j = 0; j < roomSize; j++)
                     {
-                        blocks[i, j] = new Block(contentManager, 0);
+                        blocks[i, j, k] = new Block(contentManager, 1);
 
-                        groundBlocks.Add(new Tuple<int, int>(i, j));
-
-                        if (!IsVillage && rnd.Next(0, 1000) < 5)
+                        if (k == 0 && GameWorld.GetDist(roomSize / 2, roomSize / 2, i, j) <= IslandRad - rnd.Next(0, 5))
                         {
-                            AddMob(new NPC(contentManager, gameWorld, i, j, 1, 0.075, 10, 10));
-                        }
-                        else if (!IsVillage && rnd.Next(0, 1000) < 5)
-                        {
-                            //coins
-                            AddMob(new Item(contentManager, i + rnd.NextDouble() * 0.75 - 0.375, j + rnd.NextDouble() * 0.75 - 0.375, 3, 1));
-                        }
-                    }
+                            blocks[i, j, k] = new Block(contentManager, 0);
 
-                    int blockChangeProb = rnd.Next(0, 100);
-                }
+                            groundBlocks.Add(new Tuple<int, int>(i, j));
 
-            //normal borders
-            foreach (var currentTuple in groundBlocks)
-            {
-                int i = currentTuple.Item1;
-                int j = currentTuple.Item2;
-
-                if (blocks[i, j].Type == 0)
-                {
-                    int newType = 11;
-
-                    if (blocks[i - 1, j].Passable)
-                    {
-                        newType = 14;
-                    }
-
-                    if (blocks[i, j - 1].Passable)
-                    {
-                        if (newType == 11)
-                            newType = 13;
-
-                        if (newType == 14)
-                            newType = 4;
-                    }
-
-                    if (blocks[i + 1, j].Passable)
-                    {
-                        if (newType == 11)
-                            newType = 15;
-
-                        if (newType == 13)
-                            newType = 3;
-
-                        if (newType == 14)
-                            newType = 16;
-
-                        if (newType == 4)
-                            newType = 10;
-                    }
-
-                    if (blocks[i, j + 1].Passable)
-                    {
-                        if (newType == 11)
-                            newType = 12;
-
-                        if (newType == 14)
-                            newType = 6;
-
-                        if (newType == 13)
-                            newType = 17;
-
-                        if (newType == 4)
-                            newType = 7;
-
-                        if (newType == 15)
-                            newType = 5;
-
-                        if (newType == 3)
-                            newType = 8;
-
-                        if (newType == 16)
-                            newType = 9;
-
-                        if (newType == 10)
-                            newType = 0;
-                    }
-
-                    blocks[i, j] = new Block(contentManager, newType);
-                }
-            }
-
-            int placeBeholder = rnd.Next(0, 100);
-            
-            if (placeBeholder < -1)
-            {
-                int xb = rnd.Next(0, roomSize);
-                int yb = rnd.Next(0, roomSize);
-                
-                if(blocks[xb, yb].Passable)
-                {
-                    AddMob(new NPC(contentManager, gameWorld, xb + 0.5, yb + 0.5, 5, 0.1, 20, 20));
-                }
-            }
-
-            if (!IsVillage)
-            {
-                //Adding sharokz group
-                if (rnd.Next(0, 100) < 70)
-                {
-                    double xGroup = rnd.NextDouble() * Room.roomSize;
-                    double yGroup = rnd.NextDouble() * Room.roomSize;
-
-                    ControlCenter comCenter = new ControlCenter(xGroup, yGroup, 0, 6, 0.11);
-
-                    int groupSize = rnd.Next(3, 13);
-
-                    for (int i = 0; i < groupSize; i++)
-                    {
-                        double xUnit = xGroup - (rnd.NextDouble() - 0.5) * 6;
-                        double yUnit = yGroup - (rnd.NextDouble() - 0.5) * 6;
-
-                        if ((int)xUnit >= 0 && (int)xUnit < Room.roomSize &&
-                            (int)yUnit >= 0 && (int)yUnit < Room.roomSize &&
-                            blocks[(int)xUnit, (int)yUnit].Passable)
-                        {
-                            var mbadd = new NPC(contentManager, gameWorld, xUnit, yUnit, 22, 0.12, 50, 50);
-
-                            comCenter.AddMob(mbadd);
-
-                            AddMob(mbadd);
-                        }
-
-                        AddMob(comCenter);
-                    }
-                }
-
-                //forest
-                if (rnd.Next(0, 100) < 50)
-                {
-                    int xcent = rnd.Next(roomSize / 2 - IslandRad/2, roomSize / 2 + IslandRad/2);
-                    int ycent = rnd.Next(roomSize / 2 - IslandRad/2, roomSize / 2 + IslandRad/2);
-                    int maxLayer = rnd.Next(2, 7);
-
-                    for (int layer = 0; layer < maxLayer; layer++)
-                    {
-                        int dist = layer * 3 + 6;
-                        int count = rnd.Next(3 + layer * 2, 6 + (int)(layer * 1.5));
-                        int currentlyPlaced = 0;
-                        List<Vector2> forbiddenPositions = new List<Vector2>();
-
-                        while (currentlyPlaced < count)
-                        {
-                            float angle = (float)(rnd.NextDouble() * Math.PI * 2);
-                            bool canBeUsed = true;
-
-                            for (int i = 0; i < forbiddenPositions.Count && canBeUsed; i++)
+                            if (biome == 0 && rnd.Next(0, 1000) < 5)
                             {
-                                if (angle < forbiddenPositions[i].Y && angle > forbiddenPositions[i].X)
-                                {
-                                    canBeUsed = false;
-                                }
+                                AddMob(new NPC(contentManager, gameWorld, i, j, 1, 0.075, 10, 10));
+                            }
+                            else if (biome==5 && rnd.Next(0, 1000) < 5)
+                            {
+                                //coins
+                                AddMob(new Item(contentManager, i + rnd.NextDouble() * 0.75 - 0.375, j + rnd.NextDouble() * 0.75 - 0.375, 3, 1));
+                            }
+                        }
+
+                        int blockChangeProb = rnd.Next(0, 100);
+                    }
+
+            int mountRad = rnd.Next(5, 10);
+
+            PlaceMountain(contentManager, roomSize / 2 + rnd.Next(0, 10) - 5, roomSize / 2 - rnd.Next(0, 5), 5, mountRad, mountRad / 5, 0);
+
+            //collision map
+            for (int k = 0; k < roomSizeZ; k++)
+                foreach (var currentTuple in groundBlocks)
+                {
+                    int i = currentTuple.Item1;
+                    int j = currentTuple.Item2;
+
+                    if (blocks[i, j, k].Type == 0)
+                    {
+                        int newType = 11;
+
+                        if (blocks[i - 1, j, k].Passable)
+                        {
+                            newType = 14;
+                        }
+
+                        if (blocks[i, j - 1, k].Passable)
+                        {
+                            if (newType == 11)
+                                newType = 13;
+
+                            if (newType == 14)
+                                newType = 4;
+                        }
+
+                        if (blocks[i + 1, j, k].Passable)
+                        {
+                            if (newType == 11)
+                                newType = 15;
+
+                            if (newType == 13)
+                                newType = 3;
+
+                            if (newType == 14)
+                                newType = 16;
+
+                            if (newType == 4)
+                                newType = 10;
+                        }
+
+                        if (blocks[i, j + 1, k].Passable)
+                        {
+                            if (newType == 11)
+                                newType = 12;
+
+                            if (newType == 14)
+                                newType = 6;
+
+                            if (newType == 13)
+                                newType = 17;
+
+                            if (newType == 4)
+                                newType = 7;
+
+                            if (newType == 15)
+                                newType = 5;
+
+                            if (newType == 3)
+                                newType = 8;
+
+                            if (newType == 16)
+                                newType = 9;
+
+                            if (newType == 10)
+                                newType = 0;
+                        }
+
+                        blocks[i, j, k] = new Block(contentManager, newType);
+                    }
+                }
+
+            //forest
+            if (biome == 0)
+            {
+                int xcent = rnd.Next(roomSize / 2 - IslandRad / 2, roomSize / 2 + IslandRad / 2);
+                int ycent = rnd.Next(roomSize / 2 - IslandRad / 2, roomSize / 2 + IslandRad / 2);
+                int maxLayer = rnd.Next(2, 7);
+
+                for (int layer = 0; layer < maxLayer; layer++)
+                {
+                    int dist = layer * 3 + 6;
+                    int count = rnd.Next(3 + layer * 2, 6 + (int)(layer * 1.5));
+                    int currentlyPlaced = 0;
+                    List<Vector2> forbiddenPositions = new List<Vector2>();
+
+                    while (currentlyPlaced < count)
+                    {
+                        float angle = (float)(rnd.NextDouble() * Math.PI * 2);
+                        bool canBeUsed = true;
+
+                        for (int i = 0; i < forbiddenPositions.Count && canBeUsed; i++)
+                        {
+                            if (angle < forbiddenPositions[i].Y && angle > forbiddenPositions[i].X)
+                            {
+                                canBeUsed = false;
+                            }
+                        }
+
+                        if (canBeUsed)
+                        {
+                            forbiddenPositions.Add(new Vector2(angle - ((float)Math.PI / count),
+                                angle + ((float)Math.PI / count)));
+
+                            double Xplace = Math.Cos(angle) * dist + xcent;
+                            double Yplace = Math.Sin(angle) * dist + ycent;
+
+                            currentlyPlaced++;
+
+                            int height = 0;
+
+                            while (height < roomSizeZ - 1 && blocks[(int)Xplace, (int)Yplace, height + 1].Type != 1)
+                            {
+                                height++;
                             }
 
-                            if (canBeUsed)
-                            {
-                                forbiddenPositions.Add(new Vector2(angle - ((float)Math.PI / count),
-                                    angle + ((float)Math.PI / count)));
-
-                                double Xplace = Math.Cos(angle) * dist + xcent;
-                                double Yplace = Math.Sin(angle) * dist + ycent;
-
-                                currentlyPlaced++;
-
-                                if (blocks[(int)Xplace, (int)Yplace].Type == 0)
-                                    blocks[(int)Xplace, (int)Yplace] = new Block(contentManager, 18);
-                            }
+                            if (blocks[(int)Xplace, (int)Yplace, height].Type == 0)
+                                blocks[(int)Xplace, (int)Yplace, height] = new Block(contentManager, 18);
                         }
                     }
                 }
             }
             
             //village-
-            if (IsVillage)
+            if (biome==1)
             {
                 for (int layer = 0; layer < 4; layer++)
                 {
@@ -466,7 +445,8 @@ namespace Rooms
 
                     if (!mobs[currentMob].Flying&& (int)Math.Round(mobs[currentMob].X) < roomSize && (int)Math.Round(mobs[currentMob].X) > 0)
                     {
-                        YDelay = -blocks[(int)Math.Round(mobs[currentMob].X), (int)(j - 0.5)].Textures[0].Height;
+                        YDelay = -blocks[(int)Math.Round(mobs[currentMob].X), (int)(j - 0.5), 0].Textures[0].Height
+                            - (int)(mobs[currentMob].Z * GameWorld.BlockSizeZ);
                     }
 
                     mobs[currentMob].Draw(spriteBatch, x + (int)(mobs[currentMob].X * GameWorld.BlockSizeX),
@@ -478,9 +458,13 @@ namespace Rooms
                 {
                     if (j < Room.roomSize)
                     {
-                        for (int i = 0; i < roomSize; i++)
+                        for (int k = 0; k < roomSizeZ; k++)
                         {
-                            blocks[i, j].Draw(spriteBatch, x + i * GameWorld.BlockSizeX - GameWorld.BlockSizeX / 2, y + j * GameWorld.BlockSizeY - GameWorld.BlockSizeY / 2);
+                            for (int i = 0; i < roomSize; i++)
+                            {
+                                blocks[i, j, k].Draw(spriteBatch, x + i * GameWorld.BlockSizeX - GameWorld.BlockSizeX / 2,
+                                    y + j * GameWorld.BlockSizeY - GameWorld.BlockSizeY / 2 - k * GameWorld.BlockSizeZ);
+                            }
                         }
                     }
 
@@ -506,11 +490,12 @@ namespace Rooms
                 }
             }
 
-            for (int i = 0; i < roomSize; i++)
-                for (int j = 0; j < roomSize; j++)
-                {
-                    blocks[i, j].Update(contentManager);
-                }
+            for (int k = 0; k < roomSizeZ; k++)
+                for (int i = 0; i < roomSize; i++)
+                    for (int j = 0; j < roomSize; j++)
+                    {
+                        blocks[i, j, k].Update(contentManager);
+                    }
 
             DeleteMarked();
 
@@ -535,7 +520,7 @@ namespace Rooms
         /// <param name="x2"></param>
         /// <param name="y2"></param>
         /// <param name="blockType"></param>
-        protected void placeRectagle(ContentManager contentManager, int x1, int y1, int x2, int y2, int blockType)
+        protected void placeRectagle(ContentManager contentManager, int x1, int y1, int x2, int y2, int z, int blockType)
         {
             x1 = Math.Max(x1, 0);
             y1 = Math.Max(y1, 0);
@@ -546,14 +531,36 @@ namespace Rooms
             y1 = Math.Min(y1, roomSize);
             x2 = Math.Min(x2, roomSize);
             y2 = Math.Min(y2, roomSize);
-
+            
             for (int i = x1; i < x2; i++)
             {
                 for (int j = y1; j < y2; j++)
                 {
-                    blocks[i, j] = new Block(contentManager, blockType);
+                    blocks[i, j, z] = new Block(contentManager, blockType);
                 }
             }
+        }
+        
+        protected void placeRectagle(ContentManager contentManager, int x1, int y1, int x2, int y2, int z1, int z2, int blockType)
+        {
+            x1 = Math.Max(x1, 0);
+            y1 = Math.Max(y1, 0);
+            x2 = Math.Max(x2, 0);
+            y2 = Math.Max(y2, 0);
+            z1 = Math.Max(x2, 0);
+            z2 = Math.Max(y2, 0);
+
+            x1 = Math.Min(x1, roomSize);
+            y1 = Math.Min(y1, roomSize);
+            x2 = Math.Min(x2, roomSize);
+            y2 = Math.Min(y2, roomSize);
+            z1 = Math.Min(x2, roomSize);
+            z2 = Math.Min(y2, roomSize);
+
+            for (int k = z1; k < z2; k++)
+                for (int i = x1; i < x2; i++)
+                    for (int j = y1; j < y2; j++)
+                        blocks[i, j, k] = new Block(contentManager, blockType);
         }
 
         //methods below are used to edit mob list indirectly (useful when editing from other classes)
@@ -640,6 +647,21 @@ namespace Rooms
             }
 
             return closestMob;
+        }
+
+        protected void PlaceMountain(ContentManager contentManager, int x, int y, int height, int radius, int step, int blockType)
+        {
+            var rnd = new Random();
+
+            for (int k = 0; k < height; k++)
+            {
+                for (int i = Math.Max(x - radius, 0); i < Math.Min(roomSize, x + radius); i++)
+                    for (int j = Math.Max(y - radius, 0); j < Math.Min(roomSize, y + radius); j++)
+                        if (GameWorld.GetDist(x, y, i, j) <= radius - rnd.Next(0, 2) && (k == 0 || blocks[i, j, k - 1].Type == blockType))
+                            blocks[i, j, k] = new Block(contentManager, blockType);
+
+                radius -= step;
+            }
         }
     }
 }

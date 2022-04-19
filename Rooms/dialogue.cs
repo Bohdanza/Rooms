@@ -20,7 +20,7 @@ namespace Rooms
         private int currentStage = 0;
 
         public List<Tuple<DialogueVariant, List<int>>> dialogueVariants { get; protected set; }
-        
+
         public Speaker(ContentManager contentManager, GameWorld gameWorld, double x, double y, int type, double speed)
         {
             Speed = speed;
@@ -30,7 +30,7 @@ namespace Rooms
             Type = type;
 
             Action = "id";
-            
+
             dialogueVariants = new List<Tuple<DialogueVariant, List<int>>>();
             List<string> input = new List<string>();
 
@@ -46,7 +46,7 @@ namespace Rooms
                 DialogueVariant dialogueVariant = new DialogueVariant(mainFont, Int32.Parse(input[i]));
 
                 List<int> secondPart = new List<int>();
-                List<string> outputs = input[i+1].Split(' ').ToList();
+                List<string> outputs = input[i + 1].Split(' ').ToList();
 
                 try
                 {
@@ -56,14 +56,14 @@ namespace Rooms
                     }
                 }
                 catch
-                {}
+                { }
 
                 dialogueVariants.Add(new Tuple<DialogueVariant, List<int>>(dialogueVariant, secondPart));
             }
 
             updateTexture(contentManager, true);
         }
-
+        
         public Speaker(ContentManager contentManager, List<string> input, int currentStr)
         {
             currentStage = Int32.Parse(input[currentStr + 1]);

@@ -185,7 +185,7 @@ namespace Rooms
                     var coords=gameWorld.currentRoom.GetMouseCordinates(gameWorld);
                 
                     if(coords.Item1>=0&& coords.Item1<Room.roomSize&& coords.Item2 >= 0 && coords.Item2 < Room.roomSize 
-                        && gameWorld.currentRoom.blocks[(int)coords.Item1, (int)coords.Item2].Passable)
+                        && gameWorld.currentRoom.blocks[(int)coords.Item1, (int)coords.Item2, 0].Passable)
                     {
                         selectedItem.ChangeCoords(coords.Item1, coords.Item2);
 

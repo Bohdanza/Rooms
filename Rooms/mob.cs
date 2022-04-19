@@ -25,6 +25,7 @@ namespace Rooms
 
         public virtual double X { get; private set; }
         public virtual double Y { get; private set; }
+        public virtual double Z { get; private set; } = 0;
 
         public List<Texture2D> Textures { get; protected set; }
 
@@ -73,7 +74,9 @@ namespace Rooms
 
         public virtual void Draw(SpriteBatch spriteBatch, int x, int y)
         {
-            spriteBatch.Draw(Textures[TextureNumber], new Vector2(x - Textures[TextureNumber].Width/2, y - Textures[TextureNumber].Height), Color.White);
+            spriteBatch.Draw(Textures[TextureNumber], 
+                new Vector2(x - Textures[TextureNumber].Width/2, 
+                y - Textures[TextureNumber].Height), Color.White);
         }
 
         public virtual void Update(ContentManager contentManager, GameWorld gameWorld)
@@ -86,20 +89,6 @@ namespace Rooms
 
                 TimeSinceLastTextureUpdate = 0;
             }
-
-        /*    if (Mouse.GetState().LeftButton == ButtonState.Pressed)
-            {
-                var mouseCoord = gameWorld.currentRoom.GetMouseCordinates(gameWorld);
-
-                if (GameWorld.GetDist(X, Y, mouseCoord.Item1, mouseCoord.Item2) <= Radius*3)
-                {
-                    IsSelected = true;
-                }
-                else
-                {
-                    IsSelected = false;
-                }
-            }*/
         }
 
         /// <summary>
@@ -150,7 +139,7 @@ namespace Rooms
             {
                 //check for center
                 if (X <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
-                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y)].Passable)
+                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y), (int)Math.Round(Z)].Passable)
                 {
                     X = px;
                     ans = false;
@@ -158,28 +147,28 @@ namespace Rooms
 
                 //fast check for hitbox. Can be incorrect sometimes
                 if (X + Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X + Radius >= 0 && Y >= 0 &&
-                    !gameWorld.currentRoom.blocks[(int)Math.Round(X + Radius), (int)Math.Round(Y)].Passable)
+                    !gameWorld.currentRoom.blocks[(int)Math.Round(X + Radius), (int)Math.Round(Y), (int)Math.Round(Z)].Passable)
                 {
                     X = px;
                     ans = false;
                 }
 
                 if (X - Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X - Radius >= 0 && Y >= 0 &&
-                    !gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y)].Passable)
+                    !gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y), (int)Math.Round(Z)].Passable)
                 {
                     X = px;
                     ans = false;
                 }
 
                 if (X <= Room.roomSize - 1 && Y + Radius <= Room.roomSize - 1 && X >= 0 && Y + Radius >= 0 &&
-                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y + Radius)].Passable)
+                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y + Radius), (int)Math.Round(Z)].Passable)
                 {
                     X = px;
                     ans = false;
                 }
 
                 if (X <= Room.roomSize - 1 && Y - Radius <= Room.roomSize - 1 && X >= 0 && Y - Radius >= 0 &&
-                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y - Radius)].Passable)
+                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y - Radius), (int)Math.Round(Z)].Passable)
                 {
                     X = px;
                     ans = false;
@@ -204,7 +193,7 @@ namespace Rooms
             {
                 //check for center
                 if (X <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
-                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y)].Passable)
+                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y), (int)Math.Round(Z)].Passable)
                 {
                     Y = py;
                     ans = false;
@@ -212,28 +201,28 @@ namespace Rooms
 
                 //fast check for hitbox. Can be incorrect sometimes
                 if (X + Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X + Radius >= 0 && Y >= 0 &&
-                    !gameWorld.currentRoom.blocks[(int)Math.Round(X + Radius), (int)Math.Round(Y)].Passable)
+                    !gameWorld.currentRoom.blocks[(int)Math.Round(X + Radius), (int)Math.Round(Y), (int)Math.Round(Z)].Passable)
                 {
                     Y = py;
                     ans = false;
                 }
 
                 if (X - Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X - Radius >= 0 && Y >= 0 &&
-                    !gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y)].Passable)
+                    !gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y), (int)Math.Round(Z)].Passable)
                 {
                     Y = py;
                     ans = false;
                 }
 
                 if (X <= Room.roomSize - 1 && Y + Radius <= Room.roomSize - 1 && X >= 0 && Y + Radius >= 0 &&
-                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y + Radius)].Passable)
+                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y + Radius), (int)Math.Round(Z)].Passable)
                 {
                     Y = py;
                     ans = false;
                 }
 
                 if (X <= Room.roomSize - 1 && Y - Radius <= Room.roomSize - 1 && X >= 0 && Y - Radius >= 0 &&
-                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y - Radius)].Passable)
+                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y - Radius), (int)Math.Round(Z)].Passable)
                 {
                     Y = py;
                     ans = false;

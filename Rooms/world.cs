@@ -24,6 +24,8 @@ namespace Rooms
 
         public const int BlockSizeX = 30;
         public const int BlockSizeY = 23;
+        public const int BlockSizeZ = 15;
+
         public string Name { get; protected set; }
         public Room currentRoom { get; protected set; }
         //   public Room leftRoom { get; protected set; }
