@@ -83,8 +83,8 @@ namespace Rooms
                     }
                 }
 
-            int mobsCount = Int32.Parse(input[roomSize]);
-            int currentString=roomSize+1, mobsAdded=0;
+            int mobsCount = Int32.Parse(input[roomSize * roomSizeZ]);
+            int currentString=roomSize*roomSizeZ+1, mobsAdded=0;
 
             for (mobsAdded=0; mobsAdded < mobsCount; mobsAdded++)
             {
@@ -178,15 +178,19 @@ namespace Rooms
             {
                 biome = 1;
             }
+            else if (prob <= 43 + 20)
+            {
+                biome = 5;
+            }
 
             int minIslandRad = 5, maxIslandRad = 26;
 
             int IslandRad = rnd.Next(minIslandRad, maxIslandRad);
 
             //speedup
-            List<Tuple<int, int>> groundBlocks = new List<Tuple<int, int>>();
+            List<Tuple<int, int, int>> groundBlocks = new List<Tuple<int, int, int>>();
 
-            //filling with 0-blocks and walls
+            //filling with 0-blocks
             for (int k = 0; k < roomSizeZ; k++)
                 for (int i = 0; i < roomSize; i++)
                     for (int j = 0; j < roomSize; j++)
@@ -197,13 +201,13 @@ namespace Rooms
                         {
                             blocks[i, j, k] = new Block(contentManager, 0);
 
-                            groundBlocks.Add(new Tuple<int, int>(i, j));
+                            groundBlocks.Add(new Tuple<int, int, int>(i, j, k));
 
                             if (biome == 0 && rnd.Next(0, 1000) < 5)
                             {
                                 AddMob(new NPC(contentManager, gameWorld, i, j, 1, 0.075, 10, 10));
                             }
-                            else if (biome==5 && rnd.Next(0, 1000) < 5)
+                            else if (rnd.Next(0, 1000) < 5)
                             {
                                 //coins
                                 AddMob(new Item(contentManager, i + rnd.NextDouble() * 0.75 - 0.375, j + rnd.NextDouble() * 0.75 - 0.375, 3, 1));
@@ -215,78 +219,79 @@ namespace Rooms
 
             int mountRad = rnd.Next(5, 10);
 
-            PlaceMountain(contentManager, roomSize / 2 + rnd.Next(0, 10) - 5, roomSize / 2 - rnd.Next(0, 5), 5, mountRad, mountRad / 5, 0);
+            groundBlocks.AddRange(PlaceMountain(contentManager, roomSize / 2 + rnd.Next(0, 10) - 5, 
+                roomSize / 2 - rnd.Next(0, 5), 5, mountRad, mountRad / 5, 0));
 
             //collision map
-            for (int k = 0; k < roomSizeZ; k++)
-                foreach (var currentTuple in groundBlocks)
+            foreach (var currentTuple in groundBlocks)
+            {
+                int i = currentTuple.Item1;
+                int j = currentTuple.Item2;
+                int k = currentTuple.Item3;
+
+                if (blocks[i, j, k].Type == 0)
                 {
-                    int i = currentTuple.Item1;
-                    int j = currentTuple.Item2;
+                    int newType = 11;
 
-                    if (blocks[i, j, k].Type == 0)
+                    if (blocks[i - 1, j, k].Passable)
                     {
-                        int newType = 11;
-
-                        if (blocks[i - 1, j, k].Passable)
-                        {
-                            newType = 14;
-                        }
-
-                        if (blocks[i, j - 1, k].Passable)
-                        {
-                            if (newType == 11)
-                                newType = 13;
-
-                            if (newType == 14)
-                                newType = 4;
-                        }
-
-                        if (blocks[i + 1, j, k].Passable)
-                        {
-                            if (newType == 11)
-                                newType = 15;
-
-                            if (newType == 13)
-                                newType = 3;
-
-                            if (newType == 14)
-                                newType = 16;
-
-                            if (newType == 4)
-                                newType = 10;
-                        }
-
-                        if (blocks[i, j + 1, k].Passable)
-                        {
-                            if (newType == 11)
-                                newType = 12;
-
-                            if (newType == 14)
-                                newType = 6;
-
-                            if (newType == 13)
-                                newType = 17;
-
-                            if (newType == 4)
-                                newType = 7;
-
-                            if (newType == 15)
-                                newType = 5;
-
-                            if (newType == 3)
-                                newType = 8;
-
-                            if (newType == 16)
-                                newType = 9;
-
-                            if (newType == 10)
-                                newType = 0;
-                        }
-
-                        blocks[i, j, k] = new Block(contentManager, newType);
+                        newType = 14;
                     }
+
+                    if (blocks[i, j - 1, k].Passable)
+                    {
+                        if (newType == 11)
+                            newType = 13;
+
+                        if (newType == 14)
+                            newType = 4;
+                    }
+
+                    if (blocks[i + 1, j, k].Passable)
+                    {
+                        if (newType == 11)
+                            newType = 15;
+
+                        if (newType == 13)
+                            newType = 3;
+
+                        if (newType == 14)
+                            newType = 16;
+
+                        if (newType == 4)
+                            newType = 10;
+                    }
+
+                    if (blocks[i, j + 1, k].Passable)
+                    {
+                        if (newType == 11)
+                            newType = 12;
+
+                        if (newType == 14)
+                            newType = 6;
+
+                        if (newType == 13)
+                            newType = 17;
+
+                        if (newType == 4)
+                            newType = 7;
+
+                        if (newType == 15)
+                            newType = 5;
+
+                        if (newType == 3)
+                            newType = 8;
+
+                        if (newType == 16)
+                            newType = 9;
+
+                        if (newType == 10)
+                            newType = 0;
+                    }
+
+                    blocks[i, j, k] = new Block(contentManager, newType);
                 }
+            }
 
             //forest
             if (biome == 0)
@@ -648,9 +653,21 @@ namespace Rooms
 
             return closestMob;
         }
-
-        protected void PlaceMountain(ContentManager contentManager, int x, int y, int height, int radius, int step, int blockType)
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="contentManager"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="height"></param>
+        /// <param name="radius"></param>
+        /// <param name="step"></param>
+        /// <param name="blockType"></param>
+        /// <returns>List of placed blocks coordinates</returns>
+        protected List<Tuple<int, int, int>> PlaceMountain(ContentManager contentManager, int x, int y, int height, int radius, int step, int blockType)
         {
+            List<Tuple<int, int, int>> toReturn = new List<Tuple<int, int, int>>();
             var rnd = new Random();
 
             for (int k = 0; k < height; k++)
@@ -658,10 +675,16 @@ namespace Rooms
                 for (int i = Math.Max(x - radius, 0); i < Math.Min(roomSize, x + radius); i++)
                     for (int j = Math.Max(y - radius, 0); j < Math.Min(roomSize, y + radius); j++)
                         if (GameWorld.GetDist(x, y, i, j) <= radius - rnd.Next(0, 2) && (k == 0 || blocks[i, j, k - 1].Type == blockType))
+                        {
                             blocks[i, j, k] = new Block(contentManager, blockType);
+
+                            toReturn.Add(new Tuple<int, int, int>(i, j, k));
+                        }
 
                 radius -= step;
             }
+
+            return toReturn;
         }
     }
 }

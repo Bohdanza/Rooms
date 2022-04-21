@@ -45,6 +45,17 @@ namespace Rooms
 
             Speed = double.Parse(input[currentStr + 5]);
 
+            int xc = Int32.Parse(input[currentStr + 6]);
+
+            int cstr = currentStr + 7;
+
+            for (int i = 0; i < xc; i++)
+            {
+                Inventory.Add(new Item(contentManager, input, cstr));
+
+                cstr += Inventory[Inventory.Count - 1].SaveList().Length;
+            }
+
             base.Radius = 0.25;
 
             updateTexture(contentManager, true);
@@ -306,6 +317,19 @@ namespace Rooms
 
             result += Speed.ToString();
             result += "\n";
+
+            result += Inventory.Count;
+            result += "\n";
+
+            foreach(var currentItem in Inventory)
+            {
+                result += currentItem.SaveList();
+
+                if(result[result.Length-1]!='\n')
+                {
+                    result += "\n";
+                }
+            }
 
             return result;
         }
