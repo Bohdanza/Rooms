@@ -53,7 +53,9 @@ namespace Rooms
             {
                 Inventory.Add(new Item(contentManager, input, cstr));
 
-                cstr += Inventory[Inventory.Count - 1].SaveList().Length;
+                cstr += Inventory[Inventory.Count - 1].SaveList().Count(f => (f == '\n'));
+
+                WeightToCarry += Inventory[Inventory.Count - 1].Weight;
             }
 
             base.Radius = 0.25;
