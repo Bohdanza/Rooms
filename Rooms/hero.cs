@@ -28,7 +28,7 @@ namespace Rooms
 
             ChangeCoords(x, y);
 
-            Speed = 0.11;
+            Speed = 0.3;
 
             base.Radius = 0.25;
 
@@ -105,34 +105,6 @@ namespace Rooms
 
             Action = "id";
 
-            if(ks.IsKeyDown(Keys.W))
-            {
-                Move(realSpeed, Math.PI * 1.5, gameWorld);
-
-                Action = "wa";
-            }
-            
-            if (ks.IsKeyDown(Keys.A))
-            {
-                Move(realSpeed, Math.PI, gameWorld);
-
-                Action = "wa";
-            }
-
-            if (ks.IsKeyDown(Keys.S))
-            {
-                Move(realSpeed, Math.PI * 0.5, gameWorld);
-
-                Action = "wa";
-            }
-
-            if (ks.IsKeyDown(Keys.D))
-            {
-                Move(realSpeed, 0, gameWorld);
-
-                Action = "wa";
-            }
-
             if(ks.IsKeyDown(Keys.Space))
             {
                 var arg1 = new List<Mob>();
@@ -152,7 +124,8 @@ namespace Rooms
                 }
             }
 
-            var ms = Mouse.GetState();
+            var ms = Mouse.GetState(); 
+            var mousePosition = gameWorld.currentRoom.GetMouseCordinates(gameWorld);
 
             timeSinceLastItemPick++;
 
@@ -195,12 +168,11 @@ namespace Rooms
                 }
                 else if (selectedItem != null)
                 {
-                    var coords=gameWorld.currentRoom.GetMouseCordinates(gameWorld);
-                
-                    if(coords.Item1>=0&& coords.Item1<Room.roomSize&& coords.Item2 >= 0 && coords.Item2 < Room.roomSize 
-                        && gameWorld.currentRoom.blocks[(int)coords.Item1, (int)coords.Item2, 0].Passable)
+                    if(mousePosition.Item1>=0&& mousePosition.Item1<Room.roomSize&& mousePosition.Item2 >= 0 && 
+                        mousePosition.Item2 < Room.roomSize 
+                        && gameWorld.currentRoom.blocks[(int)mousePosition.Item1, (int)mousePosition.Item2, 0].Passable)
                     {
-                        selectedItem.ChangeCoords(coords.Item1, coords.Item2);
+                        selectedItem.ChangeCoords(mousePosition.Item1, mousePosition.Item2);
 
                         gameWorld.currentRoom.AddMob(selectedItem);
 
@@ -214,8 +186,6 @@ namespace Rooms
             if (ms.RightButton == ButtonState.Pressed && AttackEnergy >= 20)
             {
                 AttackEnergy = 0;
-
-                var mousePosition = gameWorld.currentRoom.GetMouseCordinates(gameWorld);
 
                 double directionToMouse = Math.Atan2(Y - mousePosition.Item2, X - mousePosition.Item1);
 
@@ -249,8 +219,6 @@ namespace Rooms
             {
                 AttackEnergy = 0;
 
-                var mousePosition = gameWorld.currentRoom.GetMouseCordinates(gameWorld);
-
                 double directionToMouse = Math.Atan2(Y - mousePosition.Item2, X - mousePosition.Item1);
 
                 Move(0.1, directionToMouse + Math.PI, gameWorld);
@@ -277,6 +245,11 @@ namespace Rooms
                         }
                     }
                 }
+            }
+
+            if (ms.LeftButton == ButtonState.Pressed && selectedItem == null)
+            {
+                Move(realSpeed, Math.Atan2(mousePosition.Item2 - Y, mousePosition.Item1 - X), gameWorld);
             }
 
             base.Update(contentManager, gameWorld);

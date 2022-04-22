@@ -19,7 +19,7 @@ namespace Rooms
         public int DrawX = BlockSizeX / 2, DrawY = (1080 - BlockSizeY * Room.roomSize) / 2;
         public const int TextureUpdateSpeed = 9;
 
-        public static Texture2D SelectionCursorTexture { get; protected set; }
+        public static Texture2D CursorTexture { get; protected set; }
         public static SpriteFont MainFont { get; protected set; }
 
         public const int BlockSizeX = 30;
@@ -58,7 +58,7 @@ namespace Rooms
             }
 
             //loading all static things, most of them used for drawing
-            SelectionCursorTexture = contentManager.Load<Texture2D>("selection_cursor");
+            CursorTexture = contentManager.Load<Texture2D>("mouse_cursor");
             background = contentManager.Load<Texture2D>("background");
 
             MainFont = contentManager.Load<SpriteFont>("main_font_28s");
@@ -71,6 +71,14 @@ namespace Rooms
             spriteBatch.Draw(background, new Vector2(0, 0), Color.White);
 
             currentRoom.Draw(spriteBatch, DrawX, DrawY);
+
+            var ms = Mouse.GetState();
+            var mousePosition = currentRoom.GetMouseCordinates(this);
+
+            spriteBatch.Draw(CursorTexture, new Vector2(ms.X, ms.Y),
+                null, Color.White,
+                (float)(Math.PI/2+Math.Atan2(mousePosition.Item2 - currentRoom.heroReference.Y+0.5, mousePosition.Item1 - currentRoom.heroReference.X)),
+                new Vector2(CursorTexture.Width / 2, CursorTexture.Height), 1f, SpriteEffects.None, 0);
         }
         
         public void Update(ContentManager contentManager)
