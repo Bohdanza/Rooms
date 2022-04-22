@@ -20,6 +20,7 @@ namespace Rooms
 
         public int Type { get; protected set; }
         public bool Passable { get; protected set; }
+        public bool PassableSides { get; protected set; }
 
         public Block(ContentManager contentManager, int type)
         {
@@ -32,6 +33,13 @@ namespace Rooms
             else
             {
                 Passable = true;
+            }
+
+            PassableSides = false;
+
+            if (type == 1)
+            {
+                PassableSides = true;
             }
 
             updateTexture(contentManager, true);
