@@ -686,5 +686,35 @@ namespace Rooms
 
             return toReturn;
         }
+    
+        public bool LineIsClear(int x1, int y1, int x2, int y2, int z)
+        {
+            double xstep=x2-x1, ystep=y2-y1;
+
+            if (Math.Abs(xstep) > Math.Abs(ystep))
+            {
+                ystep /= Math.Abs(xstep);
+                xstep /= Math.Abs(xstep);
+            }
+            else
+            {
+                xstep /= Math.Abs(ystep);
+                ystep /= Math.Abs(ystep);
+            }
+
+            double x = x1, y = y1;
+
+            while ((int)Math.Round(x) != x2 || (int)Math.Round(y) != y2)
+            {
+                if (!blocks[(int)Math.Round(x), (int)Math.Round(y), z].Passable || 
+                    (z < roomSizeZ - 1 && !blocks[(int)Math.Round(x), (int)Math.Round(y), z + 1].PassableSides))
+                    return false;
+
+                x += xstep;
+                y += ystep;
+            }
+
+            return true;
+        }
     }
 }

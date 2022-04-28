@@ -175,7 +175,7 @@ namespace Rooms
                 }
 
                 if ((int)Math.Round(Z) < Room.roomSizeZ - 1)
-                { 
+                {
                     //check for center
                     if (X <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
                         !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y), (int)Math.Round(Z)+1].PassableSides)

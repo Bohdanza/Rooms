@@ -22,6 +22,7 @@ namespace Rooms
         private float Direction { get; set; } = 0;
         public int TimeSinceLastAttack = 0;
         public int AttackDelay = 20;
+        private bool LineClearedP=false;
 
         public NPC(ContentManager contentManager, GameWorld gameWorld, double x, double y, int type, double speed, int HP, int maxHP)
         {
@@ -47,7 +48,7 @@ namespace Rooms
         public NPC(ContentManager contentManager, List<string> input, int currentStr)
         {
             Name = input[currentStr + 1];
-
+            
             ChangeCoords(double.Parse(input[currentStr + 2]), double.Parse(input[currentStr + 3]));
 
             Type = Int32.Parse(input[currentStr + 4]);
@@ -59,7 +60,7 @@ namespace Rooms
 
             Action = "id";
 
-            if(HP<=0)
+            if (HP <= 0)
             {
                 Action = "di";
             }
@@ -77,7 +78,57 @@ namespace Rooms
             string pact = Action;
             var rnd = new Random();
 
-            if (controlCenter == null)
+            bool lineCleared = false;
+
+            if (Math.Round(Z) == Math.Round(gameWorld.currentRoom.heroReference.Z))
+            {
+                lineCleared = gameWorld.currentRoom.LineIsClear((int)Math.Round(X), (int)Math.Round(Y),
+                (int)Math.Round(gameWorld.currentRoom.heroReference.X), (int)Math.Round(gameWorld.currentRoom.heroReference.Y),
+                (int)Math.Round(Z));
+            }
+
+            if (lineCleared)
+            {
+                if(!LineClearedP)
+                {
+                    //dtc stands for detect
+                    Action = "dtc";
+                }
+
+                if (Action != "dtc" && Action != "dm" && Action != "di" && Action != "at")
+                {
+                    if (TimeSinceLastAttack >= AttackDelay)
+                    {
+                        if (GameWorld.GetDist(X, Y,
+                            gameWorld.currentRoom.heroReference.X, gameWorld.currentRoom.heroReference.Y) >
+                            Radius + gameWorld.currentRoom.heroReference.Radius)
+                        {
+                            Action = "wa";
+
+                            Move(Speed,
+                                GameWorld.GetDirection(X, Y, gameWorld.currentRoom.heroReference.X, gameWorld.currentRoom.heroReference.Y),
+                                gameWorld);
+                        }
+                        else
+                        {
+                            Action = "at";
+
+                            TimeSinceLastAttack = 0;
+
+                            gameWorld.currentRoom.heroReference.Damage(contentManager, gameWorld, (int)(HP * 0.5));
+                        }
+                    }
+                    else
+                    {
+                        Action = "wa";
+
+                        Move(Speed,
+                            GameWorld.GetDirection(gameWorld.currentRoom.heroReference.X, gameWorld.currentRoom.heroReference.Y, X, Y),
+                            gameWorld);
+                    }
+                }
+            }
+            else
             {
                 if (rnd.Next(0, 1000) < 20)
                 {
@@ -111,49 +162,8 @@ namespace Rooms
                     }
                 }
             }
-            else if (Action != "dm" && Action != "di")
-            {
-                if (GameWorld.GetDist(X, Y, controlCenter.X, controlCenter.Y) >= controlCenter.MaxDist)
-                {
-                    Move(Speed, GameWorld.GetDirection(controlCenter.X, controlCenter.Y, X, Y), gameWorld);
 
-                    Action = "wa";
-                }
-                else
-                {
-                    if (rnd.Next(0, 1000) < 20)
-                    {
-                        float addToDirection = 0.872f;
-
-                        if (rnd.Next(0, 2) == 0)
-                        {
-                            addToDirection *= -1;
-                        }
-
-                        Direction += addToDirection;
-                    }
-
-                    if (Action == "id" && rnd.Next(0, 1000) < 15)
-                    {
-                        Action = "wa";
-                    }
-
-                    if (Action == "wa")
-                    {
-                        bool moved = Move(Speed, Direction, gameWorld);
-
-                        if (rnd.Next(0, 1000) < 15)
-                        {
-                            Action = "id";
-                        }
-
-                        if (!moved)
-                        {
-                            Direction += (float)Math.PI;
-                        }
-                    }
-                }
-            }
+            LineClearedP = lineCleared;
 
             TimeSinceLastTextureUpdate++;
 
@@ -206,7 +216,7 @@ namespace Rooms
                         TextureNumber--;
                     }
 
-                    if(Action=="dm")
+                    if(Action=="dm"||Action=="at"||Action=="dtc")
                     {
                         Action = "id";
 

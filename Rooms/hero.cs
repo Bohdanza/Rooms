@@ -21,6 +21,7 @@ namespace Rooms
         private Item selectedItem = null;
         private string Action = "id";
         public int AttackEnergy { get; protected set; } = 0;
+        public int HP { get; protected set; }
 
         public Hero(ContentManager contentManager, double x, double y, int type, GameWorld gameWorld)
         {
@@ -31,6 +32,8 @@ namespace Rooms
             Speed = 0.3;
 
             base.Radius = 0.25;
+
+            HP = 1;
 
             updateTexture(contentManager, true);
         }
@@ -44,10 +47,11 @@ namespace Rooms
             Type = Int32.Parse(input[currentStr + 4]);
 
             Speed = double.Parse(input[currentStr + 5]);
+            HP = Int32.Parse(input[currentStr + 6]);
 
-            int xc = Int32.Parse(input[currentStr + 6]);
+            int xc = Int32.Parse(input[currentStr + 7]);
 
-            int cstr = currentStr + 7;
+            int cstr = currentStr + 8;
 
             for (int i = 0; i < xc; i++)
             {
@@ -126,7 +130,7 @@ namespace Rooms
 
             var ms = Mouse.GetState(); 
             var mousePosition = gameWorld.currentRoom.GetMouseCordinates(gameWorld);
-
+             
             timeSinceLastItemPick++;
 
             if (timeSinceLastItemPick>=10&&ms.LeftButton == ButtonState.Pressed) 
@@ -249,6 +253,8 @@ namespace Rooms
 
             if (ms.LeftButton == ButtonState.Pressed && selectedItem == null)
             {
+                Action = "wa";
+
                 Move(realSpeed, Math.Atan2(mousePosition.Item2 - Y, mousePosition.Item1 - X), gameWorld);
             }
 
@@ -293,6 +299,9 @@ namespace Rooms
             result += Speed.ToString();
             result += "\n";
 
+            result += HP.ToString();
+            result += "\n";
+
             result += Inventory.Count;
             result += "\n";
 
@@ -307,6 +316,29 @@ namespace Rooms
             }
 
             return result;
+        }
+
+        public void Damage(ContentManager contentManager, GameWorld gameWorld, int power)
+        {
+            HP -= power;
+
+            if (HP <= 0)
+            {
+                HP = 0;
+
+                if (Action != "di")
+                {
+                    Action = "di";
+
+                    updateTexture(contentManager, true);
+                }
+            }
+            else if (Action != "dm")
+            {
+                Action = "dm";
+
+                updateTexture(contentManager, true);
+            }
         }
     }
 }   

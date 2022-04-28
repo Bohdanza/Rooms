@@ -459,6 +459,18 @@
 /processorParam:TextureFormat=Color
 /build:mob_0_7_wa.png
 
+#begin mob_1_0_at.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:mob_1_0_at.png
+
 #begin mob_1_0_di.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -482,6 +494,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:mob_1_0_dm.png
+
+#begin mob_1_0_dtc.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:mob_1_0_dtc.png
 
 #begin mob_1_0_id.png
 /importer:TextureImporter
@@ -531,6 +555,18 @@
 /processorParam:TextureFormat=Color
 /build:mob_1_1_dm.png
 
+#begin mob_1_1_dtc.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:mob_1_1_dtc.png
+
 #begin mob_1_1_id.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -578,6 +614,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:mob_1_2_dm.png
+
+#begin mob_1_2_dtc.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:mob_1_2_dtc.png
 
 #begin mob_1_2_id.png
 /importer:TextureImporter
