@@ -12,37 +12,11 @@ using System.Threading;
 
 namespace Rooms
 {
-    public class Item : Mob
+    public abstract class Item : Mob
     {
         public int Weight { get; protected set; }
         protected List<Texture2D> bigTextures { get; set; }
         protected int bigTexturesNumber = 0;
-            
-        public Item(ContentManager contentManager, double x, double y, int type, int weight)
-        {
-            ChangeCoords(x, y);
-
-            Type = type;
-
-            Weight = weight;
-
-            updateTexture(contentManager, true);
-        }
-
-        public Item(ContentManager contentManager, List<string> input, int currentStr)
-        {
-            Weight = Int32.Parse(input[currentStr + 1]);
-
-            Name = input[currentStr + 2];
-
-            ChangeCoords(double.Parse(input[currentStr + 3]), double.Parse(input[currentStr + 4]));
-
-            Type = Int32.Parse(input[currentStr + 5]);
-            
-            base.Radius = 0.25;
-
-            updateTexture(contentManager, true);
-        }
 
         protected override void updateTexture(ContentManager contentManager, bool reload)
         {
@@ -74,14 +48,14 @@ namespace Rooms
             base.updateTexture(contentManager, reload);
         }
 
-        public void DrawIcon(SpriteBatch spriteBatch, int x, int y)
+        public virtual void DrawIcon(SpriteBatch spriteBatch, int x, int y)
         {
             spriteBatch.Draw(bigTextures[bigTexturesNumber], new Vector2(x, y), Color.White);
         }
 
         public override string SaveList()
         {
-            string output = "Item\n" + Weight.ToString() + "\n" + base.SaveList();
+            string output = Weight.ToString() + "\n" + base.SaveList();
 
             return output;
         }

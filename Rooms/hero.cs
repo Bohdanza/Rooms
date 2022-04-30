@@ -58,11 +58,16 @@ namespace Rooms
 
             for (int i = 0; i < xc; i++)
             {
-                Inventory.Add(new Item(contentManager, input, cstr));
+                Inventory.Add((Item)Mob.Loader(contentManager, cstr, input));
 
-                cstr += Inventory[Inventory.Count - 1].SaveList().Count(f => (f == '\n'));
-
-                WeightToCarry += Inventory[Inventory.Count - 1].Weight;
+                if (Inventory[Inventory.Count - 1] != null)
+                {
+                    WeightToCarry += Inventory[Inventory.Count - 1].Weight;
+                 
+                    cstr += Inventory[Inventory.Count - 1].SaveList().Count(f => (f == '\n'));
+                }
+                else
+                    cstr++;
             }
 
             base.Radius = 0.25;
@@ -139,7 +144,7 @@ namespace Rooms
             if (timeSinceLastItemPick>=10&&ms.LeftButton == ButtonState.Pressed) 
             {
                 timeSinceLastItemPick = 0;
-                int pickedItemIndex = (ms.X - 20) / 60;
+                int pickedItemIndex = (ms.X - 20) / 60 + 1;
 
                 if (ms.Y >= 1000 && ms.Y <= 1055 && ms.X >= 20 && ms.X < 80 + Inventory.Count * 60)
                 {
@@ -300,9 +305,14 @@ namespace Rooms
             else
                 base.Draw(spriteBatch, x, y, SpriteEffects.FlipHorizontally);
 
+            int ySub = 12;
+
+            if (Action == "id" && TextureNumber == 1)
+                ySub = 10;
+
             if (Inventory[0] != null)
             {
-                Inventory[0].Draw(spriteBatch, x, y - 15);
+                Inventory[0].Draw(spriteBatch, x, y - ySub);
             }
 
             //  DrawInterface(spriteBatch);
@@ -310,9 +320,10 @@ namespace Rooms
 
         public override void DrawInterface(SpriteBatch spriteBatch)
         {
-            for (int i = 0; i < Inventory.Count; i++)
+            for (int i = 1; i < Inventory.Count; i++)
             {
-                Inventory[i].DrawIcon(spriteBatch, 20 + i * 60, 1000);
+                if (Inventory[i] != null)
+                    Inventory[i].DrawIcon(spriteBatch, -40 + i * 60, 1000);
             }
 
             var ms = Mouse.GetState();

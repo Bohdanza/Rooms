@@ -104,9 +104,9 @@ namespace Rooms
             pay = new List<Item>();
             recieve = new List<Item>();
 
-            pay.Add(new Item(contentManager, 0, 0, 3, 1));
+          //  pay.Add(new Item(contentManager, 0, 0, 3, 1));
 
-            recieve.Add(new Item(contentManager, 0, 0, 4, 1));
+          //  recieve.Add(new Item(contentManager, 0, 0, 4, 1));
         }
 
         /// <summary>

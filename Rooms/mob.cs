@@ -367,9 +367,9 @@ namespace Rooms
                 resultingMob = new NPC(contentManager, input, currentStr);
             }
 
-            if (className == "Item")
+            if (className == "Shell")
             {
-                resultingMob = new Item(contentManager, input, currentStr);
+                resultingMob = new Shell(contentManager, input, currentStr);
             }
 
             if (className == "Decoration")

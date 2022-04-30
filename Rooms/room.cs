@@ -210,7 +210,7 @@ namespace Rooms
                             else if (rnd.Next(0, 1000) < 5)
                             {
                                 //coins
-                                AddMob(new Item(contentManager, i + rnd.NextDouble() * 0.75 - 0.375, j + rnd.NextDouble() * 0.75 - 0.375, 3, 1));
+                                AddMob(new Shell(contentManager, i + rnd.NextDouble() * 0.75 - 0.375, j + rnd.NextDouble() * 0.75 - 0.375, 4, 1));
                             }
                         }
 
