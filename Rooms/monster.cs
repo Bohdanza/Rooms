@@ -106,8 +106,8 @@ namespace Rooms
                             Action = "wa";
 
                             Move(Speed,
-                                GameWorld.GetDirection(X, Y, gameWorld.currentRoom.heroReference.X, gameWorld.currentRoom.heroReference.Y),
-                                gameWorld);
+                            GameWorld.GetDirection(gameWorld.currentRoom.heroReference.X, gameWorld.currentRoom.heroReference.Y, X, Y),
+                            gameWorld);
                         }
                         else
                         {
@@ -123,7 +123,7 @@ namespace Rooms
                         Action = "wa";
 
                         Move(Speed,
-                            GameWorld.GetDirection(gameWorld.currentRoom.heroReference.X, gameWorld.currentRoom.heroReference.Y, X, Y),
+                            GameWorld.GetDirection(X, Y, gameWorld.currentRoom.heroReference.X, gameWorld.currentRoom.heroReference.Y),
                             gameWorld);
                     }
                 }
@@ -166,6 +166,7 @@ namespace Rooms
             LineClearedP = lineCleared;
 
             TimeSinceLastTextureUpdate++;
+            TimeSinceLastAttack++;
 
             if (Action != pact)
             {

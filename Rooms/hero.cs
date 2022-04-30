@@ -22,6 +22,7 @@ namespace Rooms
         private string Action = "id";
         public int AttackEnergy { get; protected set; } = 0;
         public int HP { get; protected set; }
+        private double Direction=0;
 
         public Hero(ContentManager contentManager, double x, double y, int type, GameWorld gameWorld)
         {
@@ -29,7 +30,7 @@ namespace Rooms
 
             ChangeCoords(x, y);
 
-            Speed = 0.3;
+            Speed = 0.12;
 
             base.Radius = 0.25;
 
@@ -255,10 +256,29 @@ namespace Rooms
             {
                 Action = "wa";
 
-                Move(realSpeed, Math.Atan2(mousePosition.Item2 - Y, mousePosition.Item1 - X), gameWorld);
+                Direction = Math.Atan2(mousePosition.Item2 - Y, mousePosition.Item1 - X);
+
+                Move(realSpeed, Direction, gameWorld);
             }
 
-            base.Update(contentManager, gameWorld);
+            TimeSinceLastTextureUpdate++;
+
+            if (Action != "wa")
+            {
+                if (TimeSinceLastTextureUpdate > GameWorld.TextureUpdateSpeed)
+                {
+                    updateTexture(contentManager, false);
+
+                    TimeSinceLastTextureUpdate = 0;
+                }
+            }
+            else if (TimeSinceLastTextureUpdate > GameWorld.TextureUpdateSpeed * 0.5)
+            {
+                updateTexture(contentManager, false);
+
+                TimeSinceLastTextureUpdate = 0;
+            }
+                
 
             if (pact != Action)
             {
@@ -268,9 +288,17 @@ namespace Rooms
 
         public override void Draw(SpriteBatch spriteBatch, int x, int y)
         {
-            base.Draw(spriteBatch, x, y);
+            if (Direction >= Math.PI * 2)
+                Direction %= Math.PI * 2;
+            else if (Direction < 0) 
+                Direction = Math.PI * 2 + Direction;
 
-          //  DrawInterface(spriteBatch);
+            if (Direction > 0.5 * Math.PI && Direction < Math.PI * 1.5)
+                base.Draw(spriteBatch, x, y);
+            else
+                base.Draw(spriteBatch, x, y, SpriteEffects.FlipHorizontally);
+
+            //  DrawInterface(spriteBatch);
         }
 
         public override void DrawInterface(SpriteBatch spriteBatch)

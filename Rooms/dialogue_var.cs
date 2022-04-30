@@ -36,7 +36,7 @@ namespace Rooms
             {
                 input = sr.ReadToEnd().Split('\n').ToList();
             }
-
+            
             Phrase = input[0];
 
             input.RemoveAt(0);
