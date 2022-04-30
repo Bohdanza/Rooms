@@ -36,6 +36,8 @@ namespace Rooms
 
             HP = 1;
 
+            Inventory.Add(null);
+
             updateTexture(contentManager, true);
         }
 
@@ -298,6 +300,11 @@ namespace Rooms
             else
                 base.Draw(spriteBatch, x, y, SpriteEffects.FlipHorizontally);
 
+            if (Inventory[0] != null)
+            {
+                Inventory[0].Draw(spriteBatch, x, y - 15);
+            }
+
             //  DrawInterface(spriteBatch);
         }
 
@@ -333,13 +340,20 @@ namespace Rooms
             result += Inventory.Count;
             result += "\n";
 
-            foreach(var currentItem in Inventory)
+            foreach (var currentItem in Inventory)
             {
-                result += currentItem.SaveList();
-
-                if(result[result.Length-1]!='\n')
+                if (currentItem != null)
                 {
-                    result += "\n";
+                    result += currentItem.SaveList();
+
+                    if (result[result.Length - 1] != '\n')
+                    {
+                        result += "\n";
+                    }
+                }
+                else
+                {
+                    result += "null";
                 }
             }
 
