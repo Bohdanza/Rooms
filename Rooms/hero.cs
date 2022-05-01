@@ -23,6 +23,7 @@ namespace Rooms
         public int AttackEnergy { get; protected set; } = 0;
         public int HP { get; protected set; }
         private double Direction=0;
+        private bool putOn = false;
 
         public Hero(ContentManager contentManager, double x, double y, int type, GameWorld gameWorld)
         {
@@ -103,7 +104,21 @@ namespace Rooms
 
                 if (TextureNumber >= Textures.Count)
                 {
-                    TextureNumber = 0;
+                    if (Action != "di")
+                    {
+                        TextureNumber = 0;
+                    }
+                    else
+                    {
+                        TextureNumber--;
+                    }
+
+                    if (Action=="put"||Action == "dm" || Action == "at" || Action == "dtc")
+                    {
+                        Action = "id";
+
+                        updateTexture(contentManager, true);
+                    }
                 }
             }
         }
@@ -115,7 +130,8 @@ namespace Rooms
             double realSpeed = (double)Speed / (WeightToCarry*0.5 + 1);
             var ks = Keyboard.GetState();
 
-            Action = "id";
+            if (Action != "put" && Action != "di")
+                Action = "id";
 
             if(ks.IsKeyDown(Keys.Space))
             {
@@ -194,6 +210,31 @@ namespace Rooms
             }
 
             AttackEnergy++;
+
+            if (ks.IsKeyDown(Keys.X) && Action != "put")
+            {
+                if (Inventory[0] != null)
+                {
+                    putOn = false;
+                    Action = "put";
+                }   
+                else
+                {
+                    Shell closestShell = (Shell)gameWorld.currentRoom.GetClosestMob(X, Y, this, "Shell");
+
+                    if (closestShell != null && GameWorld.GetDist(X, Y, closestShell.X, closestShell.Y) < Radius + closestShell.Radius + 0.5)
+                    {
+                        putOn = true;
+                        Action = "put";
+
+                        Inventory[0] = closestShell;
+
+                        WeightToCarry += closestShell.Weight;
+
+                        gameWorld.currentRoom.MarkMobAsDeleted(closestShell);
+                    }
+                }
+            }
 
             if (ms.RightButton == ButtonState.Pressed && AttackEnergy >= 20)
             {
@@ -274,6 +315,17 @@ namespace Rooms
             {
                 if (TimeSinceLastTextureUpdate > GameWorld.TextureUpdateSpeed)
                 {
+                    if (Action == "put" && !putOn && TextureNumber == Textures.Count - 1 && Inventory[0] != null) 
+                    {
+                        Inventory[0].ChangeCoords(X, Y + 0.001);
+
+                        gameWorld.currentRoom.AddMob(Inventory[0]);
+
+                        WeightToCarry -= Inventory[0].Weight;
+
+                        Inventory[0] = null;
+                    }
+
                     updateTexture(contentManager, false);
 
                     TimeSinceLastTextureUpdate = 0;
@@ -286,7 +338,6 @@ namespace Rooms
                 TimeSinceLastTextureUpdate = 0;
             }
                 
-
             if (pact != Action)
             {
                 updateTexture(contentManager, true);
@@ -309,6 +360,14 @@ namespace Rooms
 
             if (Action == "id" && TextureNumber == 1)
                 ySub = 10;
+
+            if (Action == "put")
+            {
+                if (TextureNumber != 3)
+                    ySub = Textures[TextureNumber].Height - 5;
+                else
+                    ySub = 15;
+            }
 
             if (Inventory[0] != null)
             {

@@ -653,7 +653,51 @@ namespace Rooms
 
             return closestMob;
         }
-        
+
+        public Mob GetClosestMob(double x, double y, Mob ignoredMob, List<string> allowedTypes)
+        {
+            double cdist = 1e9;
+            Mob closestMob = null;
+
+            for (int i = 0; i < mobs.Count; i++)
+            {
+                double dst = GameWorld.GetDist(x, y, mobs[i].X, mobs[i].Y);
+
+                if (cdist > dst
+                    && ignoredMob!=mobs[i]
+                    && allowedTypes.Any(s => mobs[i].SaveList().StartsWith(s)))
+                {
+                    cdist = dst;
+
+                    closestMob = mobs[i];
+                }
+            }
+
+            return closestMob;
+        }
+
+        public Mob GetClosestMob(double x, double y, Mob ignoredMob, string allowedType)
+        {
+            double cdist = 1e9;
+            Mob closestMob = null;
+
+            for (int i = 0; i < mobs.Count; i++)
+            {
+                double dst = GameWorld.GetDist(x, y, mobs[i].X, mobs[i].Y);
+
+                if (cdist > dst
+                    && ignoredMob != mobs[i]
+                    && mobs[i].SaveList().StartsWith(allowedType))
+                {
+                    cdist = dst;
+
+                    closestMob = mobs[i];
+                }
+            }
+
+            return closestMob;
+        }
+
         /// <summary>
         /// 
         /// </summary>

@@ -351,6 +351,18 @@
 /processorParam:TextureFormat=Color
 /build:mob_0_0_id.png
 
+#begin mob_0_0_put.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:mob_0_0_put.png
+
 #begin mob_0_0_wa.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -422,6 +434,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:mob_0_1_id.png
+
+#begin mob_0_1_put.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:mob_0_1_put.png
 
 #begin mob_0_1_wa.png
 /importer:TextureImporter
@@ -483,7 +507,7 @@
 /processorParam:TextureFormat=Color
 /build:mob_0_2_id.png
 
-#begin mob_0_2_wa.png
+#begin mob_0_2_put.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -493,7 +517,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:mob_0_2_wa.png
+/build:mob_0_2_put.png
 
 #begin mob_0_2_wa.png
 /importer:TextureImporter
@@ -518,6 +542,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:mob_0_2_wa.png
+
+#begin mob_0_2_wa.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:mob_0_2_wa.png
+
+#begin mob_0_3_put.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:mob_0_3_put.png
 
 #begin mob_0_3_wa.png
 /importer:TextureImporter
