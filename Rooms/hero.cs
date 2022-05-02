@@ -157,7 +157,7 @@ namespace Rooms
             {
                 if ((int)Math.Round(Z) <= Room.roomSizeZ&& (int)Math.Round(Z) >0 && 
                     gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y), (int)Math.Round(Z)-1].Rigid)
-                    ZVector = 0.5;
+                    ZVector = 0.75;
             }
 
             var ms = Mouse.GetState(); 

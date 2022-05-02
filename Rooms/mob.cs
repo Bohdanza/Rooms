@@ -104,7 +104,7 @@ namespace Rooms
         {
             Z += ZVector;
 
-            if ((int)Math.Round(Z) < Room.roomSizeZ && (int)Math.Round(Z) >= 0)
+            if ((int)Math.Round(Z) < Room.roomSizeZ && (int)Math.Floor(Z) >= 0)
             {
                 bool stopFalling = false;
 

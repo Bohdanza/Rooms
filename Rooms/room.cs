@@ -183,7 +183,7 @@ namespace Rooms
                 biome = 5;
             }
 
-            int minIslandRad = 5, maxIslandRad = 26;
+            int minIslandRad = 10, maxIslandRad = 26;
 
             int IslandRad = rnd.Next(minIslandRad, maxIslandRad);
 
@@ -196,21 +196,30 @@ namespace Rooms
                     for (int j = 0; j < roomSize; j++)
                     {
                         blocks[i, j, k] = new Block(contentManager, 1);
-
-                        if (k == 0 && GameWorld.GetDist(roomSize / 2, roomSize / 2, i, j) <= IslandRad - rnd.Next(0, 5))
-                        {
-                            blocks[i, j, k] = new Block(contentManager, 0);
-
-                            groundBlocks.Add(new Tuple<int, int, int>(i, j, k));
-                        }
-
-                        int blockChangeProb = rnd.Next(0, 100);
                     }
 
-            int mountRad = rnd.Next(5, 10);
+            int px = roomSize / 2;
+            int py = roomSize / 2 - (IslandRad + (rnd.Next(0, 6) - 3));
 
-            groundBlocks.AddRange(PlaceMountain(contentManager, roomSize / 2 + rnd.Next(0, 10) - 5, 
-                roomSize / 2 - rnd.Next(0, 5), 5, mountRad, mountRad / 5, 0));
+            //generating island and it's points
+            for (int i = 1; i < 19; i++)
+            {
+                int lrad = IslandRad + (rnd.Next(0, 6) - 3);
+
+                int nx = roomSize / 2 + (int)(Math.Cos(i * 0.26179938779f) * lrad);
+                int ny = roomSize / 2 + (int)(Math.Sin(i * 0.26179938779f) * lrad);
+
+                groundBlocks.AddRange(PlaceLine(contentManager, px, py, nx, ny, 0, 0));
+
+                px = nx;
+                py = ny;
+            }
+
+            groundBlocks.AddRange(
+                PlaceLine(contentManager, px, py, roomSize / 2, roomSize / 2 - (IslandRad + (rnd.Next(0, 6) - 3)), 0, 0));
+
+
+            Fill(contentManager, roomSize / 2, roomSize / 2, 0, 0);
 
             //collision map
             foreach (var currentTuple in groundBlocks)
@@ -280,57 +289,6 @@ namespace Rooms
                     }
 
                     blocks[i, j, k] = new Block(contentManager, newType);
-                }
-            }
-
-            //forest
-            if (biome == 0)
-            {
-                int xcent = rnd.Next(roomSize / 2 - IslandRad / 2, roomSize / 2 + IslandRad / 2);
-                int ycent = rnd.Next(roomSize / 2 - IslandRad / 2, roomSize / 2 + IslandRad / 2);
-                int maxLayer = rnd.Next(2, 7);
-
-                for (int layer = 0; layer < maxLayer; layer++)
-                {
-                    int dist = layer * 3 + 6;
-                    int count = rnd.Next(3 + layer * 2, 6 + (int)(layer * 1.5));
-                    int currentlyPlaced = 0;
-                    List<Vector2> forbiddenPositions = new List<Vector2>();
-
-                    while (currentlyPlaced < count)
-                    {
-                        float angle = (float)(rnd.NextDouble() * Math.PI * 2);
-                        bool canBeUsed = true;
-
-                        for (int i = 0; i < forbiddenPositions.Count && canBeUsed; i++)
-                        {
-                            if (angle < forbiddenPositions[i].Y && angle > forbiddenPositions[i].X)
-                            {
-                                canBeUsed = false;
-                            }
-                        }
-
-                        if (canBeUsed)
-                        {
-                            forbiddenPositions.Add(new Vector2(angle - ((float)Math.PI / count),
-                                angle + ((float)Math.PI / count)));
-
-                            double Xplace = Math.Cos(angle) * dist + xcent;
-                            double Yplace = Math.Sin(angle) * dist + ycent;
-
-                            currentlyPlaced++;
-
-                            int height = 0;
-
-                            while (height < roomSizeZ - 1 && blocks[(int)Xplace, (int)Yplace, height + 1].Type != 1)
-                            {
-                                height++;
-                            }
-
-                            if (blocks[(int)Xplace, (int)Yplace, height].Type == 0)
-                                blocks[(int)Xplace, (int)Yplace, height] = new Block(contentManager, 18);
-                        }
-                    }
                 }
             }
         }
@@ -660,6 +618,80 @@ namespace Rooms
             }
 
             return true;
+        }
+
+        public List<Tuple<int, int, int>> PlaceLine(ContentManager contentManager, int x1, int y1, int x2, int y2, int z, int blockType)
+        {
+            double xstep = x2 - x1, ystep = y2 - y1;
+
+            if (Math.Abs(xstep) > Math.Abs(ystep))
+            {
+                ystep /= Math.Abs(xstep);
+                xstep /= Math.Abs(xstep);
+            }
+            else
+            {
+                xstep /= Math.Abs(ystep);
+                ystep /= Math.Abs(ystep);
+            }
+
+            double x = x1, y = y1;
+
+            var ans = new List<Tuple<int, int, int>>();
+
+            while ((int)Math.Round(x) != x2 || (int)Math.Round(y) != y2)
+            {
+                ans.Add(new Tuple<int, int, int>((int)x, (int)y, z));
+
+                blocks[(int)x, (int)y, z] = new Block(contentManager, blockType);
+
+                x += xstep;
+                y += ystep;
+            }
+
+            return ans;
+        }
+
+        public List<Tuple<int, int, int>> Fill(ContentManager contentManager, int x, int y, int z, int fillType)
+        {
+            int typeToFill = blocks[x, y, z].Type;
+            List<Tuple<int, int, int>> ans = new List<Tuple<int, int, int>>();
+            List<Tuple<int, int>> current = new List<Tuple<int, int>>();
+            List<Tuple<int, int>> discovered;
+
+            current.Add(new Tuple<int, int>(x, y));
+
+            while (current.Count > 0)
+            {
+                discovered = new List<Tuple<int, int>>();
+
+                foreach (var currentTuple in current)
+                {
+                    blocks[currentTuple.Item1, currentTuple.Item2, z] = new Block(contentManager, fillType);
+
+                    ans.Add(new Tuple<int, int, int>(currentTuple.Item1, currentTuple.Item2, z));
+
+                    if (currentTuple.Item1 > 0 && blocks[currentTuple.Item1 - 1, currentTuple.Item2, z].Type == typeToFill)
+                        if(!discovered.Contains(new Tuple<int, int>(currentTuple.Item1 - 1, currentTuple.Item2)))
+                            discovered.Add(new Tuple<int, int>(currentTuple.Item1 - 1, currentTuple.Item2));
+
+                    if (currentTuple.Item2 > 0 && blocks[currentTuple.Item1, currentTuple.Item2-1, z].Type == typeToFill)
+                        if (!discovered.Contains(new Tuple<int, int>(currentTuple.Item1, currentTuple.Item2-1)))
+                            discovered.Add(new Tuple<int, int>(currentTuple.Item1, currentTuple.Item2-1));
+
+                    if (currentTuple.Item1 <roomSize-1 && blocks[currentTuple.Item1 + 1, currentTuple.Item2, z].Type == typeToFill)
+                        if (!discovered.Contains(new Tuple<int, int>(currentTuple.Item1 + 1, currentTuple.Item2)))
+                            discovered.Add(new Tuple<int, int>(currentTuple.Item1 + 1, currentTuple.Item2));
+
+                    if (currentTuple.Item2 < roomSize - 1 && blocks[currentTuple.Item1, currentTuple.Item2+1, z].Type == typeToFill)
+                        if (!discovered.Contains(new Tuple<int, int>(currentTuple.Item1, currentTuple.Item2+1)))
+                            discovered.Add(new Tuple<int, int>(currentTuple.Item1, currentTuple.Item2+1));
+                }
+
+                current = discovered;
+            }
+
+            return ans;
         }
     }
 }
