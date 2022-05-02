@@ -27,6 +27,8 @@ namespace Rooms
         public virtual double Y { get; private set; }
         public virtual double Z { get; private set; } = 0;
 
+        protected virtual double ZVector { get; set; } = 0;
+
         public List<Texture2D> Textures { get; protected set; }
 
         protected int TimeSinceLastTextureUpdate = 0;
@@ -98,6 +100,53 @@ namespace Rooms
             }
         }
 
+        public virtual void UpdateGravitation(GameWorld gameWorld)
+        {
+            Z += ZVector;
+
+            if ((int)Math.Round(Z) < Room.roomSizeZ && (int)Math.Round(Z) >= 0)
+            {
+                bool stopFalling = false;
+
+                if (X <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
+                    gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y), (int)Math.Floor(Z)].Rigid)
+                    stopFalling = true;
+
+                if (X + Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X + Radius >= 0 && Y >= 0 &&
+                    gameWorld.currentRoom.blocks[(int)Math.Round(X + Radius), (int)Math.Round(Y), (int)Math.Floor(Z)].Rigid)
+                    stopFalling = true;
+
+                if (X - Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X - Radius >= 0 && Y >= 0 &&
+                    gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y), (int)Math.Floor(Z)].Rigid)
+                    stopFalling = true;
+
+                if (X <= Room.roomSize - 1 && Y + Radius <= Room.roomSize - 1 && X >= 0 && Y + Radius >= 0 &&
+                    gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y + Radius), (int)Math.Floor(Z)].Rigid)
+                    stopFalling = true;
+
+                if (X <= Room.roomSize - 1 && Y - Radius <= Room.roomSize - 1 && X >= 0 && Y - Radius >= 0 &&
+                    gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y - Radius), (int)Math.Floor(Z)].Rigid)
+                    stopFalling = true;
+
+                if (stopFalling)
+                {
+                    Z -= ZVector;
+
+                    Z = Math.Floor(Z);
+
+                    ZVector = 0;
+                    
+                }
+            }
+
+            ZVector -= 0.1;
+
+            if (ZVector < -0.3)
+            {
+                ZVector = -0.3;
+            }
+        }
+
         /// <summary>
         /// Used to automatically fill some fields (like MaxHP, Speed etc.) with given file info if any. 
         /// !USE ONLY AFTER ASSIGNING TYPE!
@@ -112,10 +161,11 @@ namespace Rooms
             return false;
         }
 
-        public void ChangeCoords(double x, double y)
+        public void ChangeCoords(double x, double y, double z)
         {
             X = x;
             Y = y;
+            Z = z;
         }
 
         public bool Move(double speed, double direction, GameWorld gameWorld)
@@ -142,11 +192,11 @@ namespace Rooms
                 ans = false;
             }
 
-            if (!Flying)
+            if (!Flying && (int)Math.Floor(Z) < Room.roomSizeZ && Z >= 0)
             {
                 //check for center
                 if (X <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
-                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y), (int)Math.Round(Z)].Passable)
+                    gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y), (int)Math.Floor(Z)].Rigid)
                 {
                     X = px;
                     ans = false;
@@ -154,71 +204,31 @@ namespace Rooms
 
                 //fast check for hitbox. Can be incorrect sometimes
                 if (X + Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X + Radius >= 0 && Y >= 0 &&
-                    !gameWorld.currentRoom.blocks[(int)Math.Round(X + Radius), (int)Math.Round(Y), (int)Math.Round(Z)].Passable)
+                    gameWorld.currentRoom.blocks[(int)Math.Round(X + Radius), (int)Math.Round(Y), (int)Math.Floor(Z)].Rigid)
                 {
                     X = px;
                     ans = false;
                 }
 
                 if (X - Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X - Radius >= 0 && Y >= 0 &&
-                    !gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y), (int)Math.Round(Z)].Passable)
+                    gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y), (int)Math.Floor(Z)].Rigid)
                 {
                     X = px;
                     ans = false;
                 }
 
                 if (X <= Room.roomSize - 1 && Y + Radius <= Room.roomSize - 1 && X >= 0 && Y + Radius >= 0 &&
-                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y + Radius), (int)Math.Round(Z)].Passable)
+                    gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y + Radius), (int)Math.Floor(Z)].Rigid)
                 {
                     X = px;
                     ans = false;
                 }
 
                 if (X <= Room.roomSize - 1 && Y - Radius <= Room.roomSize - 1 && X >= 0 && Y - Radius >= 0 &&
-                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y - Radius), (int)Math.Round(Z)].Passable)
+                    gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y - Radius), (int)Math.Floor(Z)].Rigid)
                 {
                     X = px;
                     ans = false;
-                }
-
-                if ((int)Math.Round(Z) < Room.roomSizeZ - 1)
-                {
-                    //check for center
-                    if (X <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
-                        !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y), (int)Math.Round(Z)+1].PassableSides)
-                    {
-                        X = px;
-                        ans = false;
-                    }
-
-                    //fast check for hitbox. Can be incorrect sometimes
-                    if (X + Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X + Radius >= 0 && Y >= 0 &&
-                        !gameWorld.currentRoom.blocks[(int)Math.Round(X + Radius), (int)Math.Round(Y), (int)Math.Round(Z)+1].PassableSides)
-                    {
-                        X = px;
-                        ans = false;
-                    }
-
-                    if (X - Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X - Radius >= 0 && Y >= 0 &&
-                        !gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y), (int)Math.Round(Z)+1].PassableSides)
-                    {
-                        X = px;
-                        ans = false;
-                    }
-
-                    if (X <= Room.roomSize - 1 && Y + Radius <= Room.roomSize - 1 && X >= 0 && Y + Radius >= 0 &&
-                        !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y + Radius), (int)Math.Round(Z)+1].PassableSides)
-                    {
-                        X = px;
-                        ans = false;
-                    }
-
-                    if (X <= Room.roomSize - 1 && Y - Radius <= Room.roomSize - 1 && X >= 0 && Y - Radius >= 0 &&
-                        !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y - Radius), (int)Math.Round(Z)+1].PassableSides)
-                    {
-                        X = px;
-                        ans = false;
-                    }
                 }
             }
 
@@ -236,11 +246,11 @@ namespace Rooms
                 ans = false;
             }
 
-            if (!Flying)
+            if (!Flying && (int)Math.Floor(Z) < Room.roomSizeZ && Z >= 0)
             {
                 //check for center
                 if (X <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
-                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y), (int)Math.Round(Z)].Passable)
+                    gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y), (int)Math.Floor(Z)].Rigid)
                 {
                     Y = py;
                     ans = false;
@@ -248,71 +258,31 @@ namespace Rooms
 
                 //fast check for hitbox. Can be incorrect sometimes
                 if (X + Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X + Radius >= 0 && Y >= 0 &&
-                    !gameWorld.currentRoom.blocks[(int)Math.Round(X + Radius), (int)Math.Round(Y), (int)Math.Round(Z)].Passable)
+                    gameWorld.currentRoom.blocks[(int)Math.Round(X + Radius), (int)Math.Round(Y), (int)Math.Floor(Z)].Rigid)
                 {
                     Y = py;
                     ans = false;
                 }
 
                 if (X - Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X - Radius >= 0 && Y >= 0 &&
-                    !gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y), (int)Math.Round(Z)].Passable)
+                    gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y), (int)Math.Floor(Z)].Rigid)
                 {
                     Y = py;
                     ans = false;
                 }
 
                 if (X <= Room.roomSize - 1 && Y + Radius <= Room.roomSize - 1 && X >= 0 && Y + Radius >= 0 &&
-                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y + Radius), (int)Math.Round(Z)].Passable)
+                    gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y + Radius), (int)Math.Floor(Z)].Rigid)
                 {
                     Y = py;
                     ans = false;
                 }
 
                 if (X <= Room.roomSize - 1 && Y - Radius <= Room.roomSize - 1 && X >= 0 && Y - Radius >= 0 &&
-                    !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y - Radius), (int)Math.Round(Z)].Passable)
+                    gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y - Radius), (int)Math.Floor(Z)].Rigid)
                 {
                     Y = py;
                     ans = false;
-                }
-             
-                if ((int)Math.Round(Z) < Room.roomSizeZ - 1)
-                {
-                    //check for center
-                    if (X <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X >= 0 && Y >= 0 &&
-                        !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y), (int)Math.Round(Z)+1].PassableSides)
-                    {
-                        Y = py;
-                        ans = false;
-                    }
-
-                    //fast check for hitbox. Can be incorrect sometimes
-                    if (X + Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X + Radius >= 0 && Y >= 0 &&
-                        !gameWorld.currentRoom.blocks[(int)Math.Round(X + Radius), (int)Math.Round(Y), (int)Math.Round(Z)+1].PassableSides)
-                    {
-                        Y = py;
-                        ans = false;
-                    }
-
-                    if (X - Radius <= Room.roomSize - 1 && Y <= Room.roomSize - 1 && X - Radius >= 0 && Y >= 0 &&
-                        !gameWorld.currentRoom.blocks[(int)Math.Round(X - Radius), (int)Math.Round(Y), (int)Math.Round(Z)+1].PassableSides)
-                    {
-                        Y = py;
-                        ans = false;
-                    }
-
-                    if (X <= Room.roomSize - 1 && Y + Radius <= Room.roomSize - 1 && X >= 0 && Y + Radius >= 0 &&
-                        !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y + Radius), (int)Math.Round(Z)+1].PassableSides)
-                    {
-                        Y = py;
-                        ans = false;
-                    }
-
-                    if (X <= Room.roomSize - 1 && Y - Radius <= Room.roomSize - 1 && X >= 0 && Y - Radius >= 0 &&
-                        !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y - Radius), (int)Math.Round(Z)+1].PassableSides)
-                    {
-                        Y = py;
-                        ans = false;
-                    }
                 }
             }
 
@@ -338,6 +308,9 @@ namespace Rooms
             result += "\n";
 
             result += Y.ToString();
+            result += "\n";
+
+            result += Z.ToString();
             result += "\n";
 
             result += Type.ToString();

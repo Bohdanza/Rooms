@@ -25,15 +25,15 @@ namespace Rooms
         private double Direction=0;
         private bool putOn = false;
 
-        public Hero(ContentManager contentManager, double x, double y, int type, GameWorld gameWorld)
+        public Hero(ContentManager contentManager, double x, double y, double z, int type, GameWorld gameWorld)
         {
             Type = type;
 
-            ChangeCoords(x, y);
+            ChangeCoords(x, y, z);
 
             Speed = 0.12;
 
-            base.Radius = 0.25;
+            base.Radius = 0.4;
 
             HP = 1;
 
@@ -41,21 +41,21 @@ namespace Rooms
 
             updateTexture(contentManager, true);
         }
-
+        
         public Hero(ContentManager contentManager, List<string> input, int currentStr)
         {
             Name = input[currentStr + 1];
 
-            ChangeCoords(double.Parse(input[currentStr + 2]), double.Parse(input[currentStr + 3]));
+            ChangeCoords(double.Parse(input[currentStr + 2]), double.Parse(input[currentStr + 3]), double.Parse(input[currentStr + 4]));
 
-            Type = Int32.Parse(input[currentStr + 4]);
+            Type = Int32.Parse(input[currentStr + 5]);
 
-            Speed = double.Parse(input[currentStr + 5]);
-            HP = Int32.Parse(input[currentStr + 6]);
+            Speed = double.Parse(input[currentStr + 6]);
+            HP = Int32.Parse(input[currentStr + 7]);
 
-            int xc = Int32.Parse(input[currentStr + 7]);
+            int xc = Int32.Parse(input[currentStr + 8]);
 
-            int cstr = currentStr + 8;
+            int cstr = currentStr + 9;
 
             for (int i = 0; i < xc; i++)
             {
@@ -71,7 +71,7 @@ namespace Rooms
                     cstr++;
             }
 
-            base.Radius = 0.25;
+            base.Radius = 0.4;
 
             updateTexture(contentManager, true);
         }
@@ -152,6 +152,14 @@ namespace Rooms
                 }
             }
 
+            //jump
+            if(ks.IsKeyDown(Keys.Z))
+            {
+                if ((int)Math.Round(Z) <= Room.roomSizeZ&& (int)Math.Round(Z) >0 && 
+                    gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y), (int)Math.Round(Z)-1].Rigid)
+                    ZVector = 0.5;
+            }
+
             var ms = Mouse.GetState(); 
             var mousePosition = gameWorld.currentRoom.GetMouseCordinates(gameWorld);
              
@@ -198,9 +206,9 @@ namespace Rooms
                 {
                     if(mousePosition.Item1>=0&& mousePosition.Item1<Room.roomSize&& mousePosition.Item2 >= 0 && 
                         mousePosition.Item2 < Room.roomSize 
-                        && gameWorld.currentRoom.blocks[(int)mousePosition.Item1, (int)mousePosition.Item2, 0].Passable)
+                        && !gameWorld.currentRoom.blocks[(int)mousePosition.Item1, (int)mousePosition.Item2, 0].Rigid)
                     {
-                        selectedItem.ChangeCoords(mousePosition.Item1, mousePosition.Item2);
+                        selectedItem.ChangeCoords(mousePosition.Item1, mousePosition.Item2, Z);
 
                         gameWorld.currentRoom.AddMob(selectedItem);
 
@@ -244,7 +252,7 @@ namespace Rooms
 
                 Move(0.075, directionToMouse + Math.PI, gameWorld);
 
-                Mob kck = new KickTrace(contentManager, X, Y+5, 6, 0, directionToMouse + Math.PI, 9, gameWorld);
+                Mob kck = new KickTrace(contentManager, X, Y+5, Z, 6, 0, directionToMouse + Math.PI, 9, gameWorld);
                 kck.Move(0.2, directionToMouse + Math.PI, gameWorld);
 
                 gameWorld.currentRoom.AddMob(kck);
@@ -276,7 +284,7 @@ namespace Rooms
 
                 Move(0.1, directionToMouse + Math.PI, gameWorld);
 
-                Mob kck = new KickTrace(contentManager, X, Y + 5, 7, 0, directionToMouse + Math.PI, 20, gameWorld);
+                Mob kck = new KickTrace(contentManager, X, Y + 5, Z, 7, 0, directionToMouse + Math.PI, 20, gameWorld);
                 kck.Move(0.2, directionToMouse + Math.PI, gameWorld);
 
                 gameWorld.currentRoom.AddMob(kck);
@@ -309,6 +317,8 @@ namespace Rooms
                 Move(realSpeed, Direction, gameWorld);
             }
 
+            UpdateGravitation(gameWorld);
+
             TimeSinceLastTextureUpdate++;
 
             if (Action != "wa")
@@ -317,7 +327,7 @@ namespace Rooms
                 {
                     if (Action == "put" && !putOn && TextureNumber == Textures.Count - 1 && Inventory[0] != null) 
                     {
-                        Inventory[0].ChangeCoords(X, Y + 0.001);
+                        Inventory[0].ChangeCoords(X, Y + 0.001, Z);
 
                         gameWorld.currentRoom.AddMob(Inventory[0]);
 

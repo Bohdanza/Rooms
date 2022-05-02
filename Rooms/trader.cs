@@ -17,11 +17,11 @@ namespace Rooms
         public List<Deal> deals { get; protected set; }
         private bool AddedToList = false;
 
-        public Trader(ContentManager contentManager, double x, double y, int type, GameWorld gameWorld)
+        public Trader(ContentManager contentManager, double x, double y, double z, int type, GameWorld gameWorld)
         {
             deals = new List<Deal>();
 
-            ChangeCoords(x, y);
+            ChangeCoords(x, y, z);
 
             Type = type;
 
@@ -39,9 +39,9 @@ namespace Rooms
         {
             Name = input[currentStr + 1];
 
-            ChangeCoords(double.Parse(input[currentStr + 2]), double.Parse(input[currentStr + 3]));
+            ChangeCoords(double.Parse(input[currentStr + 2]), double.Parse(input[currentStr + 3]), double.Parse(input[currentStr + 4]));
 
-            Type = Int32.Parse(input[currentStr + 4]);
+            Type = Int32.Parse(input[currentStr + 5]);
 
             Radius = 1;
 

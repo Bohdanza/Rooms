@@ -17,11 +17,11 @@ namespace Rooms
         public int HP { get; protected set; }
         public int MaxHP { get; protected set; }
 
-        public Boss(int type, double x, double y)
+        public Boss(int type, double x, double y, double z)
         {
             Type = type;
 
-            ChangeCoords(x, y);
+            ChangeCoords(x, y, z);
 
             if (type == 25)
             {

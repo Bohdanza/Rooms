@@ -19,7 +19,7 @@ namespace Rooms
         private int timeLived { get; set; }
         public int Lifetime { get; protected set; }
 
-        public KickTrace(ContentManager contentManager, double x, double y, int type, double speed, double direction, int lifetime, GameWorld gameWorld)
+        public KickTrace(ContentManager contentManager, double x, double y, double z, int type, double speed, double direction, int lifetime, GameWorld gameWorld)
         {
             Direction = direction;
             Speed = speed;
@@ -27,7 +27,7 @@ namespace Rooms
             timeLived = 0;
             Lifetime = lifetime;
 
-            ChangeCoords(x, y);
+            ChangeCoords(x, y, z);
 
             Type = type;
 

@@ -202,16 +202,6 @@ namespace Rooms
                             blocks[i, j, k] = new Block(contentManager, 0);
 
                             groundBlocks.Add(new Tuple<int, int, int>(i, j, k));
-
-                            if (biome == 0 && rnd.Next(0, 1000) < 5)
-                            {
-                                AddMob(new NPC(contentManager, gameWorld, i, j, 1, 0.075, 10, 10));
-                            }
-                            else if (rnd.Next(0, 1000) < 5)
-                            {
-                                //coins
-                                AddMob(new Shell(contentManager, i + rnd.NextDouble() * 0.75 - 0.375, j + rnd.NextDouble() * 0.75 - 0.375, 4, 1));
-                            }
                         }
 
                         int blockChangeProb = rnd.Next(0, 100);
@@ -233,12 +223,12 @@ namespace Rooms
                 {
                     int newType = 11;
 
-                    if (blocks[i - 1, j, k].Passable)
+                    if (blocks[i - 1, j, k].Rigid)
                     {
                         newType = 14;
                     }
 
-                    if (blocks[i, j - 1, k].Passable)
+                    if (blocks[i, j - 1, k].Rigid)
                     {
                         if (newType == 11)
                             newType = 13;
@@ -247,7 +237,7 @@ namespace Rooms
                             newType = 4;
                     }
 
-                    if (blocks[i + 1, j, k].Passable)
+                    if (blocks[i + 1, j, k].Rigid)
                     {
                         if (newType == 11)
                             newType = 15;
@@ -262,7 +252,7 @@ namespace Rooms
                             newType = 10;
                     }
 
-                    if (blocks[i, j + 1, k].Passable)
+                    if (blocks[i, j + 1, k].Rigid)
                     {
                         if (newType == 11)
                             newType = 12;
@@ -343,99 +333,6 @@ namespace Rooms
                     }
                 }
             }
-            
-            //village-
-            if (biome==1)
-            {
-                for (int layer = 0; layer < 4; layer++)
-                {
-                    int dist = layer * 3 + 6;
-                    int count = rnd.Next(3 + layer * 2, 6 + (int)(layer * 1.5));
-                    int currentlyPlaced = 0;
-                    List<Vector2> forbiddenPositions = new List<Vector2>();
-
-                    while (currentlyPlaced < count)
-                    {
-                        float angle = (float)(rnd.NextDouble() * Math.PI * 2);
-                        bool canBeUsed = true;
-
-                        for (int i = 0; i < forbiddenPositions.Count && canBeUsed; i++)
-                        {
-                            if (angle < forbiddenPositions[i].Y && angle > forbiddenPositions[i].X)
-                            {
-                                canBeUsed = false;
-                            }
-                        }
-
-                        if (canBeUsed)
-                        {
-                            forbiddenPositions.Add(new Vector2(angle - ((float)Math.PI / count),
-                                angle + ((float)Math.PI / count)));
-
-                            double Xplace = Math.Cos(angle) * dist + roomSize / 2;
-                            double Yplace = Math.Sin(angle) * dist + roomSize / 2;
-
-                            currentlyPlaced++;
-
-                            Mob hutToAdd;
-
-                            if (layer == 0 && rnd.Next(0, 100) < 33)
-                            {
-                                hutToAdd = new Decoration(contentManager, Xplace, Yplace, 10);
-                            }
-                            else if (layer == 0 && rnd.Next(0, 100) < 10)
-                            {
-                                hutToAdd = new Decoration(contentManager, Xplace, Yplace, 13);
-                            }
-                            else if ((layer == 1 || layer == 2) && rnd.Next(0, 100) < 25)
-                            {
-                                hutToAdd = new Decoration(contentManager, Xplace, Yplace, 13);
-                            }
-                            else if (rnd.Next(0, 100) < layer * 15)
-                            {
-                                hutToAdd = new Decoration(contentManager, (int)Math.Round(Xplace), (int)Math.Round(Yplace), 14);
-
-                                //blocks[(int)Math.Round(Xplace), (int)Math.Round(Yplace)] = new Block(contentManager, 5);
-                            }
-                            else if (rnd.Next(0, 100) <= -5 * (layer - 2) * (layer - 2) + 20)
-                            {
-                                hutToAdd = new Decoration(contentManager, Xplace, Yplace, 16);
-                            }
-                            else if (rnd.Next(0, 100) <= layer * layer * 2.5)
-                            {
-                                hutToAdd = new Decoration(contentManager, Xplace, Yplace, 15);
-                            }
-                            else if (rnd.Next(0, 100) <= -4 * (layer - 2) * (layer - 2) + 15)
-                            {
-                                hutToAdd = new Decoration(contentManager, Xplace, Yplace, 17);
-                            }
-                            else
-                            {
-                                hutToAdd = new Decoration(contentManager, Xplace, Yplace, 8);
-
-                                if (rnd.Next(0, 100) < 33)
-                                {
-                                    AddMob(new NPC(contentManager, gameWorld, Xplace, Yplace, 11, 0.05, 30, 30));
-                                }
-                                else if(rnd.Next(0, 100)<20)
-                                {
-                                    AddMob(new Trader(contentManager, Xplace+(rnd.NextDouble()-0.5)*2, Yplace + 1, 9, gameWorld));
-                                }
-                            }
-
-                            AddMob(hutToAdd);
-                        }
-                    }
-                }
-            }
-
-            //the beginning
-            if(IsFirstTemple)
-            {
-                AddMob(new Decoration(contentManager, roomSize / 2, roomSize / 2, 20));
-
-                AddMob(new Speaker(contentManager, gameWorld, roomSize / 2, roomSize / 2 + 1, 21, 0));
-            }
         }
 
         public void Draw(SpriteBatch spriteBatch, int x, int y)
@@ -444,18 +341,18 @@ namespace Rooms
 
             while (j < roomSize || currentMob < mobs.Count)
             {
-                if (currentMob < mobs.Count && mobs[currentMob].Y < j - 0.5)
+                if (currentMob < mobs.Count && mobs[currentMob].Y < j-1)
                 {
                     int YDelay = 0;
 
-                    if (!mobs[currentMob].Flying&& (int)Math.Round(mobs[currentMob].X) < roomSize && (int)Math.Round(mobs[currentMob].X) > 0)
+                    if (!mobs[currentMob].Flying
+                        && (int)Math.Round(mobs[currentMob].X) < roomSize && (int)Math.Round(mobs[currentMob].X) > 0)
                     {
-                        YDelay = -blocks[(int)Math.Round(mobs[currentMob].X), (int)(j - 0.5), 0].Textures[0].Height
-                            - (int)(mobs[currentMob].Z * GameWorld.BlockSizeZ);
+                        YDelay = - (int)(mobs[currentMob].Z * GameWorld.BlockSizeZ);
                     }
 
                     mobs[currentMob].Draw(spriteBatch, x + (int)(mobs[currentMob].X * GameWorld.BlockSizeX),
-                        y + GameWorld.BlockSizeY + (int)(mobs[currentMob].Y * GameWorld.BlockSizeY)+YDelay);
+                        y + (int)(mobs[currentMob].Y * GameWorld.BlockSizeY)+YDelay);
 
                     currentMob++;
                 }
@@ -492,6 +389,11 @@ namespace Rooms
                 if (mobs[i] != null)
                 {
                     mobs[i].Update(contentManager, gameWorld);
+
+                    if (mobs[i].Z < -1)
+                    {
+                        MarkMobAsDeleted(mobs[i]);
+                    }
                 }
             }
 
@@ -750,8 +652,7 @@ namespace Rooms
 
             while ((int)Math.Round(x) != x2 || (int)Math.Round(y) != y2)
             {
-                if (!blocks[(int)Math.Round(x), (int)Math.Round(y), z].Passable || 
-                    (z < roomSizeZ - 1 && !blocks[(int)Math.Round(x), (int)Math.Round(y), z + 1].PassableSides))
+                if (z < roomSizeZ - 1 && blocks[(int)Math.Round(x), (int)Math.Round(y), z + 1].Rigid)
                     return false;
 
                 x += xstep;

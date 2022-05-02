@@ -14,11 +14,11 @@ namespace Rooms
 {
     public class Decoration:Mob
     {
-        public Decoration(ContentManager contentManager, double x, double y, int type)
+        public Decoration(ContentManager contentManager, double x, double y, double z, int type)
         {
             Type = type;
 
-            ChangeCoords(x, y);
+            ChangeCoords(x, y, z);
 
             updateTexture(contentManager, true);
         }
@@ -27,9 +27,9 @@ namespace Rooms
         {
             Name = input[currentStr + 1];
 
-            ChangeCoords(double.Parse(input[currentStr + 2]), double.Parse(input[currentStr + 3]));
+            ChangeCoords(double.Parse(input[currentStr + 2]), double.Parse(input[currentStr + 3]), double.Parse(input[currentStr + 4]));
 
-            Type = Int32.Parse(input[currentStr + 4]);
+            Type = Int32.Parse(input[currentStr + 5]);
 
             Radius = 1;
 

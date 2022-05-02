@@ -19,28 +19,15 @@ namespace Rooms
         protected int TimeSinceLastTextureUpdate = 0;
 
         public int Type { get; protected set; }
-        public bool Passable { get; protected set; }
-        public bool PassableSides { get; protected set; }
-
+        public bool Rigid { get; protected set; }
         public Block(ContentManager contentManager, int type)
         {
             Type = type;
-
-            if (type == 1 || type == 2 || type == 18)
-            {
-                Passable = false;
-            }
-            else
-            {
-                Passable = true;
-            }
-
-            PassableSides = false;
-
+            
             if (type == 1)
-            {
-                PassableSides = true;
-            }
+                Rigid = false;
+            else
+                Rigid = true;
 
             updateTexture(contentManager, true);
         }
@@ -92,9 +79,9 @@ namespace Rooms
             }
         }
 
-        public void ChangePassability(bool newPas)
+        public void ChangeRigidity(bool newRig)
         {
-            Passable = newPas;
+            Rigid = newRig;
         }
     }
 }

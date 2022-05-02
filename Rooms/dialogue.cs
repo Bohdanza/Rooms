@@ -21,11 +21,11 @@ namespace Rooms
 
         public List<Tuple<DialogueVariant, List<int>>> dialogueVariants { get; protected set; }
 
-        public Speaker(ContentManager contentManager, GameWorld gameWorld, double x, double y, int type, double speed)
+        public Speaker(ContentManager contentManager, GameWorld gameWorld, double x, double y, double z, int type, double speed)
         {
             Speed = speed;
 
-            ChangeCoords(x, y);
+            ChangeCoords(x, y, z);
 
             Type = type;
 
@@ -72,9 +72,9 @@ namespace Rooms
 
             Name = input[currentStr + 3];
 
-            ChangeCoords(double.Parse(input[currentStr + 4]), double.Parse(input[currentStr + 5]));
+            ChangeCoords(double.Parse(input[currentStr + 4]), double.Parse(input[currentStr + 5]), double.Parse(input[currentStr + 6]));
 
-            Type = Int32.Parse(input[currentStr + 6]);
+            Type = Int32.Parse(input[currentStr + 7]);
 
             Action = "id";
 

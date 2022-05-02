@@ -24,14 +24,14 @@ namespace Rooms
         public int AttackDelay = 20;
         private bool LineClearedP=false;
 
-        public NPC(ContentManager contentManager, GameWorld gameWorld, double x, double y, int type, double speed, int HP, int maxHP)
+        public NPC(ContentManager contentManager, GameWorld gameWorld, double x, double y, double z, int type, double speed, int HP, int maxHP)
         {
             MaxHP = maxHP;
             this.HP = HP;
 
             Speed = speed;
             
-            ChangeCoords(x, y);
+            ChangeCoords(x, y, z);
 
             Type = type;
 
@@ -48,15 +48,15 @@ namespace Rooms
         public NPC(ContentManager contentManager, List<string> input, int currentStr)
         {
             Name = input[currentStr + 1];
-            
-            ChangeCoords(double.Parse(input[currentStr + 2]), double.Parse(input[currentStr + 3]));
 
-            Type = Int32.Parse(input[currentStr + 4]);
+            ChangeCoords(double.Parse(input[currentStr + 2]), double.Parse(input[currentStr + 3]), double.Parse(input[currentStr + 4]));
 
-            HP = Int32.Parse(input[currentStr + 5]);
-            MaxHP = Int32.Parse(input[currentStr + 6]);
+            Type = Int32.Parse(input[currentStr + 5]);
 
-            Speed = double.Parse(input[currentStr + 7]);
+            HP = Int32.Parse(input[currentStr + 6]);
+            MaxHP = Int32.Parse(input[currentStr + 7]);
+
+            Speed = double.Parse(input[currentStr + 8]);
 
             Action = "id";
 

@@ -21,9 +21,9 @@ namespace Rooms
         private string Action { get; set; }
         private float Direction { get; set; } = 0;
 
-        public ControlCenter(double x, double y, double minDist, double maxDist, double speed)
+        public ControlCenter(double x, double y, double z, double minDist, double maxDist, double speed)
         {
-            ChangeCoords(x, y);
+            ChangeCoords(x, y, z);
 
             MinDist = minDist;
             MaxDist = maxDist;

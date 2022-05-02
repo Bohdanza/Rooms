@@ -46,13 +46,13 @@ namespace Rooms
                     posRead = sr.ReadToEnd().Split('\n').ToList();
                 }
 
-                Hero newHero = new Hero(contentManager, Room.roomSize / 2, Room.roomSize / 2, 0, this);
+                Hero newHero = new Hero(contentManager, Room.roomSize / 2, Room.roomSize / 2, 1, 0, this);
 
                 currentRoom = new Room(contentManager, Int32.Parse(posRead[0]), Int32.Parse(posRead[1]), this, newHero);
             }
             catch
             {
-                Hero newHero = new Hero(contentManager, Room.roomSize / 2, Room.roomSize / 2, 0, this);
+                Hero newHero = new Hero(contentManager, Room.roomSize / 2, Room.roomSize / 2, 1, 0, this);
 
                 currentRoom = new Room(contentManager, 0, 0, this, newHero);
             }
@@ -93,7 +93,8 @@ namespace Rooms
 
             if (currentRoom.heroReference.X <= Room.roomSize / 2 - 64)
             {
-                currentRoom.heroReference.ChangeCoords(Room.roomSize / 2 + 64 - 0.0001, currentRoom.heroReference.Y);
+                currentRoom.heroReference.ChangeCoords(Room.roomSize / 2 + 64 - 0.0001, currentRoom.heroReference.Y,
+                    currentRoom.heroReference.Z);
 
                 var newHero = currentRoom.heroReference;
 
@@ -109,7 +110,8 @@ namespace Rooms
 
             if (currentRoom.heroReference.X >= Room.roomSize / 2 + 64)
             {
-                currentRoom.heroReference.ChangeCoords(Room.roomSize / 2 - 64 + 0.0001, currentRoom.heroReference.Y);
+                currentRoom.heroReference.ChangeCoords(Room.roomSize / 2 - 64 + 0.0001, currentRoom.heroReference.Y,
+                    currentRoom.heroReference.Z);
 
                 var newHero = currentRoom.heroReference;
 
@@ -125,7 +127,8 @@ namespace Rooms
 
             if (currentRoom.heroReference.Y <= Room.roomSize / 2 - 64)
             {
-                currentRoom.heroReference.ChangeCoords(currentRoom.heroReference.X, Room.roomSize / 2 + 64 - 0.0001);
+                currentRoom.heroReference.ChangeCoords(currentRoom.heroReference.X, Room.roomSize / 2 + 64 - 0.0001,
+                    currentRoom.heroReference.Z);
                 
                 var newHero = currentRoom.heroReference;
 
@@ -141,7 +144,8 @@ namespace Rooms
 
             if (currentRoom.heroReference.Y >= Room.roomSize / 2 + 64)
             {
-                currentRoom.heroReference.ChangeCoords(currentRoom.heroReference.X, Room.roomSize / 2 - 64 + 0.0001);
+                currentRoom.heroReference.ChangeCoords(currentRoom.heroReference.X, Room.roomSize / 2 - 64 + 0.0001,
+                    currentRoom.heroReference.Z);
 
                 var newHero = currentRoom.heroReference;
 

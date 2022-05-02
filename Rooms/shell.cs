@@ -14,9 +14,9 @@ namespace Rooms
 {
     public class Shell:Item
     {
-        public Shell(ContentManager contentManager, double x, double y, int type, int weight)
+        public Shell(ContentManager contentManager, double x, double y, double z, int type, int weight)
         {
-            ChangeCoords(x, y);
+            ChangeCoords(x, y, z);
 
             Type = type;
 
@@ -31,9 +31,9 @@ namespace Rooms
 
             Name = input[currentStr + 2];
 
-            ChangeCoords(double.Parse(input[currentStr + 3]), double.Parse(input[currentStr + 4]));
+            ChangeCoords(double.Parse(input[currentStr + 3]), double.Parse(input[currentStr + 4]), double.Parse(input[currentStr + 5]));
 
-            Type = Int32.Parse(input[currentStr + 5]);
+            Type = Int32.Parse(input[currentStr + 6]);
 
             base.Radius = 0.25;
 
