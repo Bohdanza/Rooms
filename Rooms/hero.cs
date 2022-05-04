@@ -252,7 +252,7 @@ namespace Rooms
 
                 Move(0.075, directionToMouse + Math.PI, gameWorld);
 
-                Mob kck = new KickTrace(contentManager, X, Y+5, Z, 6, 0, directionToMouse + Math.PI, 9, gameWorld);
+                Mob kck = new KickTrace(contentManager, X, Y+4.5, Z, 6, 0, directionToMouse + Math.PI, 21, gameWorld);
                 kck.Move(0.2, directionToMouse + Math.PI, gameWorld);
 
                 gameWorld.currentRoom.AddMob(kck);
@@ -284,7 +284,7 @@ namespace Rooms
 
                 Move(0.1, directionToMouse + Math.PI, gameWorld);
 
-                Mob kck = new KickTrace(contentManager, X, Y + 5, Z, 7, 0, directionToMouse + Math.PI, 20, gameWorld);
+                Mob kck = new KickTrace(contentManager, X, Y + 4.5, Z, 7, 0, directionToMouse + Math.PI, 20, gameWorld);
                 kck.Move(0.2, directionToMouse + Math.PI, gameWorld);
 
                 gameWorld.currentRoom.AddMob(kck);

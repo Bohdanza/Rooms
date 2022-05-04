@@ -15,15 +15,15 @@ namespace Rooms
     public class Room
     {
         public const int roomSize = 52;
-        public const int roomSizeZ = 5;
+        public const int roomSizeZ = 7;
 
         public int biome { get; protected set; }
 
         public int X { get; protected set; }
-        public int Y { get; protected set; } 
+        public int Y { get; protected set; }
         public Block[,,] blocks;
 
-        private GameWorld worldReference { get;  set; }
+        private GameWorld worldReference { get; set; }
         public Hero heroReference { get; protected set; }
         public List<Mob> mobs { get; protected set; }
 
@@ -43,7 +43,7 @@ namespace Rooms
             heroReference = null;
 
             try
-            { 
+            {
                 Load(contentManager, x, y, gameWorld);
             }
             catch
@@ -75,7 +75,7 @@ namespace Rooms
             for (int k = 0; k < roomSizeZ; k++)
                 for (int i = 0; i < roomSize; i++)
                 {
-                    List<string> lst = input[k*roomSize+i].Split("|").ToList();
+                    List<string> lst = input[k * roomSize + i].Split("|").ToList();
 
                     for (int j = 0; j < roomSize; j++)
                     {
@@ -84,9 +84,9 @@ namespace Rooms
                 }
 
             int mobsCount = Int32.Parse(input[roomSize * roomSizeZ]);
-            int currentString=roomSize*roomSizeZ+1, mobsAdded=0;
+            int currentString = roomSize * roomSizeZ + 1, mobsAdded = 0;
 
-            for (mobsAdded=0; mobsAdded < mobsCount; mobsAdded++)
+            for (mobsAdded = 0; mobsAdded < mobsCount; mobsAdded++)
             {
                 Mob newMob = Mob.Loader(contentManager, currentString, input);
 
@@ -97,8 +97,8 @@ namespace Rooms
                     currentString += newMob.SaveList().Count(f => (f == '\n'));
 
                     AddMob(newMob);
-                    
-                    if(str.StartsWith("Hero"))
+
+                    if (str.StartsWith("Hero"))
                     {
                         heroReference = (Hero)newMob;
                     }
@@ -162,10 +162,8 @@ namespace Rooms
 
         protected void Generate(ContentManager contentManager, int x, int y, GameWorld gameWorld)
         {
-            bool IsFirstTemple = x == 0 && y == 0;
-
             //0-golden forest, 1-village, 2-cryzualis, 4-clouds, 5-Femuhiblu desert
-            int biome=0;
+            int biome = 0;
 
             var rnd = new Random();
             int prob = rnd.Next(0, 100);
@@ -183,7 +181,7 @@ namespace Rooms
                 biome = 5;
             }
 
-            int minIslandRad = 10, maxIslandRad = 26;
+            int minIslandRad = 12, maxIslandRad = 17;
 
             int IslandRad = rnd.Next(minIslandRad, maxIslandRad);
 
@@ -198,28 +196,52 @@ namespace Rooms
                         blocks[i, j, k] = new Block(contentManager, 1);
                     }
 
-            int px = roomSize / 2;
-            int py = roomSize / 2 - (IslandRad + (rnd.Next(0, 6) - 3));
+            int pr = (IslandRad + (rnd.Next(0, 9) - 4));
+
+            int px = roomSize / 2 + (int)(Math.Cos(0) * pr);
+            int py = roomSize / 2 + (int)(Math.Sin(0) * pr);
+
+            int bx = px;
+            int by = py;
+
+            List<int> radiuses = new List<int>();
+
+            radiuses.Add(pr);
 
             //generating island and it's points
-            for (int i = 1; i < 19; i++)
+            for (int i = 1; i < 24; i++)
             {
-                int lrad = IslandRad + (rnd.Next(0, 6) - 3);
+                int lrad = Math.Min(IslandRad + 4, Math.Max(IslandRad - 4, radiuses[i - 1] + rnd.Next(-2, 3)));
 
-                int nx = roomSize / 2 + (int)(Math.Cos(i * 0.26179938779f) * lrad);
-                int ny = roomSize / 2 + (int)(Math.Sin(i * 0.26179938779f) * lrad);
+                int nx = roomSize / 2 + (int)(Math.Cos(i * Math.PI * 2 / 24) * lrad);
+                int ny = roomSize / 2 + (int)(Math.Sin(i * Math.PI * 2 / 24) * lrad);
 
                 groundBlocks.AddRange(PlaceLine(contentManager, px, py, nx, ny, 0, 0));
+
+                radiuses.Add(lrad);
 
                 px = nx;
                 py = ny;
             }
 
             groundBlocks.AddRange(
-                PlaceLine(contentManager, px, py, roomSize / 2, roomSize / 2 - (IslandRad + (rnd.Next(0, 6) - 3)), 0, 0));
-
+                PlaceLine(contentManager, px, py, bx, by, 0, 0));
 
             Fill(contentManager, roomSize / 2, roomSize / 2, 0, 0);
+
+            var newBlocks = new List<Tuple<int, int, int>>();
+
+            int mountainCount = rnd.Next(3, 10);
+
+            for (int i = 0; i < mountainCount; i++)
+            {
+                int ci = rnd.Next(0, groundBlocks.Count);
+
+                newBlocks.AddRange(PlaceMountain(contentManager, groundBlocks[ci].Item1, groundBlocks[ci].Item2,
+                    7, rnd.Next(8, 10), 1, 0));
+            }
+
+            groundBlocks.AddRange(newBlocks);
 
             //collision map
             foreach (var currentTuple in groundBlocks)
@@ -232,12 +254,12 @@ namespace Rooms
                 {
                     int newType = 11;
 
-                    if (blocks[i - 1, j, k].Rigid)
+                    if (i>0&&blocks[i - 1, j, k].Rigid)
                     {
                         newType = 14;
                     }
 
-                    if (blocks[i, j - 1, k].Rigid)
+                    if (j > 0 && blocks[i, j - 1, k].Rigid)
                     {
                         if (newType == 11)
                             newType = 13;
@@ -246,7 +268,7 @@ namespace Rooms
                             newType = 4;
                     }
 
-                    if (blocks[i + 1, j, k].Rigid)
+                    if (i<roomSize-1&& blocks[i + 1, j, k].Rigid)
                     {
                         if (newType == 11)
                             newType = 15;
@@ -261,7 +283,7 @@ namespace Rooms
                             newType = 10;
                     }
 
-                    if (blocks[i, j + 1, k].Rigid)
+                    if (j < roomSize - 1 && blocks[i, j + 1, k].Rigid)
                     {
                         if (newType == 11)
                             newType = 12;
@@ -299,18 +321,18 @@ namespace Rooms
 
             while (j < roomSize || currentMob < mobs.Count)
             {
-                if (currentMob < mobs.Count && mobs[currentMob].Y < j-1)
+                if (currentMob < mobs.Count && mobs[currentMob].Y < j - 1)
                 {
                     int YDelay = 0;
 
                     if (!mobs[currentMob].Flying
                         && (int)Math.Round(mobs[currentMob].X) < roomSize && (int)Math.Round(mobs[currentMob].X) > 0)
                     {
-                        YDelay = - (int)(mobs[currentMob].Z * GameWorld.BlockSizeZ);
+                        YDelay = -(int)(mobs[currentMob].Z * GameWorld.BlockSizeZ);
                     }
 
                     mobs[currentMob].Draw(spriteBatch, x + (int)(mobs[currentMob].X * GameWorld.BlockSizeX),
-                        y + (int)(mobs[currentMob].Y * GameWorld.BlockSizeY)+YDelay);
+                        y + (int)(mobs[currentMob].Y * GameWorld.BlockSizeY) + YDelay);
 
                     currentMob++;
                 }
@@ -332,23 +354,23 @@ namespace Rooms
                 }
             }
 
-            foreach(var currentMobInterface in mobsWithInterface)
+            foreach (var currentMobInterface in mobsWithInterface)
             {
                 currentMobInterface.DrawInterface(spriteBatch);
             }
 
-           // heroReference.DrawInterface(spriteBatch);
+            // heroReference.DrawInterface(spriteBatch);
         }
 
         public void Update(ContentManager contentManager, GameWorld gameWorld)
-        { 
+        {
             for (int i = 0; i < mobs.Count; i++)
             {
                 if (mobs[i] != null)
                 {
                     mobs[i].Update(contentManager, gameWorld);
 
-                    if (mobs[i].Z < -1)
+                    if (mobs[i]!=null&&mobs[i].Z < -1)
                     {
                         MarkMobAsDeleted(mobs[i]);
                     }
@@ -396,7 +418,7 @@ namespace Rooms
             y1 = Math.Min(y1, roomSize);
             x2 = Math.Min(x2, roomSize);
             y2 = Math.Min(y2, roomSize);
-            
+
             for (int i = x1; i < x2; i++)
             {
                 for (int j = y1; j < y2; j++)
@@ -405,7 +427,7 @@ namespace Rooms
                 }
             }
         }
-        
+
         protected void placeRectagle(ContentManager contentManager, int x1, int y1, int x2, int y2, int z1, int z2, int blockType)
         {
             x1 = Math.Max(x1, 0);
@@ -446,13 +468,13 @@ namespace Rooms
 
             markedMobs.Add(index);
         }
-        
+
         /// <summary>
         /// Used to mark mob and later delete it with DeleteMarked 
         /// </summary>
         /// <param name="index"></param>
         public void MarkMobAsDeleted(Mob mob)
-        { 
+        {
             int ind = mobs.IndexOf(mob);
 
             MarkMobIndexAsDeleted(ind);
@@ -479,9 +501,9 @@ namespace Rooms
             {
                 double dst = GameWorld.GetDist(x, y, mobs[i].X, mobs[i].Y);
 
-                if (cdist > dst 
-                    && !ignoredMobs.Contains(mobs[i]) 
-                    && allowedTypes.Any(s=>mobs[i].SaveList().StartsWith(s)))
+                if (cdist > dst
+                    && !ignoredMobs.Contains(mobs[i])
+                    && allowedTypes.Any(s => mobs[i].SaveList().StartsWith(s)))
                 {
                     cdist = dst;
 
@@ -524,7 +546,7 @@ namespace Rooms
                 double dst = GameWorld.GetDist(x, y, mobs[i].X, mobs[i].Y);
 
                 if (cdist > dst
-                    && ignoredMob!=mobs[i]
+                    && ignoredMob != mobs[i]
                     && allowedTypes.Any(s => mobs[i].SaveList().StartsWith(s)))
                 {
                     cdist = dst;
@@ -576,9 +598,9 @@ namespace Rooms
 
             for (int k = 0; k < height; k++)
             {
-                for (int i = Math.Max(x - radius, 0); i < Math.Min(roomSize, x + radius); i++)
-                    for (int j = Math.Max(y - radius, 0); j < Math.Min(roomSize, y + radius); j++)
-                        if (GameWorld.GetDist(x, y, i, j) <= radius - rnd.Next(0, 2) && (k == 0 || blocks[i, j, k - 1].Type == blockType))
+                for (int i = Math.Max(x - radius + k * step, 0); i < Math.Min(roomSize, x + radius - k * step); i++)
+                    for (int j = Math.Max(y - radius + k * step, 0); j < Math.Min(roomSize, y + radius - k * step); j++)
+                        if (GameWorld.GetDist(x, y, i, j) < radius - k * step + 0.49)
                         {
                             blocks[i, j, k] = new Block(contentManager, blockType);
 
@@ -590,10 +612,10 @@ namespace Rooms
 
             return toReturn;
         }
-    
+
         public bool LineIsClear(int x1, int y1, int x2, int y2, int z)
         {
-            double xstep=x2-x1, ystep=y2-y1;
+            double xstep = x2 - x1, ystep = y2 - y1;
 
             if (Math.Abs(xstep) > Math.Abs(ystep))
             {
@@ -672,20 +694,20 @@ namespace Rooms
                     ans.Add(new Tuple<int, int, int>(currentTuple.Item1, currentTuple.Item2, z));
 
                     if (currentTuple.Item1 > 0 && blocks[currentTuple.Item1 - 1, currentTuple.Item2, z].Type == typeToFill)
-                        if(!discovered.Contains(new Tuple<int, int>(currentTuple.Item1 - 1, currentTuple.Item2)))
+                        if (!discovered.Contains(new Tuple<int, int>(currentTuple.Item1 - 1, currentTuple.Item2)))
                             discovered.Add(new Tuple<int, int>(currentTuple.Item1 - 1, currentTuple.Item2));
 
-                    if (currentTuple.Item2 > 0 && blocks[currentTuple.Item1, currentTuple.Item2-1, z].Type == typeToFill)
-                        if (!discovered.Contains(new Tuple<int, int>(currentTuple.Item1, currentTuple.Item2-1)))
-                            discovered.Add(new Tuple<int, int>(currentTuple.Item1, currentTuple.Item2-1));
+                    if (currentTuple.Item2 > 0 && blocks[currentTuple.Item1, currentTuple.Item2 - 1, z].Type == typeToFill)
+                        if (!discovered.Contains(new Tuple<int, int>(currentTuple.Item1, currentTuple.Item2 - 1)))
+                            discovered.Add(new Tuple<int, int>(currentTuple.Item1, currentTuple.Item2 - 1));
 
-                    if (currentTuple.Item1 <roomSize-1 && blocks[currentTuple.Item1 + 1, currentTuple.Item2, z].Type == typeToFill)
+                    if (currentTuple.Item1 < roomSize - 1 && blocks[currentTuple.Item1 + 1, currentTuple.Item2, z].Type == typeToFill)
                         if (!discovered.Contains(new Tuple<int, int>(currentTuple.Item1 + 1, currentTuple.Item2)))
                             discovered.Add(new Tuple<int, int>(currentTuple.Item1 + 1, currentTuple.Item2));
 
-                    if (currentTuple.Item2 < roomSize - 1 && blocks[currentTuple.Item1, currentTuple.Item2+1, z].Type == typeToFill)
-                        if (!discovered.Contains(new Tuple<int, int>(currentTuple.Item1, currentTuple.Item2+1)))
-                            discovered.Add(new Tuple<int, int>(currentTuple.Item1, currentTuple.Item2+1));
+                    if (currentTuple.Item2 < roomSize - 1 && blocks[currentTuple.Item1, currentTuple.Item2 + 1, z].Type == typeToFill)
+                        if (!discovered.Contains(new Tuple<int, int>(currentTuple.Item1, currentTuple.Item2 + 1)))
+                            discovered.Add(new Tuple<int, int>(currentTuple.Item1, currentTuple.Item2 + 1));
                 }
 
                 current = discovered;
