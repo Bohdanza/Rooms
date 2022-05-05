@@ -162,23 +162,23 @@ namespace Rooms
 
         protected void Generate(ContentManager contentManager, int x, int y, GameWorld gameWorld)
         {
-            //0-golden forest, 1-village, 2-cryzualis, 4-clouds, 5-Femuhiblu desert
+            //0-village ruins, 1-library, 2-mines(tower+village), 3-wild
             int biome = 0;
 
             var rnd = new Random();
             int prob = rnd.Next(0, 100);
 
-            if (prob <= 33)
+            if (prob <= 100)
+            {
+                biome = 3;
+            }
+            else if (prob <= 40 + 20)
             {
                 biome = 0;
             }
-            else if (prob <= 33 + 10)
+            else
             {
-                biome = 1;
-            }
-            else if (prob <= 43 + 20)
-            {
-                biome = 5;
+                biome = 2;
             }
 
             int minIslandRad = 12, maxIslandRad = 17;
@@ -229,19 +229,46 @@ namespace Rooms
 
             Fill(contentManager, roomSize / 2, roomSize / 2, 0, 0);
 
-            var newBlocks = new List<Tuple<int, int, int>>();
-
-            int mountainCount = rnd.Next(3, 10);
-
-            for (int i = 0; i < mountainCount; i++)
+            if (biome == 3)
             {
-                int ci = rnd.Next(0, groundBlocks.Count);
+                //mountains
+                var newBlocks = new List<Tuple<int, int, int>>();
 
-                newBlocks.AddRange(PlaceMountain(contentManager, groundBlocks[ci].Item1, groundBlocks[ci].Item2,
-                    7, rnd.Next(8, 10), 1, 0));
+                int mountainCount = rnd.Next(3, 10);
+
+                for (int i = 0; i < mountainCount; i++)
+                {
+                    int ci = rnd.Next(0, groundBlocks.Count);
+
+                    newBlocks.AddRange(PlaceMountain(contentManager, groundBlocks[ci].Item1, groundBlocks[ci].Item2,
+                        6, rnd.Next(8, 10), 1, 0));
+                }
+
+                groundBlocks.AddRange(newBlocks);
+
+                int mCount = rnd.Next(7, 16);
+                int current = 0;
+
+                while(current<mCount)
+                {
+                    int xmb = rnd.Next(0, roomSize);
+                    int ymb = rnd.Next(0, roomSize);
+                    
+                    if(blocks[xmb, ymb, 0].Rigid)
+                    {
+                        current++;
+
+                        int zmb = 1;
+
+                        while(blocks[xmb, ymb, zmb].Rigid)
+                        {
+                            zmb++;
+                        }
+
+                        AddMob(new NPC(contentManager, gameWorld, xmb, ymb, zmb, 2, 0.1, 5, 5));
+                    }
+                }
             }
-
-            groundBlocks.AddRange(newBlocks);
 
             //collision map
             foreach (var currentTuple in groundBlocks)
@@ -600,7 +627,7 @@ namespace Rooms
             {
                 for (int i = Math.Max(x - radius + k * step, 0); i < Math.Min(roomSize, x + radius - k * step); i++)
                     for (int j = Math.Max(y - radius + k * step, 0); j < Math.Min(roomSize, y + radius - k * step); j++)
-                        if (GameWorld.GetDist(x, y, i, j) < radius - k * step + 0.49)
+                        if ((double)GameWorld.GetDist(x, y, i, j) < radius - k * step/2)
                         {
                             blocks[i, j, k] = new Block(contentManager, blockType);
 

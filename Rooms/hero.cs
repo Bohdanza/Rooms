@@ -113,7 +113,7 @@ namespace Rooms
                         TextureNumber--;
                     }
 
-                    if (Action=="put"||Action == "dm" || Action == "at" || Action == "dtc")
+                    if (Action == "put" || Action == "dm" || Action == "at" || Action == "dtc" || Action == "at1")
                     {
                         Action = "id";
 
@@ -130,10 +130,10 @@ namespace Rooms
             double realSpeed = (double)Speed / (WeightToCarry*0.5 + 1);
             var ks = Keyboard.GetState();
 
-            if (Action != "put" && Action != "di")
+            if (Action!="at1"&& Action != "put" && Action != "di")
                 Action = "id";
 
-            if(ks.IsKeyDown(Keys.Space))
+            if(Action != "at1"&&ks.IsKeyDown(Keys.Space))
             {
                 var arg1 = new List<Mob>();
                 var arg2 = new List<string>();
@@ -153,7 +153,7 @@ namespace Rooms
             }
 
             //jump
-            if(ks.IsKeyDown(Keys.Z))
+            if (Action != "at1" && ks.IsKeyDown(Keys.Z))
             {
                 if ((int)Math.Round(Z) <= Room.roomSizeZ&& (int)Math.Round(Z) >0 && 
                     gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y), (int)Math.Round(Z)-1].Rigid)
@@ -219,7 +219,7 @@ namespace Rooms
 
             AttackEnergy++;
 
-            if (ks.IsKeyDown(Keys.X) && Action != "put")
+            if (Action != "at1" && ks.IsKeyDown(Keys.X) && Action != "put")
             {
                 if (Inventory[0] != null)
                 {
@@ -244,8 +244,10 @@ namespace Rooms
                 }
             }
 
-            if (ms.RightButton == ButtonState.Pressed && AttackEnergy >= 20)
+            if (Action != "at1" && ms.RightButton == ButtonState.Pressed && AttackEnergy >= 50)
             {
+                Action = "at1";
+
                 AttackEnergy = 0;
 
                 double directionToMouse = Math.Atan2(Y - mousePosition.Item2, X - mousePosition.Item1);
@@ -269,14 +271,14 @@ namespace Rooms
 
                             if (Math.Abs(directionToMouse - directionToMob) <= 2.7)
                             {
-                                ((NPC)currentMob).Damage(contentManager, gameWorld, 5);
+                                ((NPC)currentMob).Damage(contentManager, gameWorld, 1);
                             }
                         }
                     }
                 }
             }
 
-            if (ms.MiddleButton == ButtonState.Pressed && AttackEnergy >= 30)
+            if (Action != "at1"&& ms.MiddleButton == ButtonState.Pressed && AttackEnergy >= 30)
             {
                 AttackEnergy = 0;
 
@@ -308,7 +310,7 @@ namespace Rooms
                 }
             }
 
-            if (ms.LeftButton == ButtonState.Pressed && selectedItem == null)
+            if (Action != "at1" && ms.LeftButton == ButtonState.Pressed && selectedItem == null)
             {
                 Action = "wa";
 
@@ -401,7 +403,12 @@ namespace Rooms
             {
                 selectedItem.DrawIcon(spriteBatch, ms.X - 27, ms.Y - 27);
             }
-            
+
+            if (Inventory[0] != null)
+            {
+                Inventory[0].DrawInterface(spriteBatch);
+            }
+
             //base.DrawInterface(spriteBatch);
         }
 
@@ -433,7 +440,7 @@ namespace Rooms
                 }
                 else
                 {
-                    result += "null";
+                    result += "null\n";
                 }
             }
 
@@ -442,24 +449,36 @@ namespace Rooms
 
         public void Damage(ContentManager contentManager, GameWorld gameWorld, int power)
         {
-            HP -= power;
-
-            if (HP <= 0)
+            if (Inventory[0] != null)
             {
-                HP = 0;
+                ((Shell)Inventory[0]).HP -= power;
 
-                if (Action != "di")
+                if (((Shell)Inventory[0]).HP <= 0)
                 {
-                    Action = "di";
+                    Inventory[0] = null;
+                }
+            }
+            else
+            {
+                HP -= power;
+
+                if (HP <= 0)
+                {
+                    HP = 0;
+
+                    if (Action != "di")
+                    {
+                        Action = "di";
+                        
+                        updateTexture(contentManager, true);
+                    }
+                }
+                else if (Action != "dm")
+                {
+                    Action = "dm";
 
                     updateTexture(contentManager, true);
                 }
-            }
-            else if (Action != "dm")
-            {
-                Action = "dm";
-
-                updateTexture(contentManager, true);
             }
         }
     }

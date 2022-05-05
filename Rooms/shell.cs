@@ -14,13 +14,25 @@ namespace Rooms
 {
     public class Shell:Item
     {
-        public Shell(ContentManager contentManager, double x, double y, double z, int type, int weight)
+        private Texture2D hpText, emptyHP;
+
+        protected int MaxHP { get; set; }
+        public int HP { get; set; }
+
+        public Shell(ContentManager contentManager, double x, double y, double z, int type, int weight, int HP, int maxHP)
         {
             ChangeCoords(x, y, z);
 
             Type = type;
 
             Weight = weight;
+
+            hpText = contentManager.Load<Texture2D>("shell_hp");
+            emptyHP = contentManager.Load<Texture2D>("empty_hp");
+
+            this.HP = HP;
+
+            MaxHP = maxHP;
 
             updateTexture(contentManager, true);
         }
@@ -35,14 +47,31 @@ namespace Rooms
 
             Type = Int32.Parse(input[currentStr + 6]);
 
+            HP = Int32.Parse(input[currentStr + 7]);
+            MaxHP = Int32.Parse(input[currentStr + 8]);
+
             base.Radius = 0.25;
+
+            hpText = contentManager.Load<Texture2D>("shell_hp");
+            emptyHP = contentManager.Load<Texture2D>("empty_hp");
 
             updateTexture(contentManager, true);
         }
 
+        public override void DrawInterface(SpriteBatch spriteBatch)
+        {
+            for (int i = 1; i <= MaxHP; i++)
+            {
+                if (i <= HP)
+                    spriteBatch.Draw(hpText, new Vector2((int)(100 + (i - 1) * hpText.Width * 1.1), 40), Color.White);
+                else
+                    spriteBatch.Draw(emptyHP, new Vector2((int)(100 + (i - 1) * hpText.Width * 1.1), 40), Color.White);
+            }
+        }
+
         public override string SaveList()
         {
-            return "Shell\n" + base.SaveList();
+            return "Shell\n" + base.SaveList() + HP.ToString() + "\n" + MaxHP.ToString() + "\n";
         }
     }
 }

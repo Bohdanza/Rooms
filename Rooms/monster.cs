@@ -80,90 +80,95 @@ namespace Rooms
 
             bool lineCleared = false;
 
-            if (Math.Round(Z) == Math.Round(gameWorld.currentRoom.heroReference.Z))
+            if (Action != "di")
             {
-                lineCleared = gameWorld.currentRoom.LineIsClear((int)Math.Round(X), (int)Math.Round(Y),
-                (int)Math.Round(gameWorld.currentRoom.heroReference.X), (int)Math.Round(gameWorld.currentRoom.heroReference.Y),
-                (int)Math.Round(Z));
-            }
-
-            if (lineCleared)
-            {
-                if(!LineClearedP)
+                if (Math.Round(Z) == Math.Round(gameWorld.currentRoom.heroReference.Z))
                 {
-                    //dtc stands for detect
-                    Action = "dtc";
+                    lineCleared = gameWorld.currentRoom.LineIsClear((int)Math.Round(X), (int)Math.Round(Y),
+                    (int)Math.Round(gameWorld.currentRoom.heroReference.X), (int)Math.Round(gameWorld.currentRoom.heroReference.Y),
+                    (int)Math.Round(Z));
                 }
 
-                if (Action != "dtc" && Action != "dm" && Action != "di" && Action != "at")
+                if (lineCleared)
                 {
-                    if (TimeSinceLastAttack >= AttackDelay)
+                    if (!LineClearedP)
                     {
-                        if (GameWorld.GetDist(X, Y,
-                            gameWorld.currentRoom.heroReference.X, gameWorld.currentRoom.heroReference.Y) >
-                            Radius + gameWorld.currentRoom.heroReference.Radius)
+                        //dtc stands for detect
+                        Action = "dtc";
+                    }
+
+                    if (Action != "dtc" && Action != "dm" && Action != "di" && Action != "at")
+                    {
+                        if (TimeSinceLastAttack >= AttackDelay)
+                        {
+                            if (GameWorld.GetDist(X, Y,
+                                gameWorld.currentRoom.heroReference.X, gameWorld.currentRoom.heroReference.Y) >
+                                Radius + gameWorld.currentRoom.heroReference.Radius)
+                            {
+                                Action = "wa";
+
+                                Move(Speed,
+                                GameWorld.GetDirection(gameWorld.currentRoom.heroReference.X, gameWorld.currentRoom.heroReference.Y, X, Y),
+                                gameWorld);
+                            }
+                            else
+                            {
+                                Action = "at";
+
+                                TimeSinceLastAttack = 0;
+
+                                gameWorld.currentRoom.heroReference.Damage(contentManager, gameWorld, (int)(HP * 0.5));
+                            }
+                        }
+                        else
                         {
                             Action = "wa";
 
                             Move(Speed,
-                            GameWorld.GetDirection(gameWorld.currentRoom.heroReference.X, gameWorld.currentRoom.heroReference.Y, X, Y),
-                            gameWorld);
-                        }
-                        else
-                        {
-                            Action = "at";
-
-                            TimeSinceLastAttack = 0;
-
-                            gameWorld.currentRoom.heroReference.Damage(contentManager, gameWorld, (int)(HP * 0.5));
+                                GameWorld.GetDirection(X, Y, gameWorld.currentRoom.heroReference.X, gameWorld.currentRoom.heroReference.Y),
+                                gameWorld);
                         }
                     }
-                    else
+                }
+                else
+                {
+                    if (rnd.Next(0, 1000) < 20)
+                    {
+                        float addToDirection = 0.872f;
+
+                        if (rnd.Next(0, 2) == 0)
+                        {
+                            addToDirection *= -1;
+                        }
+
+                        Direction += addToDirection;
+                    }
+
+                    if (Action == "id" && rnd.Next(0, 1000) < 15)
                     {
                         Action = "wa";
+                    }
 
-                        Move(Speed,
-                            GameWorld.GetDirection(X, Y, gameWorld.currentRoom.heroReference.X, gameWorld.currentRoom.heroReference.Y),
-                            gameWorld);
+                    if (Action == "wa")
+                    {
+                        bool moved = Move(Speed, Direction, gameWorld);
+
+                        if (rnd.Next(0, 1000) < 15)
+                        {
+                            Action = "id";
+                        }
+
+                        if (!moved)
+                        {
+                            Direction += (float)Math.PI;
+                        }
                     }
                 }
+
+                UpdateGravitation(gameWorld);
+
+                LineClearedP = lineCleared;
             }
-            else
-            {
-                if (rnd.Next(0, 1000) < 20)
-                {
-                    float addToDirection = 0.872f;
-
-                    if (rnd.Next(0, 2) == 0)
-                    {
-                        addToDirection *= -1;
-                    }
-
-                    Direction += addToDirection;
-                }
-
-                if (Action == "id" && rnd.Next(0, 1000) < 15)
-                {
-                    Action = "wa";
-                }
-
-                if (Action == "wa")
-                {
-                    bool moved = Move(Speed, Direction, gameWorld);
-
-                    if (rnd.Next(0, 1000) < 15)
-                    {
-                        Action = "id";
-                    }
-
-                    if (!moved)
-                    {
-                        Direction += (float)Math.PI;
-                    }
-                }
-            }
-
-            LineClearedP = lineCleared;
 
             TimeSinceLastTextureUpdate++;
             TimeSinceLastAttack++;
