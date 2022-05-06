@@ -526,15 +526,18 @@ namespace Rooms
 
             for (int i = 0; i < mobs.Count; i++)
             {
-                double dst = GameWorld.GetDist(x, y, mobs[i].X, mobs[i].Y);
-
-                if (cdist > dst
-                    && !ignoredMobs.Contains(mobs[i])
-                    && allowedTypes.Any(s => mobs[i].SaveList().StartsWith(s)))
+                if (mobs[i] != null)
                 {
-                    cdist = dst;
+                    double dst = GameWorld.GetDist(x, y, mobs[i].X, mobs[i].Y);
 
-                    closestMob = mobs[i];
+                    if (cdist > dst
+                        && !ignoredMobs.Contains(mobs[i])
+                        && allowedTypes.Any(s => mobs[i].SaveList().StartsWith(s)))
+                    {
+                        cdist = dst;
+
+                        closestMob = mobs[i];
+                    }
                 }
             }
 

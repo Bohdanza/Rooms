@@ -89,7 +89,7 @@ namespace Rooms
                     (int)Math.Round(Z));
                 }
 
-                if (lineCleared)
+                if (lineCleared && TimeSinceLastAttack >= AttackDelay)
                 {
                     if (!LineClearedP)
                     {
@@ -97,37 +97,15 @@ namespace Rooms
                         Action = "dtc";
                     }
 
-                    if (Action != "dtc" && Action != "dm" && Action != "di" && Action != "at")
+
+                    if (Action != "dtc" && Action != "at" && Action != "di")
                     {
-                        if (TimeSinceLastAttack >= AttackDelay)
-                        {
-                            if (GameWorld.GetDist(X, Y,
-                                gameWorld.currentRoom.heroReference.X, gameWorld.currentRoom.heroReference.Y) >
-                                Radius + gameWorld.currentRoom.heroReference.Radius)
-                            {
-                                Action = "wa";
+                        double dir = GameWorld.GetDirection(X, Y,
+                            gameWorld.currentRoom.heroReference.X, gameWorld.currentRoom.heroReference.Y);
 
-                                Move(Speed,
-                                GameWorld.GetDirection(gameWorld.currentRoom.heroReference.X, gameWorld.currentRoom.heroReference.Y, X, Y),
-                                gameWorld);
-                            }
-                            else
-                            {
-                                Action = "at";
+                        Action = "at";
 
-                                TimeSinceLastAttack = 0;
-
-                                gameWorld.currentRoom.heroReference.Damage(contentManager, gameWorld, (int)(HP * 0.5));
-                            }
-                        }
-                        else
-                        {
-                            Action = "wa";
-
-                            Move(Speed,
-                                GameWorld.GetDirection(X, Y, gameWorld.currentRoom.heroReference.X, gameWorld.currentRoom.heroReference.Y),
-                                gameWorld);
-                        }
+                        gameWorld.currentRoom.AddMob(new Bullet(contentManager, dir+Math.PI, X, Y, Z, 5, 1, this, 0.5, 0.2));
                     }
                 }
                 else

@@ -2667,6 +2667,18 @@
 /processorParam:TextureFormat=Color
 /build:mob_4_0.png
 
+#begin mob_5_0_di.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:mob_5_0_di.png
+
 #begin mob_5_0_id.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -2679,7 +2691,7 @@
 /processorParam:TextureFormat=Color
 /build:mob_5_0_id.png
 
-#begin mob_5_0_wa.png
+#begin mob_5_0_id.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -2689,31 +2701,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:mob_5_0_wa.png
-
-#begin mob_5_1_id.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:mob_5_1_id.png
-
-#begin mob_5_1_wa.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:mob_5_1_wa.png
+/build:mob_5_0_id.png
 
 #begin mob_6_0.png
 /importer:TextureImporter
