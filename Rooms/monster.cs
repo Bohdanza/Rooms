@@ -23,6 +23,7 @@ namespace Rooms
         public int TimeSinceLastAttack = 0;
         public int AttackDelay = 150;
         private bool LineClearedP=false;
+        protected List<Bullet> bulletsShot;
 
         public NPC(ContentManager contentManager, GameWorld gameWorld, double x, double y, double z, int type, double speed, int HP, int maxHP)
         {
@@ -42,6 +43,23 @@ namespace Rooms
                 Action = "di";
             }
 
+            bulletsShot = new List<Bullet>();
+
+            using (StreamReader sr = new StreamReader(@"info\#global\monsters\"+Type.ToString()+".bulletinfo"))
+            {
+                List<string> input = sr.ReadToEnd().Split('\n').ToList();
+
+                int count = Int32.Parse(input[0]);
+                AttackDelay = Int32.Parse(input[1]);
+
+                for (int i = 0; i < count; i++)
+                {
+                    bulletsShot.Add(new Bullet(contentManager, double.Parse(input[i * 5 + 2]), 0, 0, 0,
+                        Int32.Parse(input[i * 5 + 3]), Int32.Parse(input[i * 5 + 4]), this, double.Parse(input[i * 5 + 5]),
+                        double.Parse(input[i * 5 + 6])));
+                }
+            }
+
             updateTexture(contentManager, true);
         }
        
@@ -57,6 +75,23 @@ namespace Rooms
             MaxHP = Int32.Parse(input[currentStr + 7]);
 
             Speed = double.Parse(input[currentStr + 8]);
+
+            bulletsShot = new List<Bullet>();
+
+            using (StreamReader sr = new StreamReader(@"info\#global\monsters\" + Type.ToString() + ".bulletinfo"))
+            {
+                List<string> inp = sr.ReadToEnd().Split('\n').ToList();
+
+                int count = Int32.Parse(inp[0]);
+                AttackDelay = Int32.Parse(inp[1]);
+
+                for (int i = 0; i < count; i++)
+                {
+                    bulletsShot.Add(new Bullet(contentManager, double.Parse(inp[i * 5 + 2]), 0, 0, 0,
+                        Int32.Parse(inp[i * 5 + 3]), Int32.Parse(inp[i * 5 + 4]), this, double.Parse(inp[i * 5 + 5]),
+                        double.Parse(inp[i * 5 + 6])));
+                }
+            }
 
             Action = "id";
 
@@ -105,7 +140,12 @@ namespace Rooms
 
                         Action = "at";
 
-                        gameWorld.currentRoom.AddMob(new Bullet(contentManager, dir+Math.PI, X, Y, Z, 5, 1, this, 0.5, 0.2));
+                        foreach (var currentBullet in bulletsShot)
+                        {
+                            gameWorld.currentRoom.AddMob(new Bullet(contentManager, dir + Math.PI + currentBullet.Direction,
+                                X, Y, Z, currentBullet.Type, currentBullet.Damage, this, currentBullet.Radius,
+                                currentBullet.Speed));
+                        }
                     }
                 }
                 else
@@ -143,7 +183,8 @@ namespace Rooms
                             ZVector = 0.5;
                         }
                         else if (Z<=1 &&
-                            !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y), (int)Math.Floor(Z-1)].Rigid)
+                            !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y), 
+                            Math.Max(0, (int)Math.Floor(Z-1))].Rigid)
                         {
                             Direction += (float)Math.PI;
 
