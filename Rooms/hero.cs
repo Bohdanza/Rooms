@@ -130,193 +130,196 @@ namespace Rooms
             double realSpeed = (double)Speed / (WeightToCarry*0.5 + 1);
             var ks = Keyboard.GetState();
 
-            if (Action!="at1"&& Action != "put" && Action != "di")
-                Action = "id";
-
-            if(Action != "at1"&&ks.IsKeyDown(Keys.Space))
+            if (Action != "di")
             {
-                var arg1 = new List<Mob>();
-                var arg2 = new List<string>();
+                if (Action != "at1" && Action != "put" && Action != "di")
+                    Action = "id";
 
-                arg1.Add(this);
-                arg2.Add("Item");
-
-                var closestItem = gameWorld.currentRoom.GetClosestMob(X, Y, arg1, arg2);
-
-                if (closestItem != null && GameWorld.GetDist(X, Y, closestItem.X, closestItem.Y) <= pickUpRadius)
+                if (Action != "at1" && ks.IsKeyDown(Keys.Space))
                 {
-                    Inventory.Add((Item)closestItem);
-                    WeightToCarry += ((Item)closestItem).Weight;
+                    var arg1 = new List<Mob>();
+                    var arg2 = new List<string>();
 
-                    gameWorld.currentRoom.MarkMobAsDeleted(closestItem);
-                }
-            }
+                    arg1.Add(this);
+                    arg2.Add("Item");
 
-            //jump
-            if (Action != "at1" && ks.IsKeyDown(Keys.Z))
-            {
-                if ((int)Math.Round(Z) <= Room.roomSizeZ&& (int)Math.Round(Z) >0 && 
-                    gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y), (int)Math.Round(Z)-1].Rigid)
-                    ZVector = 0.75;
-            }
+                    var closestItem = gameWorld.currentRoom.GetClosestMob(X, Y, arg1, arg2);
 
-            var ms = Mouse.GetState(); 
-            var mousePosition = gameWorld.currentRoom.GetMouseCordinates(gameWorld);
-             
-            timeSinceLastItemPick++;
-
-            if (timeSinceLastItemPick>=10&&ms.LeftButton == ButtonState.Pressed) 
-            {
-                timeSinceLastItemPick = 0;
-                int pickedItemIndex = (ms.X - 20) / 60 + 1;
-
-                if (ms.Y >= 1000 && ms.Y <= 1055 && ms.X >= 20 && ms.X < 80 + Inventory.Count * 60)
-                {
-                    if (selectedItem == null && pickedItemIndex < Inventory.Count)
+                    if (closestItem != null && GameWorld.GetDist(X, Y, closestItem.X, closestItem.Y) <= pickUpRadius)
                     {
-                        WeightToCarry -= Inventory[pickedItemIndex].Weight;
+                        Inventory.Add((Item)closestItem);
+                        WeightToCarry += ((Item)closestItem).Weight;
 
-                        selectedItem = Inventory[pickedItemIndex];
-
-                        Inventory.RemoveAt(pickedItemIndex);
+                        gameWorld.currentRoom.MarkMobAsDeleted(closestItem);
                     }
-                    else if (selectedItem != null)
+                }
+
+                //jump
+                if (Action != "at1" && ks.IsKeyDown(Keys.Z))
+                {
+                    if ((int)Math.Round(Z) <= Room.roomSizeZ && (int)Math.Round(Z) > 0 &&
+                        gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y), (int)Math.Round(Z) - 1].Rigid)
+                        ZVector = 0.75;
+                }
+
+                var ms = Mouse.GetState();
+                var mousePosition = gameWorld.currentRoom.GetMouseCordinates(gameWorld);
+
+                timeSinceLastItemPick++;
+
+                if (timeSinceLastItemPick >= 10 && ms.LeftButton == ButtonState.Pressed)
+                {
+                    timeSinceLastItemPick = 0;
+                    int pickedItemIndex = (ms.X - 20) / 60 + 1;
+
+                    if (ms.Y >= 1000 && ms.Y <= 1055 && ms.X >= 20 && ms.X < 80 + Inventory.Count * 60)
                     {
-                        WeightToCarry += selectedItem.Weight;
-
-                        if (pickedItemIndex >= Inventory.Count)
+                        if (selectedItem == null && pickedItemIndex < Inventory.Count)
                         {
-                            Inventory.Add(selectedItem);
-
-                            selectedItem = null;
-                        }
-                        else
-                        {
-                            Item prevSelected = selectedItem;
-
                             WeightToCarry -= Inventory[pickedItemIndex].Weight;
 
                             selectedItem = Inventory[pickedItemIndex];
 
-                            Inventory[pickedItemIndex] = prevSelected;
+                            Inventory.RemoveAt(pickedItemIndex);
+                        }
+                        else if (selectedItem != null)
+                        {
+                            WeightToCarry += selectedItem.Weight;
+
+                            if (pickedItemIndex >= Inventory.Count)
+                            {
+                                Inventory.Add(selectedItem);
+
+                                selectedItem = null;
+                            }
+                            else
+                            {
+                                Item prevSelected = selectedItem;
+
+                                WeightToCarry -= Inventory[pickedItemIndex].Weight;
+
+                                selectedItem = Inventory[pickedItemIndex];
+
+                                Inventory[pickedItemIndex] = prevSelected;
+                            }
+                        }
+                    }
+                    else if (selectedItem != null)
+                    {
+                        if (mousePosition.Item1 >= 0 && mousePosition.Item1 < Room.roomSize && mousePosition.Item2 >= 0 &&
+                            mousePosition.Item2 < Room.roomSize
+                            && !gameWorld.currentRoom.blocks[(int)mousePosition.Item1, (int)mousePosition.Item2, 0].Rigid)
+                        {
+                            selectedItem.ChangeCoords(mousePosition.Item1, mousePosition.Item2, Z);
+
+                            gameWorld.currentRoom.AddMob(selectedItem);
+
+                            selectedItem = null;
                         }
                     }
                 }
-                else if (selectedItem != null)
+
+                AttackEnergy++;
+
+                if (Action != "at1" && ks.IsKeyDown(Keys.X) && Action != "put")
                 {
-                    if(mousePosition.Item1>=0&& mousePosition.Item1<Room.roomSize&& mousePosition.Item2 >= 0 && 
-                        mousePosition.Item2 < Room.roomSize 
-                        && !gameWorld.currentRoom.blocks[(int)mousePosition.Item1, (int)mousePosition.Item2, 0].Rigid)
+                    if (Inventory[0] != null)
                     {
-                        selectedItem.ChangeCoords(mousePosition.Item1, mousePosition.Item2, Z);
-
-                        gameWorld.currentRoom.AddMob(selectedItem);
-
-                        selectedItem = null;
-                    }
-                }
-            }
-
-            AttackEnergy++;
-
-            if (Action != "at1" && ks.IsKeyDown(Keys.X) && Action != "put")
-            {
-                if (Inventory[0] != null)
-                {
-                    putOn = false;
-                    Action = "put";
-                }   
-                else
-                {
-                    Shell closestShell = (Shell)gameWorld.currentRoom.GetClosestMob(X, Y, this, "Shell");
-
-                    if (closestShell != null && GameWorld.GetDist(X, Y, closestShell.X, closestShell.Y) < Radius + closestShell.Radius + 0.5)
-                    {
-                        putOn = true;
+                        putOn = false;
                         Action = "put";
+                    }
+                    else
+                    {
+                        Shell closestShell = (Shell)gameWorld.currentRoom.GetClosestMob(X, Y, this, "Shell");
 
-                        Inventory[0] = closestShell;
+                        if (closestShell != null && GameWorld.GetDist(X, Y, closestShell.X, closestShell.Y) < Radius + closestShell.Radius + 0.5)
+                        {
+                            putOn = true;
+                            Action = "put";
 
-                        WeightToCarry += closestShell.Weight;
+                            Inventory[0] = closestShell;
 
-                        gameWorld.currentRoom.MarkMobAsDeleted(closestShell);
+                            WeightToCarry += closestShell.Weight;
+
+                            gameWorld.currentRoom.MarkMobAsDeleted(closestShell);
+                        }
                     }
                 }
-            }
 
-            if (Action != "at1" && ms.RightButton == ButtonState.Pressed && AttackEnergy >= 50)
-            {
-                Action = "at1";
-
-                AttackEnergy = 0;
-
-                double directionToMouse = Math.Atan2(Y - mousePosition.Item2, X - mousePosition.Item1);
-
-                Move(0.075, directionToMouse + Math.PI, gameWorld);
-
-                Mob kck = new KickTrace(contentManager, X, Y+4.5, Z, 6, 0, directionToMouse + Math.PI, 21, gameWorld);
-                kck.Move(0.2, directionToMouse + Math.PI, gameWorld);
-
-                gameWorld.currentRoom.AddMob(kck);
-
-                foreach (var currentMob in gameWorld.currentRoom.mobs)
+                if (Action != "at1" && ms.RightButton == ButtonState.Pressed && AttackEnergy >= 50)
                 {
-                    if (currentMob.SaveList().StartsWith("NPC"))
+                    Action = "at1";
+
+                    AttackEnergy = 0;
+
+                    double directionToMouse = Math.Atan2(Y - mousePosition.Item2, X - mousePosition.Item1);
+
+                    Move(0.075, directionToMouse + Math.PI, gameWorld);
+
+                    Mob kck = new KickTrace(contentManager, X, Y + 4.5, Z, 6, 0, directionToMouse + Math.PI, 21, gameWorld);
+                    kck.Move(0.2, directionToMouse + Math.PI, gameWorld);
+
+                    gameWorld.currentRoom.AddMob(kck);
+
+                    foreach (var currentMob in gameWorld.currentRoom.mobs)
                     {
-                        double dist = GameWorld.GetDist(X, Y, currentMob.X, currentMob.Y);
-
-                        if (dist <= Radius + currentMob.Radius + 2.5)
+                        if (currentMob.SaveList().StartsWith("NPC"))
                         {
-                            double directionToMob = Math.Atan2(Y - currentMob.Y, X - currentMob.X);
+                            double dist = GameWorld.GetDist(X, Y, currentMob.X, currentMob.Y);
 
-                            if (Math.Abs(directionToMouse - directionToMob) <= 2.7)
+                            if (dist <= Radius + currentMob.Radius + 2.5)
                             {
-                                ((NPC)currentMob).Damage(contentManager, gameWorld, 1);
+                                double directionToMob = Math.Atan2(Y - currentMob.Y, X - currentMob.X);
+
+                                if (Math.Abs(directionToMouse - directionToMob) <= 2.7)
+                                {
+                                    ((NPC)currentMob).Damage(contentManager, gameWorld, 1);
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            if (Action != "at1"&& ms.MiddleButton == ButtonState.Pressed && AttackEnergy >= 30)
-            {
-                AttackEnergy = 0;
-
-                double directionToMouse = Math.Atan2(Y - mousePosition.Item2, X - mousePosition.Item1);
-
-                Move(0.1, directionToMouse + Math.PI, gameWorld);
-
-                Mob kck = new KickTrace(contentManager, X, Y + 4.5, Z, 7, 0, directionToMouse + Math.PI, 20, gameWorld);
-                kck.Move(0.2, directionToMouse + Math.PI, gameWorld);
-
-                gameWorld.currentRoom.AddMob(kck);
-
-                foreach (var currentMob in gameWorld.currentRoom.mobs)
+                if (Action != "at1" && ms.MiddleButton == ButtonState.Pressed && AttackEnergy >= 30)
                 {
-                    if (currentMob.SaveList().StartsWith("NPC"))
+                    AttackEnergy = 0;
+
+                    double directionToMouse = Math.Atan2(Y - mousePosition.Item2, X - mousePosition.Item1);
+
+                    Move(0.1, directionToMouse + Math.PI, gameWorld);
+
+                    Mob kck = new KickTrace(contentManager, X, Y + 4.5, Z, 7, 0, directionToMouse + Math.PI, 20, gameWorld);
+                    kck.Move(0.2, directionToMouse + Math.PI, gameWorld);
+
+                    gameWorld.currentRoom.AddMob(kck);
+
+                    foreach (var currentMob in gameWorld.currentRoom.mobs)
                     {
-                        double dist = GameWorld.GetDist(X, Y, currentMob.X, currentMob.Y);
-
-                        if (dist <= Radius + currentMob.Radius + 1)
+                        if (currentMob.SaveList().StartsWith("NPC"))
                         {
-                            double directionToMob = Math.Atan2(Y - currentMob.Y, X - currentMob.X);
+                            double dist = GameWorld.GetDist(X, Y, currentMob.X, currentMob.Y);
 
-                            if (Math.Abs(directionToMouse - directionToMob) <= 0.5)
+                            if (dist <= Radius + currentMob.Radius + 1)
                             {
-                                ((NPC)currentMob).Damage(contentManager, gameWorld, 10);
+                                double directionToMob = Math.Atan2(Y - currentMob.Y, X - currentMob.X);
+
+                                if (Math.Abs(directionToMouse - directionToMob) <= 0.5)
+                                {
+                                    ((NPC)currentMob).Damage(contentManager, gameWorld, 10);
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            if (Action != "at1" && ms.LeftButton == ButtonState.Pressed && selectedItem == null)
-            {
-                Action = "wa";
+                if (Action != "at1" && ms.LeftButton == ButtonState.Pressed && selectedItem == null)
+                {
+                    Action = "wa";
 
-                Direction = Math.Atan2(mousePosition.Item2 - Y, mousePosition.Item1 - X);
+                    Direction = Math.Atan2(mousePosition.Item2 - Y, mousePosition.Item1 - X);
 
-                Move(realSpeed, Direction, gameWorld);
+                    Move(realSpeed, Direction, gameWorld);
+                }
             }
 
             UpdateGravitation(gameWorld);

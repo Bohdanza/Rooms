@@ -482,6 +482,8 @@ namespace Rooms
         {
             mobs.Add(mob);
 
+            DeleteMarked();
+
             mobs.Sort((a, b) => a.Y.CompareTo(b.Y));
         }
 

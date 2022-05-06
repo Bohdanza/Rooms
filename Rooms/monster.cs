@@ -21,7 +21,7 @@ namespace Rooms
         public bool Agressive { get; set; } = false;
         private float Direction { get; set; } = 0;
         public int TimeSinceLastAttack = 0;
-        public int AttackDelay = 20;
+        public int AttackDelay = 150;
         private bool LineClearedP=false;
 
         public NPC(ContentManager contentManager, GameWorld gameWorld, double x, double y, double z, int type, double speed, int HP, int maxHP)
@@ -138,7 +138,16 @@ namespace Rooms
 
                         if (!moved)
                         {
+                            //Direction += (float)Math.PI;
+
+                            ZVector = 0.5;
+                        }
+                        else if (Z<=1 &&
+                            !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y), (int)Math.Floor(Z-1)].Rigid)
+                        {
                             Direction += (float)Math.PI;
+
+                            Move(Speed, Direction, gameWorld);
                         }
                     }
                 }

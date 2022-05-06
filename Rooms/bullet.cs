@@ -104,6 +104,15 @@ namespace Rooms
                 if (GameWorld.GetDist(X, Y, clst.X, clst.Y) <= Radius + clst.Radius)
                 {
                     Action = "di";
+
+                    if(clst.SaveList()[0]=='H')
+                    {
+                        ((Hero)clst).Damage(contentManager, gameWorld, Damage);
+                    }
+                    else
+                    {
+                        ((NPC)clst).Damage(contentManager, gameWorld, Damage);
+                    }
                 }
             }
             else if (Action == "di" && TextureNumber == Textures.Count - 1)
