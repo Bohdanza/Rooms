@@ -101,7 +101,7 @@ namespace Rooms
 
                 Mob clst = gameWorld.currentRoom.GetClosestMob(X, Y, meAndOwner, Types);
 
-                if (GameWorld.GetDist(X, Y, clst.X, clst.Y) <= Radius + clst.Radius)
+                if (clst!=null&& GameWorld.GetDist(X, Y, clst.X, clst.Y) <= Radius + clst.Radius)
                 {
                     Action = "di";
 

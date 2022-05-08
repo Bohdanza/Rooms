@@ -265,7 +265,7 @@ namespace Rooms
                             zmb++;
                         }
 
-                        AddMob(new NPC(contentManager, gameWorld, xmb, ymb, zmb, 2, 0.1, 5, 5));
+                        AddMob(new NPC(contentManager, gameWorld, xmb, ymb, zmb, 2, 0.1, 3, 3));
                     }
                 }
             }
@@ -395,9 +395,16 @@ namespace Rooms
             {
                 if (mobs[i] != null)
                 {
+                    int pcount = mobs.Count;
+
                     mobs[i].Update(contentManager, gameWorld);
 
-                    if (mobs[i]!=null&&mobs[i].Z < -1)
+                    if (mobs.Count != pcount)
+                    {
+                        i += mobs.Count - pcount;
+                    }
+
+                    if (mobs[i]!=null&&mobs[i].Z < -6)
                     {
                         MarkMobAsDeleted(mobs[i]);
                     }

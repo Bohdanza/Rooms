@@ -135,6 +135,8 @@ namespace Rooms
 
                     if (Action != "dtc" && Action != "at" && Action != "di")
                     {
+                        TimeSinceLastAttack = 0;
+
                         double dir = GameWorld.GetDirection(X, Y,
                             gameWorld.currentRoom.heroReference.X, gameWorld.currentRoom.heroReference.Y);
 
@@ -182,7 +184,7 @@ namespace Rooms
 
                             ZVector = 0.5;
                         }
-                        else if (Z<=1 &&
+                        else if (Z <= 1 && (int)Math.Round(X) < Room.roomSize && (int)Math.Round(Y) < Room.roomSize &&
                             !gameWorld.currentRoom.blocks[(int)Math.Round(X), (int)Math.Round(Y), 
                             Math.Max(0, (int)Math.Floor(Z-1))].Rigid)
                         {
@@ -211,6 +213,19 @@ namespace Rooms
 
                 updateTexture(contentManager, false);
             }
+        }
+
+        public override void Draw(SpriteBatch spriteBatch, int x, int y)
+        {
+            if (Direction >= Math.PI * 2)
+                Direction %= (float)(Math.PI * 2);
+            else if (Direction < 0)
+                Direction = (float)Math.PI * 2 + Direction;
+
+            if (Direction > 0.5 * Math.PI && Direction < Math.PI * 1.5)
+                base.Draw(spriteBatch, x, y);
+            else
+                base.Draw(spriteBatch, x, y, SpriteEffects.FlipHorizontally);
         }
 
         /// <summary>
