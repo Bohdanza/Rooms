@@ -246,7 +246,7 @@ namespace Rooms
 
                 groundBlocks.AddRange(newBlocks);
 
-                int mCount = rnd.Next(7, 16);
+                int mCount = rnd.Next(2, 7);
                 int current = 0;
 
                 while(current<mCount)
@@ -266,6 +266,29 @@ namespace Rooms
                         }
                         
                         AddMob(new NPC(contentManager, gameWorld, xmb, ymb, zmb, 2, 0.1, 1, 1));
+                    }
+                }
+
+                mCount = rnd.Next(0, 6);
+                current = 0;
+
+                while (current < mCount)
+                {
+                    int xmb = rnd.Next(0, roomSize);
+                    int ymb = rnd.Next(0, roomSize);
+
+                    if (blocks[xmb, ymb, 0].Rigid)
+                    {
+                        current++;
+
+                        int zmb = 1;
+
+                        while (blocks[xmb, ymb, zmb].Rigid)
+                        {
+                            zmb++;
+                        }
+
+                        AddMob(new NPC(contentManager, gameWorld, xmb, ymb, zmb, 11, 0.085, 1, 1));
                     }
                 }
             }

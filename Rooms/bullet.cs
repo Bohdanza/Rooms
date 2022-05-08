@@ -19,9 +19,10 @@ namespace Rooms
         public Mob Owner { get; set; } = null;
         public double Direction { get; protected set; }
         protected string Action { get; set; }
+        public int Lifetime { get; protected set; }
 
         public Bullet(ContentManager contentManager, double direction, double x, double y, double z, 
-            int type, int damage, Mob owner, double radius, double speed)
+            int type, int damage, Mob owner, double radius, double speed, int lifetime)
         {
             Speed = speed;
             Radius = radius;
@@ -38,6 +39,8 @@ namespace Rooms
             Type = type;
 
             Action = "id";
+
+            Lifetime = lifetime;
 
             updateTexture(contentManager, true);
         }
@@ -113,6 +116,13 @@ namespace Rooms
                     {
                         ((NPC)clst).Damage(contentManager, gameWorld, Damage);
                     }
+                }
+
+                Lifetime--;
+
+                if (Lifetime <= 0)
+                {
+                    Action = "di";
                 }
             }
             else if (Action == "di" && TextureNumber == Textures.Count - 1)

@@ -24,7 +24,7 @@ namespace Rooms
         public int AttackDelay = 150;
         private bool LineClearedP=false;
         protected List<Bullet> bulletsShot;
-        protected List<Tuple<Item, int>> Loot;
+        protected List<Tuple<Mob, int>> Loot;
         private bool looted = false;
 
         public NPC(ContentManager contentManager, GameWorld gameWorld, double x, double y, double z, int type, double speed, int HP, int maxHP)
@@ -56,13 +56,13 @@ namespace Rooms
 
                 for (int i = 0; i < count; i++)
                 {
-                    bulletsShot.Add(new Bullet(contentManager, double.Parse(input[i * 5 + 2]), 0, 0, 0,
-                        Int32.Parse(input[i * 5 + 3]), Int32.Parse(input[i * 5 + 4]), this, double.Parse(input[i * 5 + 5]),
-                        double.Parse(input[i * 5 + 6])));
+                    bulletsShot.Add(new Bullet(contentManager, double.Parse(input[i * 6 + 2]), 0, 0, 0,
+                        Int32.Parse(input[i * 6 + 3]), Int32.Parse(input[i * 6 + 4]), this, double.Parse(input[i * 6 + 5]),
+                        double.Parse(input[i * 6 + 6]), int.Parse(input[i*6+7])));
                 }
             }
 
-            Loot = new List<Tuple<Item, int>>();
+            Loot = new List<Tuple<Mob, int>>();
 
             using (StreamReader sr = new StreamReader(@"info\#global\monsters\" + Type.ToString() + ".loot"))
             {
@@ -78,7 +78,7 @@ namespace Rooms
 
                     currentString += 1 + added.SaveList().Count(f => (f == '\n'));
 
-                    Loot.Add(new Tuple<Item, int>((Item)added, prob));
+                    Loot.Add(new Tuple<Mob, int>(added, prob));
                 }
 
             }
@@ -112,13 +112,13 @@ namespace Rooms
 
                 for (int i = 0; i < count; i++)
                 {
-                    bulletsShot.Add(new Bullet(contentManager, double.Parse(inp[i * 5 + 2]), 0, 0, 0,
-                        Int32.Parse(inp[i * 5 + 3]), Int32.Parse(inp[i * 5 + 4]), this, double.Parse(inp[i * 5 + 5]),
-                        double.Parse(inp[i * 5 + 6])));
+                    bulletsShot.Add(new Bullet(contentManager, double.Parse(inp[i * 6 + 2]), 0, 0, 0,
+                        Int32.Parse(inp[i * 6 + 3]), Int32.Parse(inp[i * 6 + 4]), this, double.Parse(inp[i * 6 + 5]),
+                        double.Parse(inp[i * 6 + 6]), int.Parse(inp[i * 6 + 7])));
                 }
             }
 
-            Loot = new List<Tuple<Item, int>>();
+            Loot = new List<Tuple<Mob, int>>();
 
             using (StreamReader sr = new StreamReader(@"info\#global\monsters\" + Type.ToString() + ".loot"))
             {
@@ -134,7 +134,7 @@ namespace Rooms
 
                     currentString += 1 + added.SaveList().Count(f => (f == '\n'));
 
-                    Loot.Add(new Tuple<Item, int>((Item)added, prob));
+                    Loot.Add(new Tuple<Mob, int>(added, prob));
                 }
 
             }
@@ -192,7 +192,7 @@ namespace Rooms
                         {
                             gameWorld.currentRoom.AddMob(new Bullet(contentManager, dir + Math.PI + currentBullet.Direction,
                                 X, Y, Z, currentBullet.Type, currentBullet.Damage, this, currentBullet.Radius,
-                                currentBullet.Speed));
+                                currentBullet.Speed, ((Bullet)currentBullet).Lifetime));
                         }
                     }
                 }
