@@ -264,8 +264,8 @@ namespace Rooms
                         {
                             zmb++;
                         }
-
-                        AddMob(new NPC(contentManager, gameWorld, xmb, ymb, zmb, 2, 0.1, 3, 3));
+                        
+                        AddMob(new NPC(contentManager, gameWorld, xmb, ymb, zmb, 2, 0.1, 1, 1));
                     }
                 }
             }
@@ -399,7 +399,7 @@ namespace Rooms
 
                     mobs[i].Update(contentManager, gameWorld);
 
-                    if (mobs.Count != pcount)
+                    if (mobs.Count < pcount)
                     {
                         i += mobs.Count - pcount;
                     }

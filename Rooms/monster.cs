@@ -24,6 +24,8 @@ namespace Rooms
         public int AttackDelay = 150;
         private bool LineClearedP=false;
         protected List<Bullet> bulletsShot;
+        protected List<Tuple<Item, int>> Loot;
+        private bool looted = false;
 
         public NPC(ContentManager contentManager, GameWorld gameWorld, double x, double y, double z, int type, double speed, int HP, int maxHP)
         {
@@ -60,6 +62,27 @@ namespace Rooms
                 }
             }
 
+            Loot = new List<Tuple<Item, int>>();
+
+            using (StreamReader sr = new StreamReader(@"info\#global\monsters\" + Type.ToString() + ".loot"))
+            {
+                List<string> input = sr.ReadToEnd().Split('\n').ToList();
+
+                int n = Int32.Parse(input[0]);
+                int currentString = 1;
+
+                while (currentString < input.Count)
+                {
+                    int prob = Int32.Parse(input[currentString]);
+                    Mob added = Mob.Loader(contentManager, currentString + 1, input);
+
+                    currentString += 1 + added.SaveList().Count(f => (f == '\n'));
+
+                    Loot.Add(new Tuple<Item, int>((Item)added, prob));
+                }
+
+            }
+
             updateTexture(contentManager, true);
         }
        
@@ -75,6 +98,8 @@ namespace Rooms
             MaxHP = Int32.Parse(input[currentStr + 7]);
 
             Speed = double.Parse(input[currentStr + 8]);
+            
+            looted = bool.Parse(input[currentStr + 9]);
 
             bulletsShot = new List<Bullet>();
 
@@ -91,6 +116,27 @@ namespace Rooms
                         Int32.Parse(inp[i * 5 + 3]), Int32.Parse(inp[i * 5 + 4]), this, double.Parse(inp[i * 5 + 5]),
                         double.Parse(inp[i * 5 + 6])));
                 }
+            }
+
+            Loot = new List<Tuple<Item, int>>();
+
+            using (StreamReader sr = new StreamReader(@"info\#global\monsters\" + Type.ToString() + ".loot"))
+            {
+                List<string> inp = sr.ReadToEnd().Split('\n').ToList();
+
+                int n = Int32.Parse(inp[0]);
+                int currentString = 1;
+
+                while (currentString < inp.Count)
+                {
+                    int prob = Int32.Parse(inp[currentString]);
+                    Mob added = Mob.Loader(contentManager, currentString + 1, inp);
+
+                    currentString += 1 + added.SaveList().Count(f => (f == '\n'));
+
+                    Loot.Add(new Tuple<Item, int>((Item)added, prob));
+                }
+
             }
 
             Action = "id";
@@ -203,6 +249,26 @@ namespace Rooms
             TimeSinceLastTextureUpdate++;
             TimeSinceLastAttack++;
 
+            if (Action == "di" && TextureNumber == Textures.Count - 1&&!looted)
+            {
+                looted = true;
+
+                foreach(var currentItem in Loot)
+                {
+                    int prob = rnd.Next(0, 100);
+
+                    if (prob < currentItem.Item2)
+                    {
+                        Mob mobToAdd = Mob.Loader(contentManager, 0,
+                            currentItem.Item1.SaveList().Split('\n').ToList());
+
+                        mobToAdd.ChangeCoords(X + rnd.NextDouble() - 0.5, Y + rnd.NextDouble() - 0.5, Z);
+
+                        gameWorld.currentRoom.AddMob(mobToAdd);
+                    }
+                }
+            }
+
             if (Action != pact)
             {
                 updateTexture(contentManager, true);
@@ -311,6 +377,9 @@ namespace Rooms
             result += "\n";
 
             result += Speed.ToString();
+            result += "\n";
+
+            result += looted.ToString();
             result += "\n";
 
             return result;

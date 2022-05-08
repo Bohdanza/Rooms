@@ -328,7 +328,7 @@ namespace Rooms
         public static Mob Loader(ContentManager contentManager, int currentStr, List<string> input)
         {
             Mob resultingMob = null;
-            string className = input[currentStr].Trim('\n');
+            string className = input[currentStr].Trim('\n').Trim('\r');
 
             if (className == "Hero")
             {
@@ -343,6 +343,11 @@ namespace Rooms
             if (className == "Shell")
             {
                 resultingMob = new Shell(contentManager, input, currentStr);
+            }
+
+            if (className == "Resource")
+            {
+                resultingMob = new Resource(contentManager, input, currentStr);
             }
 
             if (className == "Decoration")

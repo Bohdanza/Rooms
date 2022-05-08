@@ -141,7 +141,7 @@ namespace Rooms
                     var arg2 = new List<string>();
 
                     arg1.Add(this);
-                    arg2.Add("Item");
+                    arg2.Add("Resource");
 
                     var closestItem = gameWorld.currentRoom.GetClosestMob(X, Y, arg1, arg2);
 
