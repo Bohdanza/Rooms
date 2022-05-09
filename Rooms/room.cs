@@ -162,17 +162,17 @@ namespace Rooms
 
         protected void Generate(ContentManager contentManager, int x, int y, GameWorld gameWorld)
         {
-            //0-village ruins, 1-library, 2-mines(tower+village), 3-wild
+            //0-organic village, 1-garbage, 3-wild
             int biome = 0;
 
             var rnd = new Random();
             int prob = rnd.Next(0, 100);
 
-            if (prob <= 100)
+            if (prob <= 50)
             {
                 biome = 3;
             }
-            else if (prob <= 40 + 20)
+            else if (prob <= 100)
             {
                 biome = 0;
             }
@@ -291,6 +291,51 @@ namespace Rooms
                         AddMob(new NPC(contentManager, gameWorld, xmb, ymb, zmb, 11, 0.085, 1, 1));
                     }
                 }
+            }
+
+            if (biome == 0)
+            {
+                //huts
+                var newBlocks = new List<Tuple<int, int, int>>();
+
+                int hutCount = rnd.Next(4, 11);
+
+                for (int i = 0; i < hutCount; i++)
+                {
+                    int ci = rnd.Next(0, groundBlocks.Count);
+                    prob = rnd.Next(0, 100);
+
+                    if (prob < 33)
+                    {
+                        newBlocks.AddRange(PlaceMountain(contentManager, groundBlocks[ci].Item1, groundBlocks[ci].Item2,
+                            3, 4, 0, 18));
+
+                        newBlocks.AddRange(PlaceMountain(contentManager, groundBlocks[ci].Item1, groundBlocks[ci].Item2,
+                                1, 4, 0, 0));
+
+                        AddMob(new Decoration(contentManager, groundBlocks[ci].Item1, groundBlocks[ci].Item2 + 3,
+                            1, 13));
+                    }
+                    else if (prob < 66)
+                    {
+                        newBlocks.AddRange(PlaceMountain(contentManager, groundBlocks[ci].Item1, groundBlocks[ci].Item2,
+                            3, 4, 0, 18));
+
+                        newBlocks.AddRange(PlaceMountain(contentManager, groundBlocks[ci].Item1, groundBlocks[ci].Item2,
+                                1, 4, 0, 0));
+
+                        AddMob(new Decoration(contentManager, groundBlocks[ci].Item1, groundBlocks[ci].Item2+3,
+                            1, 8));
+                    }
+                    else
+                    {
+                        newBlocks.AddRange(PlaceMountain(contentManager, groundBlocks[ci].Item1, groundBlocks[ci].Item2,
+                            1, 4, 0, 0));
+                        
+                    }
+                }
+
+                groundBlocks.AddRange(newBlocks);
             }
 
             //collision map
@@ -427,7 +472,7 @@ namespace Rooms
                         i += mobs.Count - pcount;
                     }
 
-                    if (mobs[i]!=null&&mobs[i].Z < -6)
+                    if (mobs[i]!=null&&mobs[i].Z < -100)
                     {
                         MarkMobAsDeleted(mobs[i]);
                     }

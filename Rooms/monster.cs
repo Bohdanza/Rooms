@@ -108,7 +108,7 @@ namespace Rooms
                 List<string> inp = sr.ReadToEnd().Split('\n').ToList();
 
                 int count = Int32.Parse(inp[0]);
-                AttackDelay = Int32.Parse(inp[1]);
+                AttackDelay = Int32.Parse(inp[1]); 
 
                 for (int i = 0; i < count; i++)
                 {
