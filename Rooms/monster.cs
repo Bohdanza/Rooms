@@ -21,7 +21,8 @@ namespace Rooms
         public bool Agressive { get; set; } = false;
         private float Direction { get; set; } = 0;
         public int TimeSinceLastAttack = 0;
-        public int AttackDelay = 150;
+        public List<int> AttackDelays = new List<int>();
+        protected int currentDelay = 0;
         private bool LineClearedP=false;
         protected List<Bullet> bulletsShot;
         protected List<Tuple<Mob, int>> Loot;
@@ -47,18 +48,23 @@ namespace Rooms
 
             bulletsShot = new List<Bullet>();
 
-            using (StreamReader sr = new StreamReader(@"info\#global\monsters\"+Type.ToString()+".bulletinfo"))
+            using (StreamReader sr = new StreamReader(@"info\#global\monsters\" + Type.ToString() + ".bulletinfo"))
             {
-                List<string> input = sr.ReadToEnd().Split('\n').ToList();
+                List<string> inp = sr.ReadToEnd().Split('\n').ToList();
 
-                int count = Int32.Parse(input[0]);
-                AttackDelay = Int32.Parse(input[1]);
+                int count = Int32.Parse(inp[0]);
+
+                int delayCount = Int32.Parse(inp[1]);
+
+                for (int i = 0; i < delayCount; i++)
+                    AttackDelays.Add(Int32.Parse(inp[i + 2]));
 
                 for (int i = 0; i < count; i++)
                 {
-                    bulletsShot.Add(new Bullet(contentManager, double.Parse(input[i * 6 + 2]), 0, 0, 0,
-                        Int32.Parse(input[i * 6 + 3]), Int32.Parse(input[i * 6 + 4]), this, double.Parse(input[i * 6 + 5]),
-                        double.Parse(input[i * 6 + 6]), int.Parse(input[i*6+7])));
+                    bulletsShot.Add(new Bullet(contentManager, double.Parse(inp[i * 6 + 2 + delayCount]), 0, 0, 0,
+                        Int32.Parse(inp[i * 6 + 3 + delayCount]), Int32.Parse(inp[i * 6 + 4 + delayCount]),
+                        this, double.Parse(inp[i * 6 + 5 + delayCount]),
+                        double.Parse(inp[i * 6 + 6 + delayCount]), int.Parse(inp[i * 6 + 7 + delayCount])));
                 }
             }
 
@@ -108,13 +114,18 @@ namespace Rooms
                 List<string> inp = sr.ReadToEnd().Split('\n').ToList();
 
                 int count = Int32.Parse(inp[0]);
-                AttackDelay = Int32.Parse(inp[1]); 
+
+                int delayCount = Int32.Parse(inp[1]);
+
+                for (int i = 0; i < delayCount; i++)
+                    AttackDelays.Add(Int32.Parse(inp[i + 2]));
 
                 for (int i = 0; i < count; i++)
                 {
-                    bulletsShot.Add(new Bullet(contentManager, double.Parse(inp[i * 6 + 2]), 0, 0, 0,
-                        Int32.Parse(inp[i * 6 + 3]), Int32.Parse(inp[i * 6 + 4]), this, double.Parse(inp[i * 6 + 5]),
-                        double.Parse(inp[i * 6 + 6]), int.Parse(inp[i * 6 + 7])));
+                    bulletsShot.Add(new Bullet(contentManager, double.Parse(inp[i * 6 + 2+delayCount]), 0, 0, 0,
+                        Int32.Parse(inp[i * 6 + 3 + delayCount]), Int32.Parse(inp[i * 6 + 4 + delayCount]), 
+                        this, double.Parse(inp[i * 6 + 5 + delayCount]),
+                        double.Parse(inp[i * 6 + 6 + delayCount]), int.Parse(inp[i * 6 + 7 + delayCount])));
                 }
             }
 
@@ -170,14 +181,13 @@ namespace Rooms
                     (int)Math.Round(Z));
                 }
 
-                if (lineCleared && TimeSinceLastAttack >= AttackDelay)
+                if (lineCleared && TimeSinceLastAttack >= AttackDelays[currentDelay])
                 {
                     if (!LineClearedP)
                     {
                         //dtc stands for detect
                         Action = "dtc";
                     }
-
 
                     if (Action != "dtc" && Action != "at" && Action != "di")
                     {
@@ -186,7 +196,12 @@ namespace Rooms
                         double dir = GameWorld.GetDirection(X, Y,
                             gameWorld.currentRoom.heroReference.X, gameWorld.currentRoom.heroReference.Y);
 
+                        Direction = (float)dir;
+
                         Action = "at";
+
+                        currentDelay++;
+                        currentDelay %= AttackDelays.Count;
 
                         foreach (var currentBullet in bulletsShot)
                         {

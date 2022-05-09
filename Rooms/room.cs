@@ -269,7 +269,7 @@ namespace Rooms
                     }
                 }
 
-                mCount = rnd.Next(0, 6);
+                mCount = rnd.Next(0, 4);
                 current = 0;
 
                 while (current < mCount)
@@ -307,8 +307,7 @@ namespace Rooms
 
                     if (prob < 33)
                     {
-                        newBlocks.AddRange(PlaceMountain(contentManager, groundBlocks[ci].Item1, groundBlocks[ci].Item2,
-                            3, 4, 0, 18));
+                        PlaceMountain(contentManager, groundBlocks[ci].Item1, groundBlocks[ci].Item2, 3, 4, 0, 18);
 
                         newBlocks.AddRange(PlaceMountain(contentManager, groundBlocks[ci].Item1, groundBlocks[ci].Item2,
                                 1, 4, 0, 0));
@@ -318,8 +317,7 @@ namespace Rooms
                     }
                     else if (prob < 66)
                     {
-                        newBlocks.AddRange(PlaceMountain(contentManager, groundBlocks[ci].Item1, groundBlocks[ci].Item2,
-                            3, 4, 0, 18));
+                        PlaceMountain(contentManager, groundBlocks[ci].Item1, groundBlocks[ci].Item2, 3, 4, 0, 18);
 
                         newBlocks.AddRange(PlaceMountain(contentManager, groundBlocks[ci].Item1, groundBlocks[ci].Item2,
                                 1, 4, 0, 0));
@@ -336,6 +334,29 @@ namespace Rooms
                 }
 
                 groundBlocks.AddRange(newBlocks);
+                
+                int mCount = rnd.Next(4, 15);
+                int current = 0;
+
+                while (current < mCount)
+                {
+                    int xmb = rnd.Next(0, roomSize);
+                    int ymb = rnd.Next(0, roomSize);
+
+                    if (blocks[xmb, ymb, 0].Rigid)
+                    {
+                        current++;
+
+                        int zmb = 1;
+
+                        while (blocks[xmb, ymb, zmb].Rigid)
+                        {
+                            zmb++;
+                        }
+
+                        AddMob(new NPC(contentManager, gameWorld, xmb, ymb, zmb, 22, 0.091, 1, 1));
+                    }
+                }
             }
 
             //collision map
