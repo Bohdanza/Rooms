@@ -307,13 +307,24 @@ namespace Rooms
 
                     if (prob < 33)
                     {
-                        PlaceMountain(contentManager, groundBlocks[ci].Item1, groundBlocks[ci].Item2, 3, 4, 0, 18);
+                        var mplace = PlaceMountain(contentManager, groundBlocks[ci].Item1, groundBlocks[ci].Item2,
+                                1, 4, 0, 0);
 
-                        newBlocks.AddRange(PlaceMountain(contentManager, groundBlocks[ci].Item1, groundBlocks[ci].Item2,
-                                1, 4, 0, 0));
+                        newBlocks.AddRange(mplace);
 
-                        AddMob(new Decoration(contentManager, groundBlocks[ci].Item1, groundBlocks[ci].Item2 + 3,
-                            1, 13));
+                        int rootCount = rnd.Next(4, 11);
+
+                        for (int j = 0; j < rootCount; j++)
+                        {
+                            int ct = rnd.Next(0, mplace.Count);
+
+                            AddMob(new Decoration(contentManager, mplace[ct].Item1, mplace[ct].Item2,
+                                1, 10));
+
+                            PlaceMountain(contentManager, mplace[ct].Item1, mplace[ct].Item2, 7, 1, 0, 18);
+
+                            mplace.RemoveAt(ct);
+                        }
                     }
                     else if (prob < 66)
                     {
