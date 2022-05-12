@@ -88,6 +88,14 @@ namespace Rooms
                 y - Textures[TextureNumber].Height), null, Color.White, 0, new Vector2(0,0), 1f, spriteEffects, 0);
         }
 
+        public virtual void DrawShadow(SpriteBatch spriteBatch, int x, int y)
+        {
+            spriteBatch.Draw(Textures[TextureNumber],
+                new Vector2(x - Textures[TextureNumber].Width / 2,
+                y), null, new Color(0, 0, 0, 128), (float)Math.PI, new Vector2(Textures[TextureNumber].Width, Textures[TextureNumber].Height),
+                new Vector2(1f, 1.5f), SpriteEffects.None, 0);
+        }
+
         public virtual void Update(ContentManager contentManager, GameWorld gameWorld)
         {
             TimeSinceLastTextureUpdate++;

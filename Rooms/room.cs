@@ -481,6 +481,20 @@ namespace Rooms
                 }
             }
 
+            for (currentMob = 0; currentMob < mobs.Count; currentMob++)
+            {
+                int YDelay = 0;
+
+                if (!mobs[currentMob].Flying
+                    && (int)Math.Round(mobs[currentMob].X) < roomSize && (int)Math.Round(mobs[currentMob].X) > 0)
+                {
+                    YDelay = -(int)(mobs[currentMob].Z * GameWorld.BlockSizeZ);
+                }
+
+                mobs[currentMob].DrawShadow(spriteBatch, x + (int)(mobs[currentMob].X * GameWorld.BlockSizeX),
+                    y + (int)(mobs[currentMob].Y * GameWorld.BlockSizeY) + YDelay);
+            }
+
             foreach (var currentMobInterface in mobsWithInterface)
             {
                 currentMobInterface.DrawInterface(spriteBatch);

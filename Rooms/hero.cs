@@ -33,7 +33,7 @@ namespace Rooms
 
             Speed = 0.12;
 
-            base.Radius = 0.4;
+            base.Radius = 0.3;
 
             HP = 1;
 
@@ -71,7 +71,7 @@ namespace Rooms
                     cstr++;
             }
 
-            base.Radius = 0.4;
+            base.Radius = 0.3;
 
             updateTexture(contentManager, true);
         }
