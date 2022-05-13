@@ -99,7 +99,7 @@ namespace Rooms
                 meAndOwner.Add(this);
                 meAndOwner.Add(Owner);
 
-                Types.Add("Monster");
+                Types.Add("NPC");
                 Types.Add("Hero");
 
                 Mob clst = gameWorld.currentRoom.GetClosestMob(X, Y, meAndOwner, Types);

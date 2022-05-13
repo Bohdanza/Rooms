@@ -92,7 +92,7 @@ namespace Rooms
         {
             spriteBatch.Draw(Textures[TextureNumber],
                 new Vector2(x - Textures[TextureNumber].Width / 2,
-                y), null, new Color(0, 0, 0, 128), (float)Math.PI, new Vector2(Textures[TextureNumber].Width, Textures[TextureNumber].Height),
+                y), null, new Color(0, 0, 0, 50), (float)Math.PI, new Vector2(Textures[TextureNumber].Width, Textures[TextureNumber].Height),
                 new Vector2(1f, 1.5f), SpriteEffects.None, 0);
         }
 

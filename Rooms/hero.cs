@@ -261,20 +261,17 @@ namespace Rooms
 
                     gameWorld.currentRoom.AddMob(kck);
 
-                    foreach (var currentMob in gameWorld.currentRoom.mobs)
+                    foreach (var currentMob in gameWorld.currentRoom.MobsByTypes["NPC"])
                     {
-                        if (currentMob.SaveList().StartsWith("NPC"))
+                        double dist = GameWorld.GetDist(X, Y, currentMob.X, currentMob.Y);
+
+                        if (dist <= Radius + currentMob.Radius + 2.5)
                         {
-                            double dist = GameWorld.GetDist(X, Y, currentMob.X, currentMob.Y);
+                            double directionToMob = Math.Atan2(Y - currentMob.Y, X - currentMob.X);
 
-                            if (dist <= Radius + currentMob.Radius + 2.5)
+                            if (Math.Abs(directionToMouse - directionToMob) <= 2.7)
                             {
-                                double directionToMob = Math.Atan2(Y - currentMob.Y, X - currentMob.X);
-
-                                if (Math.Abs(directionToMouse - directionToMob) <= 2.7)
-                                {
-                                    ((NPC)currentMob).Damage(contentManager, gameWorld, 1);
-                                }
+                                ((NPC)currentMob).Damage(contentManager, gameWorld, 1);
                             }
                         }
                     }

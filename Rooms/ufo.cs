@@ -13,13 +13,29 @@ using System.Reflection;
 
 namespace Rooms
 {
-    public class UFO:Mob
+    public class UFO:Item
     {
         public string Action { get; protected set; }
+        public double FlyHight { get; protected set; }
+        protected double ZMove { get; set; }
 
-        public UFO(ContentManager contentManager, double X, double Y, double Z, double Speed)
+        public UFO(ContentManager contentManager, double x, double y, double z, int type, double speed)
         {
-            
+            ZMove = 0.12;
+
+            Speed = speed;
+
+            ChangeCoords(x, y, z);
+
+            Type = type;
+
+            Speed = speed;
+
+            Action = "id";
+
+            updateTexture(contentManager, true);
         }
+
+       
     }
 }

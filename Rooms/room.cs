@@ -29,6 +29,7 @@ namespace Rooms
 
         private List<int> markedMobs { get; set; } = new List<int>();
         public List<Mob> mobsWithInterface { get; protected set; }
+        public Dictionary<string, List<Mob>> MobsByTypes { get; protected set; } = new Dictionary<string, List<Mob>>();
 
         public Room(ContentManager contentManager, int x, int y, GameWorld gameWorld, Hero heroMoved)
         {
@@ -323,7 +324,7 @@ namespace Rooms
                         else
                             tmptype = rnd.Next(14, 17);
 
-                        AddMob(new Decoration(contentManager, xmb + 0.5, ymb + 0.5, zmb, tmptype));
+                        AddMob(new Decoration(contentManager, xmb, ymb, zmb, tmptype));
                     }
                 }
             }
@@ -641,6 +642,13 @@ namespace Rooms
             DeleteMarked();
 
             mobs.Sort((a, b) => a.Y.CompareTo(b.Y));
+
+            string key = mob.SaveList().Split('\n')[0];
+
+            if (!MobsByTypes.ContainsKey(key))
+                MobsByTypes.Add(key, new List<Mob>());
+
+            MobsByTypes[key].Add(mob);
         }
 
         /// <summary>
@@ -682,22 +690,25 @@ namespace Rooms
             double cdist = 1e9;
             Mob closestMob = null;
 
-            for (int i = 0; i < mobs.Count; i++)
-            {
-                if (mobs[i] != null)
-                {
-                    double dst = GameWorld.GetDist(x, y, mobs[i].X, mobs[i].Y);
-
-                    if (cdist > dst
-                        && !ignoredMobs.Contains(mobs[i])
-                        && allowedTypes.Any(s => mobs[i].SaveList().StartsWith(s)))
+            for(int q=0; q<allowedTypes.Count; q++)
+                if(MobsByTypes.ContainsKey(allowedTypes[q]))
+                    for (int i = 0; i < MobsByTypes[allowedTypes[q]].Count; i++)
                     {
-                        cdist = dst;
+                        if (MobsByTypes[allowedTypes[q]][i] != null)
+                        {
+                            double dst = GameWorld.GetDist(x, y, MobsByTypes[allowedTypes[q]][i].X,
+                                MobsByTypes[allowedTypes[q]][i].Y);
 
-                        closestMob = mobs[i];
+                            if (cdist > dst
+                                && !ignoredMobs.Contains(MobsByTypes[allowedTypes[q]][i])
+                                && allowedTypes.Any(s => MobsByTypes[allowedTypes[q]][i].SaveList().StartsWith(s)))
+                            {
+                                cdist = dst;
+
+                                closestMob = MobsByTypes[allowedTypes[q]][i];
+                            }
+                        }
                     }
-                }
-            }
 
             return closestMob;
         }
