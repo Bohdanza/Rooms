@@ -291,6 +291,41 @@ namespace Rooms
                         AddMob(new NPC(contentManager, gameWorld, xmb, ymb, zmb, 11, 0.085, 1, 1));
                     }
                 }
+
+                mCount = rnd.Next(6, 20);
+                current = 0;
+
+                while (current < mCount)
+                {
+                    int xmb = rnd.Next(0, roomSize);
+                    int ymb = rnd.Next(0, roomSize);
+
+                    if (blocks[xmb, ymb, 0].Rigid)
+                    {
+                        current++;
+
+                        int zmb = 1;
+
+                        while (blocks[xmb, ymb, zmb].Rigid)
+                        {
+                            zmb++;
+                        }
+
+                        int tmptype = 0;
+                        prob = rnd.Next(0, 100);
+
+                        if (prob < 16)
+                            tmptype = 10;
+                        else if (prob < 33)
+                            tmptype = 8;
+                        else if (prob < 50)
+                            tmptype = 13;
+                        else
+                            tmptype = rnd.Next(14, 17);
+
+                        AddMob(new Decoration(contentManager, xmb + 0.5, ymb + 0.5, zmb, tmptype));
+                    }
+                }
             }
 
             if (biome == 0)

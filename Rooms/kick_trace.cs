@@ -47,6 +47,11 @@ namespace Rooms
                 null, Color.White, (float)Direction, new Vector2(0, Textures[TextureNumber].Height / 2), 1f, SpriteEffects.None, 0);
         }
 
+        public override void DrawShadow(SpriteBatch spriteBatch, int x, int y)
+        {
+            //NOPE
+        }
+
         public override void Update(ContentManager contentManager, GameWorld gameWorld)
         {
             timeLived++;

@@ -1095,18 +1095,6 @@
 /processorParam:TextureFormat=Color
 /build:mob_11_4_di.png
 
-#begin mob_12_0_id.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:mob_12_0_id.png
-
 #begin mob_13_0.png
 /importer:TextureImporter
 /processor:TextureProcessor
