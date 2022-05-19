@@ -32,6 +32,7 @@ namespace Rooms
         //   public Room rightRoom { get; protected set; }
 
         private Texture2D background;
+        private Texture2D fogTexture;
 
         public GameWorld(ContentManager contentManager, string name)
         {
@@ -60,6 +61,7 @@ namespace Rooms
             //loading all static things, most of them used for drawing
             CursorTexture = contentManager.Load<Texture2D>("mouse_cursor");
             background = contentManager.Load<Texture2D>("background");
+            fogTexture = contentManager.Load<Texture2D>("darkness");
 
             MainFont = contentManager.Load<SpriteFont>("main_font_28s");
 
@@ -71,6 +73,8 @@ namespace Rooms
             spriteBatch.Draw(background, new Vector2(0, 0), Color.White);
 
             currentRoom.Draw(spriteBatch, DrawX, DrawY);
+
+            spriteBatch.Draw(fogTexture, new Vector2(0, 0), Color.White);
 
             var ms = Mouse.GetState();
             var mousePosition = currentRoom.GetMouseCordinates(this);

@@ -258,10 +258,11 @@ namespace Rooms
 
                     Mob kck = new KickTrace(contentManager, X, Y + 4.5, Z, 6, 0, directionToMouse + Math.PI, 21, gameWorld);
                     kck.Move(0.2, directionToMouse + Math.PI, gameWorld);
-
+                    
                     gameWorld.currentRoom.AddMob(kck);
+                    var npcs = gameWorld.currentRoom.MobsByTypes["NPC"];
 
-                    foreach (var currentMob in gameWorld.currentRoom.MobsByTypes["NPC"])
+                    foreach (var currentMob in npcs)
                     {
                         double dist = GameWorld.GetDist(X, Y, currentMob.X, currentMob.Y);
 

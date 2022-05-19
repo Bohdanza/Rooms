@@ -315,14 +315,12 @@ namespace Rooms
                         int tmptype = 0;
                         prob = rnd.Next(0, 100);
 
-                        if (prob < 16)
+                        if (prob < 15)
                             tmptype = 10;
-                        else if (prob < 33)
+                        else if (prob < 30)
                             tmptype = 8;
-                        else if (prob < 50)
-                            tmptype = 13;
                         else
-                            tmptype = rnd.Next(14, 17);
+                            tmptype = rnd.Next(12, 17);
 
                         AddMob(new Decoration(contentManager, xmb, ymb, zmb, tmptype));
                     }
