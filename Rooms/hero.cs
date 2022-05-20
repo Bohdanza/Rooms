@@ -24,6 +24,8 @@ namespace Rooms
         public int HP { get; protected set; }
         private double Direction=0;
         private bool putOn = false;
+        private int FlyEnergy = 0;
+        private bool prevC = false;
 
         public Hero(ContentManager contentManager, double x, double y, double z, int type, GameWorld gameWorld)
         {
@@ -130,7 +132,7 @@ namespace Rooms
             double realSpeed = (double)Speed / (WeightToCarry*0.5 + 1);
             var ks = Keyboard.GetState();
 
-            if (Action != "di")
+            if (Action != "di" && Action != "fly")
             {
                 if (Action != "at1" && Action != "put" && Action != "di")
                     Action = "id";
@@ -318,9 +320,37 @@ namespace Rooms
 
                     Move(realSpeed, Direction, gameWorld);
                 }
+
+                if (Action != "at1" && ks.IsKeyDown(Keys.C))
+                {
+                    Action = "focus";
+
+                    FlyEnergy++;
+                }
+                else if (Action != "at1" && prevC)
+                {
+                    if (FlyEnergy >= 120)
+                    {
+                        Action = "fly";
+                    }
+                    else
+                        FlyEnergy = 0;
+                }
             }
 
-            UpdateGravitation(gameWorld);
+            prevC = ks.IsKeyDown(Keys.C);
+
+            if(Action=="fly")
+            {
+                bool mtz = !Move(Speed * 2, Direction, gameWorld);
+
+                if (X > 0 && Y > 0 && X < Room.roomSize && Y < Room.roomSize && mtz)
+                {
+                    Action = "id";
+                }
+            }
+            else
+                UpdateGravitation(gameWorld);
 
             TimeSinceLastTextureUpdate++;
 

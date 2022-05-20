@@ -75,7 +75,7 @@ namespace Rooms
             currentRoom.Draw(spriteBatch, DrawX, DrawY);
 
             spriteBatch.Draw(fogTexture, new Vector2(0, 0), Color.White);
-
+                
             var ms = Mouse.GetState();
             var mousePosition = currentRoom.GetMouseCordinates(this);
 

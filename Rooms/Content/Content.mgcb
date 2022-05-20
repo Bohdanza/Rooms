@@ -387,6 +387,30 @@
 /processorParam:TextureFormat=Color
 /build:mob_0_0_dm.png
 
+#begin mob_0_0_fly.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:mob_0_0_fly.png
+
+#begin mob_0_0_focus.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:mob_0_0_focus.png
+
 #begin mob_0_0_id.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -458,6 +482,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:mob_0_1_dm.png
+
+#begin mob_0_1_fly.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:mob_0_1_fly.png
 
 #begin mob_0_1_id.png
 /importer:TextureImporter

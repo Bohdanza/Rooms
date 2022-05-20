@@ -394,7 +394,7 @@ namespace Rooms
 
                         int zmb = 1;
 
-                        while (blocks[xmb, ymb, zmb].Rigid)
+                        //while (zmb < roomSizeZ && blocks[xmb, ymb, zmb].Rigid)
                         {
                             zmb++;
                         }
@@ -812,6 +812,9 @@ namespace Rooms
 
         public bool LineIsClear(int x1, int y1, int x2, int y2, int z)
         {
+            if (x1 < 0 || y1 < 0 || x2 < 0 || y2 < 0 || x1 >= roomSize || y1 >= roomSize || x2 >= roomSize || y2 >= roomSize)
+                return false;
+
             double xstep = x2 - x1, ystep = y2 - y1;
 
             if (Math.Abs(xstep) > Math.Abs(ystep))
